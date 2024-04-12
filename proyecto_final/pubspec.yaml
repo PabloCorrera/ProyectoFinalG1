@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  cloud_firestore: ^3.1.0  # Agregamos la dependencia de cloud_firestore
   go_router: ^13.2.4
 
 dev_dependencies:
