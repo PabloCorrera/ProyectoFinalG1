@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "927976205488",
+    "project_id": "wepark-9879c",
+    "storage_bucket": "wepark-9879c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:927976205488:android:0fccef1485bfa48a39df75",
+        "android_client_info": {
+          "package_name": "com.example.proyecto_final"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBW0CVawjbPCH3Hj5cWC4DveDJPMa3Ck8g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

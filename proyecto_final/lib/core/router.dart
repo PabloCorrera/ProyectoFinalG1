@@ -1,4 +1,4 @@
-import 'package:proyecto_final/home/login_screen.dart';
+import 'package:proyecto_final/pages/login_screen.dart';
 import 'package:go_router/go_router.dart';
 
 final appRouter = GoRouter(routes: [
