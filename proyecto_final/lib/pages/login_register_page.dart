@@ -43,6 +43,9 @@ class _LoginPageState extends State<LoginPage>{
  Future<void> signInWithGoogle() async{
       try {
         await Auth().signInWithGoogle();
+        if (context.mounted){
+              context.pushNamed(HomePage.name);
+           }
       }  catch (e){
         setState(() {
           errorMessage = "error $e";
@@ -126,7 +129,7 @@ class _LoginPageState extends State<LoginPage>{
         color: Colors.red,
         borderRadius: BorderRadius.circular(10)
       ),
-      child: TextButton(onPressed: _signInWithGoogle,
+      child: TextButton(onPressed: signInWithGoogle,
      child: const Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -163,6 +166,8 @@ class _LoginPageState extends State<LoginPage>{
               _entryField('Contraseña', _controllerPassword),
               _errorMessage(),
               _submitButton(),
+              SizedBox(height: 5,),
+              _signInWithGoogle(),
               _loginOrRegisterButton(),
               
               ],
