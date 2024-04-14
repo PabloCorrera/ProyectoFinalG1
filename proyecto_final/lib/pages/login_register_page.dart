@@ -1,10 +1,13 @@
+import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:proyecto_final/auth.dart';
+import 'package:proyecto_final/pages/home_page.dart';
 
 class LoginPage extends StatefulWidget{
+  static const String name = 'LoginPage';
   
   const LoginPage ({Key? key}) : super(key: key);
   
@@ -26,6 +29,10 @@ class _LoginPageState extends State<LoginPage>{
           email: _controllerEmail.text,
            password: _controllerPassword.text
            );
+           if (context.mounted){
+              context.pushNamed(HomePage.name);
+           }
+           
       } on FirebaseAuthException catch (e){
         setState(() {
           errorMessage = e.message;
@@ -66,6 +73,7 @@ class _LoginPageState extends State<LoginPage>{
   ){
     return TextField(
       controller: controller,
+      obscureText: title == "Contraseña" ? true : false,
       decoration: InputDecoration(
         labelText: title,
       ),
@@ -77,9 +85,27 @@ class _LoginPageState extends State<LoginPage>{
   }
 
   Widget _submitButton(){
-    return ElevatedButton(onPressed: isLogin ? signInWithEmailAndPassword : createUserWithEmailAndPassword,
-     child: Text(isLogin ? 'Login' : 'Register')
-     );
+    return Container(
+      width: double.infinity,
+      height: 45,
+      decoration: BoxDecoration(
+        color: Colors.blue,
+        borderRadius: BorderRadius.circular(10)
+      ),
+      child: TextButton(onPressed: isLogin ? signInWithEmailAndPassword : createUserWithEmailAndPassword,
+       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+         children: [
+           Text(isLogin ? 'Login' : 'Register',
+           style: TextStyle(
+            color:Colors.white),
+            ),
+            SizedBox(width: 5,),
+            Icon(FontAwesomeIcons.car, color: Colors.white,)
+         ],
+       )
+       ),
+    );
   }
 
   Widget _loginOrRegisterButton(){
@@ -133,11 +159,10 @@ class _LoginPageState extends State<LoginPage>{
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              _entryField('email', _controllerEmail),
-              _entryField('password', _controllerPassword),
+              _entryField('Email', _controllerEmail),
+              _entryField('Contraseña', _controllerPassword),
               _errorMessage(),
               _submitButton(),
-              _signInWithGoogle(),
               _loginOrRegisterButton(),
               
               ],
