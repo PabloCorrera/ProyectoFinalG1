@@ -59,6 +59,9 @@ class _LoginPageState extends State<LoginPage>{
         email: _controllerEmail.text,
         password: _controllerPassword.text
         );
+        if (context.mounted){
+              context.pushNamed(HomePage.name);
+           }
     } on FirebaseAuthException catch (e){
         setState(() {
           errorMessage = e.message;
