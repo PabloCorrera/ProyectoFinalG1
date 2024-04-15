@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:proyecto_final/auth.dart';
+import 'package:proyecto_final/pages/garage_register.dart';
 import 'package:proyecto_final/pages/login_register_page.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:proyecto_final/pages/user_register.dart';
 
 class HomePage extends StatefulWidget{
 static const String name = 'HomePage';
@@ -47,7 +49,10 @@ static const String name = 'HomePage';
         color: Colors.blue,
         borderRadius: BorderRadius.circular(10)
       ),
-      child: TextButton(onPressed: ()=>{},
+      child: TextButton(onPressed: ()=>{
+        context.pushNamed(UserRegister.name)
+
+      },
      child: const Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -70,7 +75,11 @@ static const String name = 'HomePage';
         color: Colors.blue,
         borderRadius: BorderRadius.circular(10)
       ),
-      child: TextButton(onPressed: ()=>{},
+      child: TextButton(onPressed: (
+  
+      )=>{
+        context.pushNamed(GarageRegister.name)
+      },
      child: const Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
