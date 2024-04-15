@@ -30,7 +30,7 @@ class GarageRegister extends StatelessWidget {
 
   Widget _title () {
     return const Text (
-      'Registro de Usuario',
+      'Registro de Cochera',
       style: TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.bold,
