@@ -148,7 +148,6 @@ class _LoginPageState extends State<LoginPage>{
     } else {
       return Container();
     } 
-     
   }
 
   @override
@@ -169,7 +168,7 @@ class _LoginPageState extends State<LoginPage>{
               _entryField('Contraseña', _controllerPassword),
               _errorMessage(),
               _submitButton(),
-              SizedBox(height: 5,),
+              const SizedBox(height: 5,),
               _signInWithGoogle(),
               _loginOrRegisterButton(),
               
