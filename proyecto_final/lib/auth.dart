@@ -1,6 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+// USUARIO wepark2606@gmail.com
+// CONTRASEÑA aguanteboca
+
 class Auth{
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
