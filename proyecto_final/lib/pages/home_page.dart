@@ -75,9 +75,7 @@ static const String name = 'HomePage';
         color: Colors.blue,
         borderRadius: BorderRadius.circular(10)
       ),
-      child: TextButton(onPressed: (
-  
-      )=>{
+      child: TextButton(onPressed: ()=>{
         context.pushNamed(GarageRegister.name)
       },
      child: const Row(

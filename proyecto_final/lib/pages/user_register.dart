@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_final/auth.dart';
+import 'package:proyecto_final/entities/user.dart';
 
 class UserRegister extends StatelessWidget {
   UserRegister({Key? key}) : super(key: key);
@@ -7,6 +9,7 @@ class UserRegister extends StatelessWidget {
   final TextEditingController _controllerName = TextEditingController();
   final TextEditingController _controllerSurname = TextEditingController();
   String? errorMessage = '';
+
 
   Widget _submitButton() {
     return ElevatedButton(
