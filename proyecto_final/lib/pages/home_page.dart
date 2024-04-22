@@ -28,7 +28,7 @@ static const String name = 'HomePage';
   }
 
   Widget _title(){
-    return const Text('Firebase Auth');
+    return const Text('Bienvenido a We Park');
   }
 
   Widget _userUid(){

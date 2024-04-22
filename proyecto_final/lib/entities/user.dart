@@ -1,5 +1,4 @@
 import 'cochera.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class User {
   late String userId;

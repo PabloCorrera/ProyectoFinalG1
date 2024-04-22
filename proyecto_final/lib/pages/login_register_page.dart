@@ -70,7 +70,7 @@ class _LoginPageState extends State<LoginPage>{
   }
 
     Widget _title(){
-    return const Text('Firebase Auth');
+    return const Text('Bienvenido a We Park');
   }
 
   Widget _entryField(
