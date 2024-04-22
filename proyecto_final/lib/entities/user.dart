@@ -7,7 +7,7 @@ class User {
   late String userId;
   late String nombre;
   late String apellido;
-  late String email;
+  late String? email;
   late List<Cochera> cocheras;
   late String urlImage;
   late String reservaInReservada;
