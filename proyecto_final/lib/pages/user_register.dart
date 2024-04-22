@@ -11,7 +11,6 @@ class UserRegister extends StatelessWidget {
   final DatabaseService _databaseService = DatabaseService();
   final TextEditingController _controllerName = TextEditingController();
   final TextEditingController _controllerSurname = TextEditingController();
-  final TextEditingController _userMail = TextEditingController();
   String? userMail = FirebaseAuth.FirebaseAuth.instance.currentUser?.email;
 
   String? errorMessage = '';
@@ -43,7 +42,7 @@ class UserRegister extends StatelessWidget {
         User user = User(
           nombre: _controllerName.text,
           apellido: _controllerSurname.text,
-          email: _userMail.text,
+          email: userMail,
         );
         _databaseService.addUsuario(user);
       },
