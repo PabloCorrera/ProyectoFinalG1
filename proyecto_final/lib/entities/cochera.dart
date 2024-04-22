@@ -27,8 +27,58 @@ class Cochera {
     List<Reserva>? reservas,
   }) : reservas = reservas ?? [];
 
+
+
+
+   Cochera copyWith({
+    String? nombre,
+    String? direccion,
+    double? lat,
+    double? lng,
+    double? price,
+    String? urlImage,
+    String? owner ,
+    String? ownerName,
+    String? descripcion,
+    List<Reserva>? reservas,
+  }) {
+    return Cochera(
+        nombre: nombre ?? this.nombre,
+        direccion: direccion ?? this.direccion,
+        lat: lat ?? this.lat,
+        lng: lng ?? this.lng,
+        price: price ?? this.price,
+        urlImage: urlImage ?? this.urlImage,
+        owner: owner ?? this.owner,
+        ownerName: ownerName ?? this.ownerName,
+        descripcion: descripcion ?? this.descripcion,
+        reservas: reservas ?? this.reservas,
+       
+    );
+  }
+
+  Map<String, Object?> toJson() {
+    return {
+      'nombre': nombre,
+      'direccion': direccion,
+      'lat': lat,
+      'lng': lng,
+      'price': price,
+      'urlImage': urlImage,
+      'owner': owner,
+      'ownerName': ownerName,
+      'descripcion': descripcion,
+      'reservas': reservas,
+      
+    };
+  }
+
  
   void addReserva(Reserva reserva) {
     reservas.add(reserva);
   }
+
+
+
+
 }
