@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as FirebaseAuth;
 import 'package:flutter/material.dart';
 import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/entities/user.dart';
@@ -11,7 +11,7 @@ class UserRegister extends StatelessWidget {
   final DatabaseService _databaseService = DatabaseService();
   final TextEditingController _controllerName = TextEditingController();
   final TextEditingController _controllerSurname = TextEditingController();
-  String userMail = FirebaseAuth.instance.currentUser.email;
+  String? userMail = FirebaseAuth.FirebaseAuth.instance.currentUser?.email;
 
   String? errorMessage = '';
 
@@ -24,6 +24,7 @@ class UserRegister extends StatelessWidget {
       ),
     );
   }
+
 
   Widget _title() {
     return const Text(
@@ -41,7 +42,7 @@ class UserRegister extends StatelessWidget {
         User user = User(
           nombre: _controllerName.text,
           apellido: _controllerSurname.text,
-          email: _email,
+          email: userMail,
         );
         _databaseService.addUser(user);
       },
@@ -60,6 +61,8 @@ class UserRegister extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+ 
+
     return Scaffold(
       appBar: AppBar(
         title: _title(),
@@ -80,7 +83,7 @@ class UserRegister extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'REGISTRO DE USUARIO', // Agregamos el título aquí
+              'REGISTRO DE USUARIO',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
