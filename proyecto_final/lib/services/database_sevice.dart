@@ -21,7 +21,7 @@ class DatabaseService {
     return _usuariosConsumidorRef.snapshots();
   }
 
-  void addUsuario(User user) async {
+  void addUser(User user) async {
     _usuariosConsumidorRef.add(user);
   }
 }
