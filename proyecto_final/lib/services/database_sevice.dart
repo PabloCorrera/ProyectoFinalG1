@@ -1,18 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:proyecto_final/entities/user.dart';
-
 
 const String USUARIO_CONSUMIDOR = "usuarioConsumidor";
 
 class DatabaseService {
-
-
-final _firesore = FirebaseFirestore.instance;
-
-late final CollectionReference _usersRef;
-
-
 
   final _firestore = FirebaseFirestore.instance;
 
