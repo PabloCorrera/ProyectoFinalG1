@@ -36,6 +36,7 @@ class UserRegister extends StatelessWidget {
     );
   }
 
+<<<<<<< HEAD
  Widget _submitButton(BuildContext context) {
   return ElevatedButton(
     onPressed: () {
@@ -72,6 +73,21 @@ class UserRegister extends StatelessWidget {
     child: Text('Confirmar'),
   );
 }
+=======
+  Widget _submitButton() {
+    return ElevatedButton(
+      onPressed: () {
+        User user = User(
+          nombre: _controllerName.text,
+          apellido: _controllerSurname.text,
+          email: userMail,
+        );
+        _databaseService.addUser(user);
+      },
+      child: Text('Confirmar'),
+    );
+  }
+>>>>>>> b7435a06f81ef411e8e2028fe231390c65e55611
 
   Widget _errorMessage() {
     return Text(

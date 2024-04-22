@@ -1,18 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:proyecto_final/entities/user.dart';
-
 
 const String USUARIO_CONSUMIDOR = "usuarioConsumidor";
 
 class DatabaseService {
-
-
-final _firesore = FirebaseFirestore.instance;
-
-late final CollectionReference _usersRef;
-
-
 
   final _firestore = FirebaseFirestore.instance;
 
@@ -31,7 +22,7 @@ late final CollectionReference _usersRef;
     return _usuariosConsumidorRef.snapshots();
   }
 
-Future<bool> addUsuario(User user) async {
+Future<bool> addUser(User user) async {
   try {
     // Realizar una consulta para verificar si el correo electrónico ya existe
     var query = await _usuariosConsumidorRef
