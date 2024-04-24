@@ -8,8 +8,7 @@ class Cochera {
   late double lng;
   late double price;
   late String urlImage;
-  late String owner;
-  late String ownerName;
+  late String ownerId;
   late String descripcion;
   late List<Reserva> reservas;
 
@@ -21,14 +20,25 @@ class Cochera {
     this.lng = 0.0,
     this.price = 0.0,
     this.urlImage = "",
-    required this.owner,
-    required this.ownerName,
+    required this.ownerId,
     required this.descripcion,
     List<Reserva>? reservas,
   }) : reservas = reservas ?? [];
 
 
+Cochera.fromJson(Map<String, Object?> json)
+      : this(
+          nombre: json['nombre']! as String,
+          direccion: json['direccion']! as String,
+          lat: json['lat']! as double,
+          lng: json['lng']! as double,
+          price: json['price']! as double,
+          urlImage: json['urlImage']! as String,
+          ownerId: json['owner']! as String,
+          descripcion: json['descripcion']! as String,
+          reservas: json['reservas']! as List<Reserva>,
 
+        );
 
    Cochera copyWith({
     String? nombre,
@@ -49,8 +59,7 @@ class Cochera {
         lng: lng ?? this.lng,
         price: price ?? this.price,
         urlImage: urlImage ?? this.urlImage,
-        owner: owner ?? this.owner,
-        ownerName: ownerName ?? this.ownerName,
+        ownerId: owner ?? this.ownerId,
         descripcion: descripcion ?? this.descripcion,
         reservas: reservas ?? this.reservas,
        
@@ -65,8 +74,7 @@ class Cochera {
       'lng': lng,
       'price': price,
       'urlImage': urlImage,
-      'owner': owner,
-      'ownerName': ownerName,
+      'owner': ownerId,
       'descripcion': descripcion,
       'reservas': reservas,
       
