@@ -1,16 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:proyecto_final/entities/cochera.dart';
 
 import 'package:proyecto_final/entities/user.dart';
 
 
 const String USUARIO_CONSUMIDOR = "usuarioConsumidor";
+const String COCHERA = "cochera";
 
 class DatabaseService {
-
 
   final _firestore = FirebaseFirestore.instance;
 
   late final CollectionReference _usuariosConsumidorRef;
+  late final CollectionReference _cocheraRef;
 
   DatabaseService() {
     _usuariosConsumidorRef =
@@ -18,37 +20,31 @@ class DatabaseService {
             fromFirestore: (snapshots, _) => User.fromJson(
                   snapshots.data()!,
                 ),
-            toFirestore: (user, _) => user.toJson());
+            toFirestore: (user, _) => user.toJson(),
+        );
+    _cocheraRef = 
+    _firestore.collection(COCHERA).withConverter<Cochera>(
+      fromFirestore: (snapshots, _) => Cochera.fromJson(
+        snapshots.data()!
+        ),
+        toFirestore: (cochera, _) => cochera.toJson(),
+  );
   }
+
+  
 
   Stream<QuerySnapshot> getUsuarios() {
     return _usuariosConsumidorRef.snapshots();
   }
 
-Future<bool> addUsuario(User user) async {
-  try {
-    // Realizar una consulta para verificar si el correo electrónico ya existe
-    var query = await _usuariosConsumidorRef
-        .where('email', isEqualTo: user.email)
-        .get();
-
-    // Verificar si la consulta devolvió algún documento
-    if (query.docs.isEmpty) {
-      // Si no se encontró ningún documento con el mismo correo electrónico, agregar el usuario
-      await _usuariosConsumidorRef.add(user);
-      return true; // Indicar que el usuario se agregó con éxito
-    } else {
-      // Si se encontró algún documento, el correo electrónico ya existe en la base de datos
-      // Aquí puedes manejar la lógica para mostrar un mensaje de error o realizar otras acciones
-      print('El correo electrónico ya existe en la base de datos');
-      return false; // Indicar que hubo un problema al agregar el usuario
-    }
-  } catch (e) {
-    // Manejar cualquier error que ocurra durante el proceso
-    print('Error al agregar el usuario: $e');
-    return false; // Indicar que hubo un problema al agregar el usuario
+  void addUser(User user) async {
+    _usuariosConsumidorRef.add(user);
   }
-}
+
+    void addCochera(Cochera cochera) async {
+    _cocheraRef.add(cochera);
+  }
+
 
 Future<bool> validarUsuario(String email) async {
   try {
@@ -60,4 +56,7 @@ Future<bool> validarUsuario(String email) async {
   }
 }
 
+
 }
+
+

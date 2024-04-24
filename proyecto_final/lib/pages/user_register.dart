@@ -36,42 +36,19 @@ class UserRegister extends StatelessWidget {
     );
   }
 
- Widget _submitButton(BuildContext context) {
-  return ElevatedButton(
-    onPressed: () {
-      User user = User(
-        nombre: _controllerName.text,
-        apellido: _controllerSurname.text,
-        email: userMail,
-      );
-      _databaseService.addUsuario(user).then((addedSuccessfully) {
-        if (!addedSuccessfully) {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('Error'),
-                content: Text('No se pudo agregar el usuario'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(); // Cerrar la ventana emergente
-                    },
-                    child: Text('OK'),
-                  ),
-                ],
-              );
-            },
-          );
-        }
-      }).catchError((error) {
-        print('Error al agregar el usuario: $error');
-        // Aquí puedes manejar cualquier error que ocurra durante la llamada a addUsuario
-      });
-    },
-    child: Text('Confirmar'),
-  );
-}
+  Widget _submitButton() {
+    return ElevatedButton(
+      onPressed: () {
+        User user = User(
+          nombre: _controllerName.text,
+          apellido: _controllerSurname.text,
+          email: userMail,
+        );
+        _databaseService.addUser(user);
+      },
+      child: Text('Confirmar'),
+    );
+  }
 
   Widget _errorMessage() {
     return Text(
@@ -120,7 +97,7 @@ class UserRegister extends StatelessWidget {
             const SizedBox(height: 20),
             _errorMessage(),
             const SizedBox(height: 20),
-            _submitButton(context),
+            _submitButton(),
           ],
         ),
       ),
