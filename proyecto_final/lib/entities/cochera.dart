@@ -21,11 +21,27 @@ class Cochera {
     this.lng = 0.0,
     this.price = 0.0,
     this.urlImage = "",
-    required this.owner,
+    required this.owner, 
     required this.ownerName,
     required this.descripcion,
     List<Reserva>? reservas,
   }) : reservas = reservas ?? [];
+
+
+    Cochera.fromJson(Map<String, Object?> json)
+      : this(
+          nombre: json['nombre']! as String,
+          direccion: json['direccion']! as String,
+          lat: json['lat']! as double,
+          lng: json['lng']! as double,
+          price: json['price']! as double,
+          urlImage: json['urlImage']! as String,
+          owner: json['owner']! as String,
+          ownerName: json['ownerName']! as String,
+          descripcion: json['descripcion']! as String,
+          reservas: json['reservas']! as List<Reserva>,
+
+        );
 
 
 

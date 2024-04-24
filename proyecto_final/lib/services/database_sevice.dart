@@ -8,12 +8,6 @@ const String USUARIO_CONSUMIDOR = "usuarioConsumidor";
 class DatabaseService {
 
 
-final _firesore = FirebaseFirestore.instance;
-
-late final CollectionReference _usersRef;
-
-
-
   final _firestore = FirebaseFirestore.instance;
 
   late final CollectionReference _usuariosConsumidorRef;
