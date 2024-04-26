@@ -6,6 +6,7 @@ class User {
   late String apellido;
   late String? email;
   late List<Cochera> cocheras;
+  late bool consumidor;
   late String urlImage;
   late String reservaInReservada;
   late String reservaInCheckIn;
