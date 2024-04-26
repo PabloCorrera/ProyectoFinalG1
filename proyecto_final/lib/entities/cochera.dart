@@ -10,6 +10,7 @@ class Cochera {
   late String urlImage;
   late String ownerId;
   late String descripcion;
+  late int cantLugares;
   late List<Reserva> reservas;
 
   Cochera({
@@ -22,6 +23,7 @@ class Cochera {
     this.urlImage = "",
     required this.ownerId,
     required this.descripcion,
+    required this.cantLugares,
     List<Reserva>? reservas,
   }) : reservas = reservas ?? [];
 
@@ -36,6 +38,7 @@ Cochera.fromJson(Map<String, Object?> json)
           urlImage: json['urlImage']! as String,
           ownerId: json['owner']! as String,
           descripcion: json['descripcion']! as String,
+          cantLugares: json['cantLugares']! as int,
           reservas: json['reservas']! as List<Reserva>,
 
         );
@@ -50,6 +53,7 @@ Cochera.fromJson(Map<String, Object?> json)
     String? owner ,
     String? ownerName,
     String? descripcion,
+    int? cantLugares,
     List<Reserva>? reservas,
   }) {
     return Cochera(
@@ -62,6 +66,7 @@ Cochera.fromJson(Map<String, Object?> json)
         ownerId: owner ?? this.ownerId,
         descripcion: descripcion ?? this.descripcion,
         reservas: reservas ?? this.reservas,
+        cantLugares: cantLugares ?? this.cantLugares,
        
     );
   }
@@ -77,6 +82,7 @@ Cochera.fromJson(Map<String, Object?> json)
       'owner': ownerId,
       'descripcion': descripcion,
       'reservas': reservas,
+      'cantLugares': cantLugares
       
     };
   }

@@ -26,8 +26,10 @@ class GarageRegister extends StatelessWidget {
         ownerId: _controllerOwnerId.text,
         descripcion: _description.text,
         direccion: _controllerGarageAdress.text,
+        price: double.parse(_controllerPrice.text),
+        cantLugares: int.parse(_controllerQuantitySpaces.text),
       );
-        // price: _controllerPrice.value);
+       
         _databaseService.addCochera(cochera);
       },
       child: Text('Confirmar'),
@@ -105,8 +107,6 @@ Widget build(BuildContext context) {
                 color: Colors.white, 
               ),
             ),
-            // const SizedBox(height: 20),
-            // _entryField('Nombre', _controllerOwnerId),
             const SizedBox(height: 20),
             _entryField('Nombre Estacionamiento', _controllerGarageName),
             const SizedBox(height: 20),
@@ -115,8 +115,6 @@ Widget build(BuildContext context) {
             _entryField('Direccion', _controllerGarageAdress, ),
             const SizedBox(height: 20),
             _entryFieldNumber('Precio por hora', _controllerPrice),
-            //const SizedBox(height: 20),
-            //_entryField('Tipo del vehiculo', _controllerGarageName),
             const SizedBox(height: 20),
             _entryFieldNumber('Cantidad de lugares', _controllerQuantitySpaces),
             _errorMessage(),
