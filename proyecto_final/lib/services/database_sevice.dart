@@ -1,8 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:proyecto_final/entities/cochera.dart';
-
 import 'package:proyecto_final/entities/user.dart';
-
 
 const String USUARIO_CONSUMIDOR = "usuarioConsumidor";
 const String COCHERA = "cochera";
@@ -37,8 +34,28 @@ class DatabaseService {
     return _usuariosConsumidorRef.snapshots();
   }
 
-  void addUser(User user) async {
-    _usuariosConsumidorRef.add(user);
+Future<bool> addUser(User user) async {
+  try {
+    // Realizar una consulta para verificar si el correo electrónico ya existe
+    var query = await _usuariosConsumidorRef
+        .where('email', isEqualTo: user.email)
+        .get();
+
+    // Verificar si la consulta devolvió algún documento
+    if (query.docs.isEmpty) {
+      // Si no se encontró ningún documento con el mismo correo electrónico, agregar el usuario
+      await _usuariosConsumidorRef.add(user);
+      return true; // Indicar que el usuario se agregó con éxito
+    } else {
+      // Si se encontró algún documento, el correo electrónico ya existe en la base de datos
+      // Aquí puedes manejar la lógica para mostrar un mensaje de error o realizar otras acciones
+      print('El correo electrónico ya existe en la base de datos');
+      return false; // Indicar que hubo un problema al agregar el usuario
+    }
+  } catch (e) {
+    // Manejar cualquier error que ocurra durante el proceso
+    print('Error al agregar el usuario: $e');
+    return false; // Indicar que hubo un problema al agregar el usuario
   }
 
     void addCochera(Cochera cochera) async {
@@ -57,6 +74,28 @@ Future<bool> validarUsuario(String email) async {
 }
 
 
+  void updateUser(String email, String nombre, String apellido) async {
+  // Primero, obtén una referencia al documento del usuario usando su email
+  QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+      .collection('USUARIO_CONSUMIDOR')
+      .where('email', isEqualTo: email)
+      .get();
+
+  // Verifica si se encontró un documento con el email proporcionado
+  if (querySnapshot.docs.isNotEmpty) {
+    // Si se encontró un documento, actualiza sus datos
+    String docId = querySnapshot.docs.first.id;
+    DocumentReference userRef = FirebaseFirestore.instance.collection('USUARIO_CONSUMIDOR').doc(docId);
+
+    // Actualiza el nombre y apellido del usuario
+    await userRef.update({
+      'nombre': nombre,
+      'apellido': apellido,
+    });
+  }
+  }
+
 }
 
 
+}

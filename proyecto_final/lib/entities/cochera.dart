@@ -10,6 +10,7 @@ class Cochera {
   late String urlImage;
   late String ownerId;
   late String descripcion;
+  late int cantLugares;
   late List<Reserva> reservas;
 
   Cochera({
@@ -22,6 +23,7 @@ class Cochera {
     this.urlImage = "",
     required this.ownerId,
     required this.descripcion,
+    required this.cantLugares,
     List<Reserva>? reservas,
   }) : reservas = reservas ?? [];
 
@@ -34,8 +36,9 @@ class Cochera {
           lng: json['lng']! as double,
           price: json['price']! as double,
           urlImage: json['urlImage']! as String,
-          ownerId: json['owner']! as String,
+          ownerId: json['ownerId']! as String,
           descripcion: json['descripcion']! as String,
+          cantLugares: json['cantLugares']! as int,
           reservas: json['reservas']! as List<Reserva>,
 
         );
@@ -47,9 +50,9 @@ class Cochera {
     double? lng,
     double? price,
     String? urlImage,
-    String? owner ,
-    String? ownerName,
+    String? ownerId,
     String? descripcion,
+    int? cantLugares,
     List<Reserva>? reservas,
   }) {
     return Cochera(
@@ -59,9 +62,10 @@ class Cochera {
         lng: lng ?? this.lng,
         price: price ?? this.price,
         urlImage: urlImage ?? this.urlImage,
-        ownerId: owner ?? this.ownerId,
+        ownerId: ownerId ?? this.ownerId,
         descripcion: descripcion ?? this.descripcion,
         reservas: reservas ?? this.reservas,
+        cantLugares: cantLugares ?? this.cantLugares,
        
     );
   }
@@ -74,9 +78,10 @@ class Cochera {
       'lng': lng,
       'price': price,
       'urlImage': urlImage,
-      'owner': ownerId,
+      'ownerId': ownerId,
       'descripcion': descripcion,
       'reservas': reservas,
+      'cantLugares': cantLugares
       
     };
   }
