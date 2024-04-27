@@ -1,12 +1,14 @@
 import 'package:go_router/go_router.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/pages/home_page.dart';
-import 'package:proyecto_final/pages/usuario_home.dart';
-import 'package:proyecto_final/services/database_sevice.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:proyecto_final/services/local_auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+
 
 class LoginPage extends StatefulWidget {
   static const String name = 'LoginPage';
@@ -15,6 +17,7 @@ class LoginPage extends StatefulWidget {
 
   @override
   State<LoginPage> createState() => _LoginPageState();
+  
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -24,25 +27,117 @@ class _LoginPageState extends State<LoginPage> {
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
-  final DatabaseService _databaseService = DatabaseService();
+
+  @override
+  void initState(){
+    super.initState();
+    obtenerCredenciales();
+  }
+  AndroidOptions _getAndroidOptions() => const AndroidOptions(
+        encryptedSharedPreferences: true,
+      );
+
+  Future<void> obtenerCredenciales() async {
+    print("ARRANCA");
+  final storage = FlutterSecureStorage(aOptions: _getAndroidOptions());
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  if(prefs.getBool('usarAutenticacionBiometrica')==true){
+    try {
+        bool isAuthorized = await LocalAuth.authenticate();
+        if (isAuthorized) {
+          String? usuario = await storage.read(key: 'usuario');
+          String? contrasena = await storage.read(key: 'contrasena');
+          if(usuario!=null && contrasena!=null){
+              try {
+      await Auth().signInWithEmailAndPassword(
+          email: usuario, password: contrasena);
+      if (context.mounted) {
+        context.pushNamed(HomePage.name);
+      }
+      
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message;
+      });
+    }
+          }
+        } 
+      
+    
+  } catch (e) {
+    print('Error: $e');
+  }
+  }
+  
+}
+
 
   Future<void> signInWithEmailAndPassword() async {
     try {
       await Auth().signInWithEmailAndPassword(
           email: _controllerEmail.text, password: _controllerPassword.text);
-      bool registrado = await _databaseService.validarUsuario(_controllerEmail.text);
-      if (context.mounted && registrado) {
-        context.pushNamed(UsuarioHome.name);
-      } else {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          if(prefs.getBool('usarAutenticacionBiometrica') == null){
+            print("NO TIENE");
+            bool? usarAutenticacionBiometrica = await _mostrarDialogo(context);
+            if(usarAutenticacionBiometrica!=null){
+               _guardarPreferencia(usarAutenticacionBiometrica);
+                print("ACA ESTOY" + usarAutenticacionBiometrica.toString());
+                if(usarAutenticacionBiometrica){
+                  print("entro a guardarDatos");
+                  guardarCredenciales(_controllerEmail.text, _controllerPassword.text);
+                }
+            }
+               
+          }
+      
+      if (context.mounted) {
         context.pushNamed(HomePage.name);
       }
-      ;
+      
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
       });
     }
   }
+
+  Future<bool?> _mostrarDialogo(BuildContext context) async {
+  return showDialog<bool>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Habilitar autenticación biométrica'),
+        content: Text('¿Desea utilizar autenticación biométrica para futuros inicios de sesión?'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
+            child: Text('No'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+            child: Text('Sí'),
+          ),
+        ],
+      );
+    },
+  );
+}
+Future<void> _guardarPreferencia(bool usarAutenticacionBiometrica) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setBool('usarAutenticacionBiometrica', usarAutenticacionBiometrica);
+  print("GUARDO PREFERENCIAS");
+}
+
+void guardarCredenciales(String usuario, String contrasena) async {
+  final storage = FlutterSecureStorage(aOptions: _getAndroidOptions());
+  await storage.write(key: 'usuario', value: usuario);
+  await storage.write(key: 'contrasena', value: contrasena);
+}
 
   Future<void> signInWithGoogle() async {
     try {

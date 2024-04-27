@@ -91,6 +91,30 @@ static const String name = 'HomePage';
      ),
      ); 
   }
+   Widget _logOutButton(){
+    return Container (
+      width: double.infinity,
+      height: 45,
+      decoration: BoxDecoration(
+        color: Colors.red,
+        borderRadius: BorderRadius.circular(10)
+      ),
+      child: TextButton(onPressed: ()=>{
+        signOut()
+      },
+     child: const Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+       Text ('cerrar sesion',
+       style: TextStyle(
+        color:Colors.white ),
+        ),
+       SizedBox(width: 5,),
+       Icon(FontAwesomeIcons.car,color: Colors.white,),
+     ],)
+     ),
+     ); 
+  }
 
   @override
   Widget build(BuildContext context){
@@ -109,7 +133,8 @@ static const String name = 'HomePage';
             _userUid(),
             _registerConsumerButton(),
             const SizedBox(height: 5,),
-            _registerGarageButton()
+            _registerGarageButton(),
+            _signOutButton()
           ],
 
         ),
