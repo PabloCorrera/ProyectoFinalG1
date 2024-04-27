@@ -45,4 +45,25 @@ class DatabaseService {
     _cocheraRef.add(cochera);
   }
 
+  void updateUser(String email, String nombre, String apellido) async {
+  // Primero, obtén una referencia al documento del usuario usando su email
+  QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+      .collection('USUARIO_CONSUMIDOR')
+      .where('email', isEqualTo: email)
+      .get();
+
+  // Verifica si se encontró un documento con el email proporcionado
+  if (querySnapshot.docs.isNotEmpty) {
+    // Si se encontró un documento, actualiza sus datos
+    String docId = querySnapshot.docs.first.id;
+    DocumentReference userRef = FirebaseFirestore.instance.collection('USUARIO_CONSUMIDOR').doc(docId);
+
+    // Actualiza el nombre y apellido del usuario
+    await userRef.update({
+      'nombre': nombre,
+      'apellido': apellido,
+    });
+  }
+  }
+
 }

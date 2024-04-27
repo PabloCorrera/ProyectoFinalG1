@@ -9,9 +9,6 @@ class User {
   late List<Cochera> cocheras;
   late bool consumidor;
   late String urlImage;
-  late String reservaInReservada;
-  late String reservaInCheckIn;
-  late String reservaInCheckOut;
 
   User({
     this.userId = "",
@@ -20,9 +17,6 @@ class User {
     this.email = "",
     List<Cochera>? cocheras,
     this.urlImage = "",
-    this.reservaInReservada = "",
-    this.reservaInCheckIn = "",
-    this.reservaInCheckOut = "",
   }) : cocheras = cocheras ?? [];
 
   User.fromJson(Map<String, Object?> json)
@@ -32,9 +26,6 @@ class User {
           email: json['email']! as String,
           cocheras: json['cocheras']! as List<Cochera>,
           urlImage: json['urlImage']! as String,
-          reservaInReservada: json['reservaInReservada']! as String,
-          reservaInCheckIn: json['reservaInCheckIn']! as String,
-          reservaInCheckOut: json['reservaInCheckOut']! as String,
         );
 
   User copyWith({
@@ -53,9 +44,7 @@ class User {
         email: email ?? this.email,
         cocheras: cocheras ?? this.cocheras,
         urlImage: urlImage ?? this.urlImage,
-        reservaInReservada: reservaInReservada ?? this.reservaInReservada,
-        reservaInCheckIn: reservaInCheckIn ?? this.reservaInCheckIn,
-        reservaInCheckOut: reservaInCheckOut ?? this.reservaInCheckOut);
+    );
   }
 
   Map<String, Object?> toJson() {
@@ -65,9 +54,9 @@ class User {
       'email': email,
       'cocheras': cocheras,
       'urlImage': urlImage,
-      'reservaInReservada': reservaInReservada,
-      'reservaInCheckin': reservaInCheckIn,
-      'reservaInCheckOut': reservaInCheckOut,
     };
+  }
+  String getId(){
+    return userId;
   }
 }

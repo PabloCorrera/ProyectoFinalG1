@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:proyecto_final/entities/cochera.dart';
+import 'package:proyecto_final/entities/user.dart' as myUser;
 import 'package:proyecto_final/services/database_sevice.dart';
 
 class GarageRegister extends StatelessWidget {
@@ -9,28 +11,41 @@ class GarageRegister extends StatelessWidget {
 
 
   final DatabaseService _databaseService = DatabaseService();
-  final TextEditingController _controllerOwnerId = TextEditingController();
   final TextEditingController _description = TextEditingController();
   final TextEditingController _controllerGarageName = TextEditingController();
   final TextEditingController _controllerGarageAdress = TextEditingController();
   final TextEditingController _controllerQuantitySpaces = TextEditingController();
   final TextEditingController _controllerPrice = TextEditingController();
+  final TextEditingController _controllerName = TextEditingController();
+  final TextEditingController _controllerSurname = TextEditingController();
   
   String? errorMessage = '';
-
+  String? emailUsuario = FirebaseAuth.instance.currentUser?.email;
+  
   Widget _submitButton() {
     return ElevatedButton(
       onPressed: () {
+        String email = emailUsuario ?? "";
+        myUser.User myUser1 = myUser.User(
+          nombre: _controllerName.text,
+          apellido: _controllerSurname.text,
+          email: email,
+        );    
+        _databaseService.addUser(myUser1);
+        String? userId = FirebaseAuth.instance.currentUser?.uid;
+        String idUser = userId ?? "";
+        print(idUser);
       Cochera cochera = Cochera(
         nombre: _controllerGarageName.text,
-        ownerId: _controllerOwnerId.text,
         descripcion: _description.text,
         direccion: _controllerGarageAdress.text,
         price: double.parse(_controllerPrice.text),
         cantLugares: int.parse(_controllerQuantitySpaces.text),
+        ownerId: idUser,
+        //ownerId: 
       );
-       
         _databaseService.addCochera(cochera);
+        
       },
       child: Text('Confirmar'),
     );
@@ -108,6 +123,10 @@ Widget build(BuildContext context) {
               ),
             ),
             const SizedBox(height: 20),
+            _entryField('Nombre', _controllerName),
+            const SizedBox(height: 20),
+            _entryField('Apellido', _controllerSurname),
+            const SizedBox(height: 20),
             _entryField('Nombre Estacionamiento', _controllerGarageName),
             const SizedBox(height: 20),
              _entryField('Descripcion', _description),
@@ -117,6 +136,7 @@ Widget build(BuildContext context) {
             _entryFieldNumber('Precio por hora', _controllerPrice),
             const SizedBox(height: 20),
             _entryFieldNumber('Cantidad de lugares', _controllerQuantitySpaces),
+      
             _errorMessage(),
             _submitButton(),
           ],
