@@ -1,3 +1,4 @@
+import 'package:proyecto_final/entities/user.dart';
 import 'package:proyecto_final/pages/garage_home.dart';
 import 'package:proyecto_final/pages/garage_register.dart';
 import 'package:proyecto_final/pages/login_register_page.dart';
@@ -30,12 +31,13 @@ final appRouter = GoRouter(routes: [
     builder: (context, state) => GarageRegister(),
   ), 
 
-     GoRoute(
-    name: UsuarioHome.name,
-    path: '/usuarioHome',
-    builder: (context, state) => const UsuarioHome(),
-  ), 
+GoRoute(
+  name: UsuarioHome.name,
+  path: '/usuarioHome',
+  builder: (context, state) => UsuarioHome(userMail: state.extra as String),
+),
 
+    
        GoRoute(
     name: GarageHome.name,
     path: '/garageHome',

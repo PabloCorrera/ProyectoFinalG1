@@ -30,9 +30,13 @@ class _LoginPageState extends State<LoginPage> {
     try {
       await Auth().signInWithEmailAndPassword(
           email: _controllerEmail.text, password: _controllerPassword.text);
-      bool registrado = await _databaseService.validarUsuario(_controllerEmail.text);
+      bool registrado =
+          await _databaseService.validarUsuario(_controllerEmail.text);
       if (context.mounted && registrado) {
-        context.pushNamed(UsuarioHome.name);
+        context.pushNamed(
+          UsuarioHome.name,
+          extra: _controllerEmail.text, // Pasando el objeto user como argumento
+        );
       } else {
         context.pushNamed(HomePage.name);
       }
@@ -71,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-    Widget _title(){
+  Widget _title() {
     return const Text('Bienvenido a We Park');
   }
 

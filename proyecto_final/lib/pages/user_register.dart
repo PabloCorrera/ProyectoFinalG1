@@ -48,7 +48,10 @@ Widget _submitButton(BuildContext context) {
         email: userMail,
       );
       _databaseService.addUser(user);
-      context.pushNamed(UsuarioHome.name);
+      context.pushNamed(
+        UsuarioHome.name,
+        extra: userMail, // Pasando el objeto user como argumento
+      );
     },
     child: Text('Confirmar'),
   );
