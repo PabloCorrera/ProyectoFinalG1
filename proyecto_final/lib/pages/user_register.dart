@@ -43,6 +43,7 @@ class UserRegister extends StatelessWidget {
           nombre: _controllerName.text,
           apellido: _controllerSurname.text,
           email: userMail,
+          
         );
         _databaseService.addUser(user);
       },
