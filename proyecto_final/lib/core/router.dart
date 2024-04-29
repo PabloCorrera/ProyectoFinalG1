@@ -41,7 +41,8 @@ GoRoute(
        GoRoute(
     name: GarageHome.name,
     path: '/garageHome',
-    builder: (context, state) => const GarageHome(),
-  ),
+  builder: (context, state) => GarageHome(userMail: state.extra as String),
+),
+
   
 ]);

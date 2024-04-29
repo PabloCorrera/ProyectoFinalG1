@@ -24,6 +24,7 @@ class GarageRegister extends StatelessWidget {
   String? errorMessage = '';
   String? emailUsuario = FirebaseAuth.instance.currentUser?.email;
   
+  
   Widget _submitButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
@@ -47,7 +48,10 @@ class GarageRegister extends StatelessWidget {
         //ownerId: 
       );
         _databaseService.addCochera(cochera);
-         context.pushNamed(GarageHome.name);
+               context.pushNamed(
+        GarageHome.name,
+        extra: emailUsuario, // Pasando el objeto user como argumento
+      );
         
       },
       child: Text('Confirmar'),
