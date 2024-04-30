@@ -30,12 +30,14 @@ class GarageRegister extends StatelessWidget {
           nombre: _controllerName.text,
           apellido: _controllerSurname.text,
           email: email,
+          consumidor: false
         );    
         _databaseService.addUser(myUser1);
         String? userId = FirebaseAuth.instance.currentUser?.uid;
         String idUser = userId ?? "";
         print(idUser);
-      Cochera cochera = Cochera(
+
+        Cochera cochera = Cochera(
         nombre: _controllerGarageName.text,
         descripcion: _description.text,
         direccion: _controllerGarageAdress.text,
@@ -45,6 +47,11 @@ class GarageRegister extends StatelessWidget {
         //ownerId: 
       );
         _databaseService.addCochera(cochera);
+        Map<String, dynamic> cocheraMap = cochera.toJson();
+        myUser1.addCochera(cocheraMap);
+        print(myUser1.toString());
+        
+        
         
       },
       child: Text('Confirmar'),

@@ -1,9 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-<<<<<<< HEAD
 import 'package:proyecto_final/entities/cochera.dart';
 
-=======
->>>>>>> 6c2de7eb51c4d95a7c56bf16f2babfed49a35c44
 import 'package:proyecto_final/entities/user.dart';
 
 const String USUARIO_CONSUMIDOR = "usuarioConsumidor";
