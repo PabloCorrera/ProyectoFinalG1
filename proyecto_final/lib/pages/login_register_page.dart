@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:proyecto_final/auth.dart';
+import 'package:proyecto_final/pages/garage_home.dart';
 import 'package:proyecto_final/pages/home_page.dart';
 import 'package:proyecto_final/pages/usuario_home.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
@@ -21,6 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   String? errorMessage = '';
   bool isLogin = true;
   String? userMail = FirebaseAuth.instance.currentUser?.email;
+  
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
@@ -30,14 +32,26 @@ class _LoginPageState extends State<LoginPage> {
     try {
       await Auth().signInWithEmailAndPassword(
           email: _controllerEmail.text, password: _controllerPassword.text);
+
       bool registrado =
           await _databaseService.validarUsuario(_controllerEmail.text);
+          print(registrado);
+
+      bool isConsumer =
+          await _databaseService.isConsumer(_controllerEmail.text);
+
+          print("HOLAAAAAAAAAAAAAAAAAA");
+          print(isConsumer);
+          print(registrado);
+
       if (context.mounted && registrado) {
         context.pushNamed(
           UsuarioHome.name,
           extra: _controllerEmail.text, // Pasando el objeto user como argumento
         );
-      } else {
+      }
+    
+      else {
         context.pushNamed(HomePage.name);
       }
       ;

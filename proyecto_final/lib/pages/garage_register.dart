@@ -33,6 +33,7 @@ class GarageRegister extends StatelessWidget {
           nombre: _controllerName.text,
           apellido: _controllerSurname.text,
           email: email,
+          consumidor: false
         );    
         _databaseService.addUser(myUser1);
         String? userId = FirebaseAuth.instance.currentUser?.uid;

@@ -46,6 +46,7 @@ Widget _submitButton(BuildContext context) {
         nombre: _controllerName.text,
         apellido: _controllerSurname.text,
         email: userMail,
+        consumidor: true
       );
       _databaseService.addUser(user);
       context.pushNamed(

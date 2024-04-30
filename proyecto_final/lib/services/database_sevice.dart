@@ -30,27 +30,32 @@ class DatabaseService {
   }
 
 Future<User?> getUserByEmail(String email) async {
-    try {
-      // Realizar una consulta para obtener el usuario con el correo electrónico proporcionado
-      QuerySnapshot querySnapshot = await _usuariosConsumidorRef
-          .where('email', isEqualTo: email)
-          .limit(1) // Limitar la consulta a un solo resultado
-          .get();
+  try {
+    print(email);
+    print("Validamos usuario");
+    print(await validarUsuario(email));
 
-      // Verificar si se encontró algún documento
-      if (querySnapshot.docs.isNotEmpty) {
-        // Obtener los datos del primer documento encontrado y devolverlo como un objeto User
-       return User.fromJson(querySnapshot.docs.first.data()! as Map<String, dynamic>);
-      } else {
-        // Si no se encontró ningún documento, devolver null
-        return null;
-      }
-    } catch (e) {
-      // Manejar cualquier error que ocurra durante el proceso
-      print('Error al obtener el usuario por correo electrónico: $e');
-      return null; // Devolver null en caso de error
+    QuerySnapshot querySnapshot = await _usuariosConsumidorRef
+        .where('email', isEqualTo: email)
+        .limit(1)
+        .get();
+
+        print("Tamaño");
+        print(querySnapshot.docs.length);
+
+    if (querySnapshot.docs.isNotEmpty) {
+      Map<String, dynamic> userData = querySnapshot.docs.first.data()! as Map<String, dynamic>;
+      User user = User.fromJson(userData);
+
+      return user;
+    } else {
+      return null;
     }
+  } catch (e) {
+    print('Error al obtener el usuario por correo electrónico: $e');
+    return null;
   }
+}
   
 
   Stream<QuerySnapshot> getUsuarios() {
@@ -115,6 +120,30 @@ Future<bool> validarUsuario(String email) async {
       'apellido': apellido,
     });
   }
+  }
+
+Future<bool> isConsumer(String email) async {
+    try {
+      // Obtener el usuario correspondiente al correo electrónico proporcionado
+      User? user = await getUserByEmail(email);
+      print("ACAAAAAAAAAAAAAAAAAAAAAAAAAA");
+      print(email);
+      print(user);
+
+      // Verificar si se encontró un usuario con el correo electrónico proporcionado
+      if (user != null) {
+      
+        // Devolver el valor del atributo consumidor del usuario
+        return user.consumidor;
+      } else {
+        // Si no se encontró ningún usuario con ese correo electrónico, devolver null
+        return false;
+      }
+    } catch (e) {
+      // Manejar cualquier error que ocurra durante el proceso
+      print('Error al verificar si el usuario es consumidor: $e');
+      return false; // Devolver null en caso de error
+    }
   }
 
 }
