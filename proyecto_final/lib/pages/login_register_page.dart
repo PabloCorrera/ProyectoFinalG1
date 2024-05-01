@@ -6,6 +6,7 @@ import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/pages/garage_home.dart';
 import 'package:proyecto_final/pages/home_page.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:proyecto_final/services/database_sevice.dart';
 import 'package:proyecto_final/services/local_auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -26,6 +27,7 @@ class _LoginPageState extends State<LoginPage> {
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
+  DatabaseService databaseService = DatabaseService();
 
   @override
   void initState() {
