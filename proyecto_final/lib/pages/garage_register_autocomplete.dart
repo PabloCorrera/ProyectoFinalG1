@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
 import 'package:proyecto_final/models/autocomplete_prediction.dart';
@@ -87,6 +86,9 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
       decoration: InputDecoration(
         labelText: title,
       ),
+      inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]')),
+    ],
     );
   }
 

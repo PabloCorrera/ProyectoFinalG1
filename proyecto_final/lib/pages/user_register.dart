@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart' as FirebaseAuth;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/entities/usuario_consumidor.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
@@ -16,12 +17,14 @@ class UserRegister extends StatelessWidget {
   String? errorMessage = '';
 
   Widget _entryField(String title, TextEditingController controller) {
-    return TextField(
+   return TextField(
       controller: controller,
-      obscureText: title == "Contraseña",
       decoration: InputDecoration(
         labelText: title,
       ),
+      inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]')),
+    ],
     );
   }
 
