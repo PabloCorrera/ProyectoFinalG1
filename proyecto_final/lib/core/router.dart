@@ -23,28 +23,6 @@ final appRouter = GoRouter(routes: [
     path: '/userregister',
     builder: (context, state) => UserRegister(),
   ),
-<<<<<<< HEAD
-
-     GoRoute(
-    name: GarageRegister.name,
-    path: '/garageRegister',
-    builder: (context, state) => GarageRegister(),
-  ), 
-
-     GoRoute(
-    name: UsuarioHome.name,
-    path: '/usuarioHome',
-    builder: (context, state) => const UsuarioHome(),
-  ), 
-
-
-//  GoRoute(
-//     name: UsuarioCocheraHome.name, // Nombre de la ruta corregido
-//     path: '/usuarioCocheraHome', // Ruta corregida
-//     builder: (context, state) => const UsuarioCocheraHome(), // Página corregida
-//   ),
-  
-=======
   GoRoute(
     name: GarageRegisterAutoPlete.name,
     path: '/garageRegisterAutoPlete',
@@ -55,5 +33,4 @@ final appRouter = GoRouter(routes: [
     path: '/mapsPage',
     builder: (context, state) => MapsPage(),
   ),
->>>>>>> ca744a17fce8061d992929e9f996e49844f82700
 ]);
