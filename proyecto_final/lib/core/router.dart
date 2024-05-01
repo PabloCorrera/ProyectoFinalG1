@@ -18,21 +18,21 @@ final appRouter = GoRouter(routes: [
     path: '/home',
     builder: (context, state) => const HomePage(),
   ),
-  GoRoute(
-    name: UserRegister.name,
-    path: '/userregister',
-    builder: (context, state) => UserRegister(),
-  ),
   // GoRoute(
-  //   name: GarageRegisterAutoPlete.name,
-  //   path: '/garageRegisterAutoPlete',
-  //   builder: (context, state) => GarageRegisterAutoPlete(),
+  //   name: UserRegister.name,
+  //   path: '/userregister',
+  //   builder: (context, state) => UserRegister(),
   // ),
   GoRoute(
-    name: GarageRegister.name,
-    path: '/garageRegister',
-    builder: (context, state) => GarageRegister(),
+    name: GarageRegisterAutoPlete.name,
+    path: '/garageRegisterAutoPlete',
+    builder: (context, state) => GarageRegisterAutoPlete(),
   ),
+  // GoRoute(
+  //   name: GarageRegister.name,
+  //   path: '/garageRegister',
+  //   builder: (context, state) => GarageRegister(),
+  // ),
   GoRoute(
     name: MapsPage.name,
     path: '/mapsPage',
