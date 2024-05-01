@@ -18,6 +18,8 @@ class User {
     this.urlImage = "",
   }) : cocheras = cocheras ?? [];
 
+// Formulario para Firestore DataBase
+
   User.fromJson(Map<String, Object?> json)
       : this(
           nombre: json['nombre']! as String,
