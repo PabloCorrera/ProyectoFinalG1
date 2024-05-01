@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_webservice/places.dart';
-import 'package:proyecto_final/services/network_utility.dart';
-import 'package:proyecto_final/models/place_auto_comlate_response.dart';
-import 'package:proyecto_final/models/place_auto_comlate_response.dart';
+import 'package:proyecto_final/entities/cochera.dart';
 import 'package:proyecto_final/models/autocomplete_prediction.dart';
+import 'package:proyecto_final/services/database_sevice.dart';
 import 'package:proyecto_final/services/location_list_tile.dart';
 import '../models/constant.dart';
 
@@ -19,12 +19,25 @@ class GarageRegisterAutoPlete extends StatefulWidget {
 
 class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
   List<AutocompletePrediction> placePredictions = [];
+  final DatabaseService _databaseService = DatabaseService();
+  final TextEditingController _controllerOwnerId = TextEditingController();
+  final TextEditingController _description = TextEditingController();
+  final TextEditingController _controllerGarageName = TextEditingController();
+  final TextEditingController _controllerGarageAdress = TextEditingController();
+  final TextEditingController _controllerQuantitySpaces =
+      TextEditingController();
+  final TextEditingController _controllerPrice = TextEditingController();
+  bool showSourceField = false;
 
+  String? errorMessage = '';
+
+  //funcion AUTO complete de google
   Future<String> showGoogleAutoComplete() async {
     try {
       const kGoogleApiKey = apiKey;
       String calle = "no encontrada";
-      Prediction? p = await PlacesAutocomplete.show(
+      Prediction? p = Prediction(description: "no econtrada");
+      p = await PlacesAutocomplete.show(
           offset: 0,
           radius: 1000,
           strictbounds: false,
@@ -33,122 +46,179 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
           apiKey: kGoogleApiKey,
           mode: Mode.overlay, // Mode.fullscreen
           language: "es",
-          types: ["(address)"],
+          types: ["address"],
           hint: "Search place",
-          components: [new Component(Component.country, 'ar')]);
-
-      return calle = p!.description!;
+          components: [new Component(Component.country, "ar")]);
+      return p!.description!;
     } catch (e) {
       String calle = "no encontrada";
       print("Error al obtener predicciones de lugares: $e");
-      return calle; // Devolver null en caso de error
+      return calle;
     }
   }
 
-  TextEditingController _controllerGarageAdress = TextEditingController();
-  bool showSourceField = false;
+  Widget _submitButton() {
+    return ElevatedButton(
+      onPressed: () {
+        Cochera cochera = Cochera(
+          nombre: _controllerGarageName.text,
+          ownerId: _controllerOwnerId.text,
+          descripcion: _description.text,
+          direccion: _controllerGarageAdress.text,
+          price: double.parse(_controllerPrice.text),
+        );
+        _databaseService.addCochera(cochera);
+      },
+      child: Text('Confirmar'),
+    );
+  }
+
+  Widget _entryField(String title, TextEditingController controller) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: title,
+      ),
+    );
+  }
+
+  Widget _entryFieldNumber(String title, TextEditingController controller) {
+    return TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: title,
+        ),
+        keyboardType: TextInputType.number,
+        inputFormatters: <TextInputFormatter>[
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+        ]);
+  }
+
+  Widget _title() {
+    return const Text(
+      'Registro de Cochera',
+      style: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+
+  Widget _errorMessage() {
+    return Text(
+      errorMessage == '' ? '' : '¡Ups! $errorMessage',
+      style: TextStyle(
+        color: Colors.red,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.only(left: defaultPadding),
-          child: CircleAvatar(
-            backgroundColor: secondaryColor10LightTheme,
-            child: SvgPicture.asset(
-              "assets/icons/location.svg",
-              height: 16,
-              width: 16,
-              color: secondaryColor40LightTheme,
-            ),
-          ),
-        ),
-        title: const Text(
-          "Buscar direccion",
-          style: TextStyle(color: textColorLightTheme),
-        ),
-        actions: [
-          CircleAvatar(
-            backgroundColor: secondaryColor10LightTheme,
-            child: IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.close, color: Colors.black),
-            ),
-          ),
-          const SizedBox(width: defaultPadding)
-        ],
+        title: _title(),
       ),
-      body: Column(
-        children: [
-          Form(
-            child: Padding(
-              padding: const EdgeInsets.all(defaultPadding),
-              child: TextFormField(
-                controller: _controllerGarageAdress,
-                onTap: () async {
-                  String selectedPlace = await showGoogleAutoComplete();
-                  _controllerGarageAdress.text = selectedPlace;
+      body: SingleChildScrollView(
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFFAF0050),
+                Color(0x00EF5350),
+              ],
+              begin: Alignment.topCenter,
+            ),
+          ),
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const Text(
+                'REGISTRO DE COCHERA',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              // const SizedBox(height: 20),
+              // _entryField('Nombre', _controllerOwnerId),
+              const SizedBox(height: 20),
+              _entryField('Nombre Estacionamiento', _controllerGarageName),
+              const SizedBox(height: 20),
+              _entryField('Descripcion', _description),
+              const SizedBox(height: 20),
+              //_entryField('Direccion', _controllerGarageAdress, ),
+              Padding(
+                padding: const EdgeInsets.all(defaultPadding),
+                child: TextFormField(
+                  controller: _controllerGarageAdress,
+                  onTap: () async {
+                    try {
+                      String selectedPlace = await showGoogleAutoComplete();
+                      _controllerGarageAdress.text = selectedPlace;
 
-                  setState(() {
-                    showSourceField = true;
-                  });
-                },
-                textInputAction: TextInputAction.search,
-                decoration: InputDecoration(
-                  hintText: "Search your location",
-                  prefixIcon: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    child: SvgPicture.asset(
-                      "assets/icons/location_pin.svg",
-                      color: secondaryColor40LightTheme,
+                      setState(() {
+                        showSourceField = true;
+                      });
+                    } catch (e) {
+                      print("te la mandaste con algo perri $e");
+                    }
+                  },
+                  textInputAction: TextInputAction.search,
+                  decoration: InputDecoration(
+                    hintText: "Buscar tu direccion",
+                  ),
+                ),
+              ),
+
+              ListView.builder(
+                itemCount: placePredictions.length,
+                shrinkWrap:
+                    true, // Este atributo es importante para evitar un error de desbordamiento
+                //  physics:
+                //    NeverScrollableScrollPhysics(), // Deshabilita el desplazamiento de esta ListView
+                itemBuilder: (context, index) => LocationListTile(
+                  press: () {},
+                  location: placePredictions[index].description!,
+                ),
+              ),
+              /* Padding(
+                padding: EdgeInsets.all(16.0),
+                child: ElevatedButton.icon(
+                  onPressed: () {},
+                  icon: SvgPicture.asset(
+                    "assets/icons/location.svg",
+                    height: 16,
+                  ),
+                  label: const Text("Usar mi ubicacion actual"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFEEEEEE),
+                    foregroundColor: Color(0xFF0D0D0E),
+                    elevation: 0,
+                    fixedSize: const Size(double.infinity, 40),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
                   ),
                 ),
               ),
-            ),
+              */
+              const SizedBox(height: 20),
+              _entryFieldNumber('Precio por hora', _controllerPrice),
+              //const SizedBox(height: 20),
+              //_entryField('Tipo del vehiculo', _controllerGarageName),
+              const SizedBox(height: 20),
+              _entryFieldNumber(
+                  'Cantidad de lugares', _controllerQuantitySpaces),
+              _errorMessage(),
+              _submitButton(),
+            ],
           ),
-          const Divider(
-            height: 4,
-            thickness: 4,
-            color: secondaryColor5LightTheme,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(defaultPadding),
-            child: ElevatedButton.icon(
-              onPressed: () {},
-              icon: SvgPicture.asset(
-                "assets/icons/location.svg",
-                height: 16,
-              ),
-              label: const Text("Usar mi ubicacion Actual"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: secondaryColor10LightTheme,
-                foregroundColor: textColorLightTheme,
-                elevation: 0,
-                fixedSize: const Size(double.infinity, 40),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-              ),
-            ),
-          ),
-          const Divider(
-            height: 4,
-            thickness: 4,
-            color: secondaryColor5LightTheme,
-          ),
-          Expanded(
-              child: ListView.builder(
-            itemCount: placePredictions.length,
-            itemBuilder: (context, index) => LocationListTile(
-              press: () {},
-              location: placePredictions[index].description!,
-            ),
-          ))
-        ],
+        ),
       ),
     );
   }
 }
-

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:proyecto_final/entities/cochera.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
-import 'package:proyecto_final/services/network_utility.dart';
 import '../models/constant.dart';
 
 class GarageRegister extends StatelessWidget {
@@ -21,23 +19,6 @@ class GarageRegister extends StatelessWidget {
       TextEditingController();
   final TextEditingController _controllerPrice = TextEditingController();
   bool showSourceField = false;
-/*
-  void placeAutoComplete(String query) async {
-    Uri uri = Uri.http(
-        "maps.googleapis.com",
-        'maps/api/place/autocomplete/json', // unencoder path
-        {
-          "input": query,
-          "key": apiKey,
-        });
-    String? response = await NetworkUtility.fetchUrl(uri);
-
-    if (response != null) {
-      print(response);
-    }
-  }
-*/
-  
 
   String? errorMessage = '';
 
