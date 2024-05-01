@@ -1,10 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart' as FirebaseAuth;
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/entities/user.dart';
-import 'package:proyecto_final/pages/home_page.dart';
-import 'package:proyecto_final/pages/usuario_home.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 
 class UserRegister extends StatelessWidget {
