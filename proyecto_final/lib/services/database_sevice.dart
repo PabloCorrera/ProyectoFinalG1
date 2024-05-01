@@ -80,7 +80,23 @@ class DatabaseService {
     }
   }
 
+  Future<String?> getTipoUsuario(String email) async {
+    try {
+      var queryConsumidor = await _usuariosConsumidorRef.where('email', isEqualTo: email).get();
+      var queryCochera = await _usuariosCocheraRef.where('email', isEqualTo: email).get();
 
+      if (queryConsumidor.docs.isNotEmpty) {
+        return 'consumidor';
+      } else if (queryCochera.docs.isNotEmpty) {
+        return 'cochera';
+      } else {
+        return null; // Usuario no encontrado
+      }
+    } catch (e) {
+      print('Error al obtener el tipo de usuario: $e');
+      return null;
+    }
+  }
 
 
 

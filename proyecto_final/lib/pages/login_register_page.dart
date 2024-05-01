@@ -25,6 +25,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
 
+
   @override
   void initState() {
     super.initState();
@@ -82,7 +83,10 @@ class _LoginPageState extends State<LoginPage> {
                 _controllerEmail.text, _controllerPassword.text);
           }
         }
-      }
+      } 
+   
+   
+
 
       if (context.mounted) {
         context.pushNamed(HomePage.name);
