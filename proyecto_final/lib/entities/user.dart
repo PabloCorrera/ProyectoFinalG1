@@ -15,7 +15,6 @@ class User {
     this.apellido = "",
     this.email = "",
     List<Cochera>? cocheras,
-    required this.consumidor,
     this.urlImage = "",
   }) : cocheras = cocheras ?? [];
 
@@ -26,8 +25,7 @@ class User {
           nombre: json['nombre']! as String,
           apellido: json['apellido']! as String,
           email: json['email']! as String,
-          cocheras: (json['cocheras']! as List<dynamic>).map((e) => Cochera.fromJson(e)).toList(),
-          consumidor: json['consumidor']! as bool,
+          cocheras: json['cocheras']! as List<Cochera>,
           urlImage: json['urlImage']! as String,
         );
 
@@ -36,7 +34,6 @@ class User {
     String? apellido,
     String? email,
     List<Cochera>? cocheras,
-    bool? consumidor,
     String? urlImage,
     String? reservaInReservada,
     String? reservaInCheckIn,
@@ -47,7 +44,6 @@ class User {
         apellido: apellido ?? this.apellido,
         email: email ?? this.email,
         cocheras: cocheras ?? this.cocheras,
-        consumidor: consumidor ?? this.consumidor,
         urlImage: urlImage ?? this.urlImage,
     );
   }
@@ -58,7 +54,6 @@ class User {
       'apellido': apellido,
       'email': email,
       'cocheras': cocheras,
-      'consumidor': consumidor,
       'urlImage': urlImage,
     };
   }
