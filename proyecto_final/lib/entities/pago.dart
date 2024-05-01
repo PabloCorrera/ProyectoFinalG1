@@ -19,6 +19,8 @@ class Pago {
     required this.precio,
   });
 
+// Formulario para Firestore DataBase
+
   Pago.fromJson(Map<String, Object?> json)
       : this(
           reserva: json['reserva']! as Reserva,
@@ -28,6 +30,7 @@ class Pago {
           horaSalida: json['horaSalida']! as String,
           precio: json['precio']! as double,
         );
+
 
   Pago copyWith({
     Reserva? reserva,
