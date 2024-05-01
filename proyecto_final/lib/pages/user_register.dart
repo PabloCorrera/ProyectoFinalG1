@@ -39,24 +39,20 @@ class UserRegister extends StatelessWidget {
     );
   }
 
-Widget _submitButton(BuildContext context) {
-  return ElevatedButton(
-    onPressed: () {
-      User user = User(
-        nombre: _controllerName.text,
-        apellido: _controllerSurname.text,
-        email: userMail,
-        consumidor: true
-      );
-      _databaseService.addUser(user);
-      context.pushNamed(
-        UsuarioHome.name,
-        extra: userMail, // Pasando el objeto user como argumento
-      );
-    },
-    child: Text('Confirmar'),
-  );
-}
+  Widget _submitButton() {
+    return ElevatedButton(
+      onPressed: () {
+        User user = User(
+          nombre: _controllerName.text,
+          apellido: _controllerSurname.text,
+          email: userMail,
+          
+        );
+        _databaseService.addUser(user);
+      },
+      child: Text('Confirmar'),
+    );
+  }
 
   Widget _errorMessage() {
     return Text(
@@ -105,7 +101,7 @@ Widget _submitButton(BuildContext context) {
             const SizedBox(height: 20),
             _errorMessage(),
             const SizedBox(height: 20),
-            _submitButton(context),
+            _submitButton(),
           ],
         ),
       ),

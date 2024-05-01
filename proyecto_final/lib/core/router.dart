@@ -1,9 +1,14 @@
+<<<<<<< HEAD
 import 'package:proyecto_final/entities/user.dart';
 import 'package:proyecto_final/pages/garage_home.dart';
 import 'package:proyecto_final/pages/garage_register.dart';
+=======
+import 'package:proyecto_final/pages/garage_register_autocomplete.dart';
+>>>>>>> main
 import 'package:proyecto_final/pages/login_register_page.dart';
 import 'package:proyecto_final/pages/home_page.dart';
 import 'package:go_router/go_router.dart';
+import 'package:proyecto_final/pages/maps_page.dart';
 import 'package:proyecto_final/pages/user_register.dart';
 import 'package:proyecto_final/pages/usuario_home.dart';
 
@@ -13,17 +18,17 @@ final appRouter = GoRouter(routes: [
     path: '/',
     builder: (context, state) => const LoginPage(),
   ),
- GoRoute(
+  GoRoute(
     name: HomePage.name,
     path: '/home',
     builder: (context, state) => const HomePage(),
-  ), 
-
-   GoRoute(
+  ),
+  GoRoute(
     name: UserRegister.name,
     path: '/userregister',
     builder: (context, state) => UserRegister(),
   ),
+<<<<<<< HEAD
 
      GoRoute(
     name: GarageRegister.name,
@@ -45,4 +50,16 @@ GoRoute(
 ),
 
   
+=======
+  GoRoute(
+    name: GarageRegisterAutoPlete.name,
+    path: '/garageRegisterAutoPlete',
+    builder: (context, state) => GarageRegisterAutoPlete(),
+  ),
+  GoRoute(
+    name: MapsPage.name,
+    path: '/mapsPage',
+    builder: (context, state) => MapsPage(),
+  ),
+>>>>>>> main
 ]);

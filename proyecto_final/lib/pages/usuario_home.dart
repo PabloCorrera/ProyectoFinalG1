@@ -17,14 +17,7 @@ class UsuarioHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Llama al método getUserByEmail para obtener el usuario correspondiente al correo electrónico actual
-    _databaseService.getUserByEmail(emailUsuario!).then((user) {
-      // Haz algo con el usuario obtenido, como mostrar su nombre en la pantalla
-      if (user != null) {
-        print('El usuario actual es: ${user.nombre}');
-      } else {
-        print('No se encontró ningún usuario con el correo electrónico actual');
-      }
-    });
+ 
 
     return Scaffold(
       appBar: AppBar(
