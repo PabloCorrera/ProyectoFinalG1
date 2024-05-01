@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart' as FirebaseAuth;
 import 'package:flutter/material.dart';
 import 'package:proyecto_final/auth.dart';
-import 'package:proyecto_final/entities/user.dart';
+import 'package:proyecto_final/entities/usuario_consumidor.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 
 class UserRegister extends StatelessWidget {
@@ -39,12 +39,13 @@ class UserRegister extends StatelessWidget {
   Widget _submitButton() {
     return ElevatedButton(
       onPressed: () {
-        User user = User(
+        UsuarioConsumidor user = UsuarioConsumidor(
           nombre: _controllerName.text,
           apellido: _controllerSurname.text,
           email: userMail,
+          
         );
-        _databaseService.addUser(user);
+        _databaseService.addUsuarioConsumidor(user);
       },
       child: Text('Confirmar'),
     );
