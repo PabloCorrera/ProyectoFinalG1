@@ -19,12 +19,12 @@ class User {
     this.urlImage = "",
   }) : cocheras = cocheras ?? [];
 
-  User.fromJson(Map<String, Object?> json)
+User.fromJson(Map<String, Object?> json)
       : this(
           nombre: json['nombre']! as String,
           apellido: json['apellido']! as String,
           email: json['email']! as String,
-          cocheras: json['cocheras']! as List<Cochera>,
+          cocheras: (json['cocheras']! as List<dynamic>).map((e) => Cochera.fromJson(e)).toList(),
           consumidor: json['consumidor']! as bool,
           urlImage: json['urlImage']! as String,
         );
@@ -56,7 +56,7 @@ class User {
       'apellido': apellido,
       'email': email,
       'cocheras': cocheras,
-      'consumidor': cocheras,
+      'consumidor': consumidor,
       'urlImage': urlImage,
     };
   }

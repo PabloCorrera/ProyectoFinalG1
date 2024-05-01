@@ -29,34 +29,29 @@ class DatabaseService {
   );
   }
 
+
 Future<User?> getUserByEmail(String email) async {
   try {
-    print(email);
-    print("Validamos usuario");
-    print(await validarUsuario(email));
+var query = await _usuariosConsumidorRef
+    .where('email', isEqualTo: email)
+    .limit(1)
+    .get();
 
-    QuerySnapshot querySnapshot = await _usuariosConsumidorRef
-        .where('email', isEqualTo: email)
-        .limit(1)
-        .get();
+if (query.docs.isNotEmpty) {
+  var userData = query.docs.first;
+  var user = User.fromJson(userData.data()! as Map<String, dynamic>);
+  return user;
 
-        print("Tamaño");
-        print(querySnapshot.docs.length);
-
-    if (querySnapshot.docs.isNotEmpty) {
-      Map<String, dynamic> userData = querySnapshot.docs.first.data()! as Map<String, dynamic>;
-      User user = User.fromJson(userData);
-
-      return user;
-    } else {
-      return null;
-    }
+} else {
+  print('No se encontró ningún documento con el correo electrónico proporcionado.');
+  return null;
+}
   } catch (e) {
+    // Manejar cualquier error que ocurra durante el proceso
     print('Error al obtener el usuario por correo electrónico: $e');
     return null;
   }
 }
-  
 
   Stream<QuerySnapshot> getUsuarios() {
     return _usuariosConsumidorRef.snapshots();
@@ -126,9 +121,6 @@ Future<bool> isConsumer(String email) async {
     try {
       // Obtener el usuario correspondiente al correo electrónico proporcionado
       User? user = await getUserByEmail(email);
-      print("ACAAAAAAAAAAAAAAAAAAAAAAAAAA");
-      print(email);
-      print(user);
 
       // Verificar si se encontró un usuario con el correo electrónico proporcionado
       if (user != null) {
