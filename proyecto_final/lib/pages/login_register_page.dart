@@ -5,6 +5,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/pages/home_page.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:proyecto_final/pages/usuario_cochera_home.dart';
+import 'package:proyecto_final/pages/usuario_home.dart';
+import 'package:proyecto_final/services/database_sevice.dart';
 import 'package:proyecto_final/services/local_auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -24,6 +27,7 @@ class _LoginPageState extends State<LoginPage> {
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
+  DatabaseService databaseService = new DatabaseService();
 
   @override
   void initState() {
@@ -81,9 +85,33 @@ class _LoginPageState extends State<LoginPage> {
         }
       }
 
-      if (context.mounted) {
+       bool registrado =
+          await databaseService.validarUsuario(_controllerEmail.text);
+      bool isConsumer =
+          await databaseService.getTipoUsuario(_controllerEmail.text) ==
+              "consumidor";
+      bool isOwner =
+          await databaseService.getTipoUsuario(_controllerEmail.text) ==
+              "cochera";
+
+      print("Registradoooooooooooooooooooooooooo");
+      print(registrado);
+      print("Is owner");
+      print(isOwner);
+      print(context.mounted);
+
+      if (context.mounted && registrado && isConsumer) {
+        print("Va por aca");
+        context.pushNamed(UsuarioHome.name);
+      }
+      else if (context.mounted && registrado && isOwner) {
+        print("Es usuario dueño");
+        context.pushNamed(UsuarioCocheraHome.name);
+      } else {
+        print("Va por aca tambien");
         context.pushNamed(HomePage.name);
       }
+
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
