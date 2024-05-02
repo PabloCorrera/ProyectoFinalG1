@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
+import 'package:proyecto_final/pages/garage_home.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 
 class GarageRegister extends StatelessWidget {
@@ -21,7 +23,7 @@ class GarageRegister extends StatelessWidget {
   String? errorMessage = '';
   String? emailUsuario = FirebaseAuth.instance.currentUser?.email;
   
-  Widget _submitButton() {
+  Widget _submitButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
         String email = emailUsuario ?? "";
@@ -37,6 +39,7 @@ class GarageRegister extends StatelessWidget {
         cantLugares: int.parse(_controllerQuantitySpaces.text),
         );    
         _databaseService.addUsuarioCochera(usuarioCochera);
+        context.pushNamed(GarageHome.name);
       },
       child: Text('Confirmar'),
     );
@@ -129,7 +132,7 @@ Widget build(BuildContext context) {
             _entryFieldNumber('Cantidad de lugares', _controllerQuantitySpaces),
       
             _errorMessage(),
-            _submitButton(),
+            _submitButton(context),
           ],
         ),
       ),

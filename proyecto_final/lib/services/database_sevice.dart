@@ -100,16 +100,17 @@ class DatabaseService {
 
 
 
-  Future<bool> validarUsuario(String email) async {
-    try {
-      var query =
-          await _usuariosConsumidorRef.where('email', isEqualTo: email).get();
-      return query.docs.isNotEmpty;
-    } catch (e) {
-      print('Error al validar el usuario: $e');
-      return false; // Manejo del error: en este caso, se asume que el usuario no existe
-    }
+Future<bool> validarUsuario(String email) async {
+  try {
+    var queryConsumidor = await _usuariosConsumidorRef.where('email', isEqualTo: email).get();
+    var queryDuenio = await _usuariosCocheraRef.where('email', isEqualTo: email).get();
+
+    return queryConsumidor.docs.isNotEmpty || queryDuenio.docs.isNotEmpty;
+  } catch (e) {
+    print('Error al validar el usuario: $e');
+    return false; // Manejo del error: en este caso, se asume que el usuario no existe
   }
+}
 
   void updateUsuarioConsumidor(String email, String nombre, String apellido) async {
     // Primero, obtén una referencia al documento del usuario usando su email

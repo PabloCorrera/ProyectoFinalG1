@@ -1,3 +1,4 @@
+import 'package:proyecto_final/pages/garage_home.dart';
 import 'package:proyecto_final/pages/garage_register.dart';
 import 'package:proyecto_final/pages/garage_register_autocomplete.dart';
 import 'package:proyecto_final/pages/login_register_page.dart';
@@ -28,6 +29,19 @@ final appRouter = GoRouter(routes: [
   //   path: '/garageRegisterAutoPlete',
   //   builder: (context, state) => GarageRegisterAutoPlete(),
   // ),
+  GoRoute(
+    name: GarageHome.name,
+    path: '/garageHome',
+    builder: (context, state) => GarageHome(),
+  ),
+
+    GoRoute(
+    name: UsuarioHome.name,
+    path: '/usuarioHome',
+    builder: (context, state) => UsuarioHome(),
+  ),
+
+
   GoRoute(
     name: GarageRegister.name,
     path: '/garageRegister',
