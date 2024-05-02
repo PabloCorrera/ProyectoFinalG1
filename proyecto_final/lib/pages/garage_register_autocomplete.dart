@@ -59,11 +59,21 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
     }
   }
 
-  Widget _submitButton() {
-    return ElevatedButton(
-      onPressed: () {
-       String email = emailUsuario ?? "";
+  static bool isNotBlank(String value) {
+  return value.trim().isNotEmpty;
+}
 
+  Widget _submitButton() {
+  return ElevatedButton(
+    onPressed: () {
+      String email = emailUsuario ?? "";
+      if (isNotBlank(_controllerName.text) &&
+          isNotBlank(_controllerSurname.text) &&
+          isNotBlank(_controllerGarageName.text) &&
+          isNotBlank(_controllerGarageAdress.text) &&
+          isNotBlank(_description.text) &&
+          isNotBlank(_controllerPrice.text) &&
+          isNotBlank(_controllerQuantitySpaces.text)) {
         UsuarioCochera usuarioCochera = UsuarioCochera(
           nombre: _controllerName.text,
           apellido: _controllerSurname.text,
@@ -72,13 +82,18 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
           direccion: _controllerGarageAdress.text,
           descripcion: _description.text,
           price: double.parse(_controllerPrice.text),
-        cantLugares: int.parse(_controllerQuantitySpaces.text),
-        );    
+          cantLugares: int.parse(_controllerQuantitySpaces.text),
+        );
         _databaseService.addUsuarioCochera(usuarioCochera);
-      },
-      child: Text('Confirmar'),
-    );
-  }
+      } else {
+        setState(() {
+          errorMessage = 'Por favor, complete todos los campos correctamente.';
+        });
+      }
+    },
+    child: Text('Confirmar'),
+  );
+}
 
   Widget _entryField(String title, TextEditingController controller) {
     return TextField(
@@ -87,7 +102,7 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
         labelText: title,
       ),
       inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]')),
+      FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
     ],
     );
   }
