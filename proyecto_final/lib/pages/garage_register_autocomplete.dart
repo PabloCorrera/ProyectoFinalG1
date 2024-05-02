@@ -2,14 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_webservice/places.dart';
-import 'package:proyecto_final/entities/cochera.dart';
+import 'package:proyecto_final/entities/usuario_cochera.dart';
 import 'package:proyecto_final/models/autocomplete_prediction.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 import 'package:proyecto_final/services/location_list_tile.dart';
 import '../models/constant.dart';
-import 'package:proyecto_final/entities/user.dart' as myUser;
 
 class GarageRegisterAutoPlete extends StatefulWidget {
   const GarageRegisterAutoPlete({Key? key}) : super(key: key);
@@ -22,12 +20,10 @@ class GarageRegisterAutoPlete extends StatefulWidget {
 class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
   List<AutocompletePrediction> placePredictions = [];
   final DatabaseService _databaseService = DatabaseService();
-  final TextEditingController _controllerOwnerId = TextEditingController();
   final TextEditingController _description = TextEditingController();
   final TextEditingController _controllerGarageName = TextEditingController();
   final TextEditingController _controllerGarageAdress = TextEditingController();
-  final TextEditingController _controllerQuantitySpaces =
-      TextEditingController();
+  final TextEditingController _controllerQuantitySpaces = TextEditingController();
   final TextEditingController _controllerPrice = TextEditingController();
   final TextEditingController _controllerName = TextEditingController();
   final TextEditingController _controllerSurname = TextEditingController();
@@ -63,33 +59,41 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
     }
   }
 
+  static bool isNotBlank(String value) {
+  return value.trim().isNotEmpty;
+}
+
   Widget _submitButton() {
-    return ElevatedButton(
-      onPressed: () {
-        String email = emailUsuario ?? "";
-        myUser.User myUser1 = myUser.User(
+  return ElevatedButton(
+    onPressed: () {
+      String email = emailUsuario ?? "";
+      if (isNotBlank(_controllerName.text) &&
+          isNotBlank(_controllerSurname.text) &&
+          isNotBlank(_controllerGarageName.text) &&
+          isNotBlank(_controllerGarageAdress.text) &&
+          isNotBlank(_description.text) &&
+          isNotBlank(_controllerPrice.text) &&
+          isNotBlank(_controllerQuantitySpaces.text)) {
+        UsuarioCochera usuarioCochera = UsuarioCochera(
           nombre: _controllerName.text,
           apellido: _controllerSurname.text,
           email: email,
-        );
-        _databaseService.addUser(myUser1);
-        String? userId = FirebaseAuth.instance.currentUser?.uid;
-        String idUser = userId ?? "";
-        print(idUser);
-
-        Cochera cochera = Cochera(
-          nombre: _controllerGarageName.text,
-          ownerId: idUser,
-          descripcion: _description.text,
+          nombreCochera: _controllerGarageName.text,
           direccion: _controllerGarageAdress.text,
+          descripcion: _description.text,
           price: double.parse(_controllerPrice.text),
           cantLugares: int.parse(_controllerQuantitySpaces.text),
         );
-        _databaseService.addCochera(cochera);
-      },
-      child: Text('Confirmar'),
-    );
-  }
+        _databaseService.addUsuarioCochera(usuarioCochera);
+      } else {
+        setState(() {
+          errorMessage = 'Por favor, complete todos los campos correctamente.';
+        });
+      }
+    },
+    child: Text('Confirmar'),
+  );
+}
 
   Widget _entryField(String title, TextEditingController controller) {
     return TextField(
@@ -97,6 +101,9 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
       decoration: InputDecoration(
         labelText: title,
       ),
+      inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
+    ],
     );
   }
 

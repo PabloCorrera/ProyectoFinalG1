@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:proyecto_final/auth.dart';
+import 'package:proyecto_final/pages/garage_register.dart';
 import 'package:proyecto_final/pages/garage_register_autocomplete.dart';
 import 'package:proyecto_final/pages/login_register_page.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';

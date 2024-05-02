@@ -1,13 +1,22 @@
 import 'package:firebase_auth/firebase_auth.dart' as FirebaseAuth;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:proyecto_final/auth.dart';
-import 'package:proyecto_final/entities/user.dart';
+import 'package:proyecto_final/entities/usuario_consumidor.dart';
+import 'package:proyecto_final/pages/usuario_home.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 
-class UserRegister extends StatelessWidget {
+class UserRegister extends StatefulWidget {
   UserRegister({Key? key}) : super(key: key);
+
   static const String name = 'UserRegister';
 
+  @override
+  _UserRegisterState createState() => _UserRegisterState();
+}
+
+class _UserRegisterState extends State<UserRegister> {
   final DatabaseService _databaseService = DatabaseService();
   final TextEditingController _controllerName = TextEditingController();
   final TextEditingController _controllerSurname = TextEditingController();
@@ -18,13 +27,14 @@ class UserRegister extends StatelessWidget {
   Widget _entryField(String title, TextEditingController controller) {
     return TextField(
       controller: controller,
-      obscureText: title == "Contraseña",
       decoration: InputDecoration(
         labelText: title,
       ),
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]')),
+      ],
     );
   }
-
 
   Widget _title() {
     return const Text(
@@ -39,13 +49,19 @@ class UserRegister extends StatelessWidget {
   Widget _submitButton() {
     return ElevatedButton(
       onPressed: () {
-        User user = User(
-          nombre: _controllerName.text,
-          apellido: _controllerSurname.text,
-          email: userMail,
-          
-        );
-        _databaseService.addUser(user);
+        if (_controllerName.text.trim().isNotEmpty &&
+            _controllerSurname.text.trim().isNotEmpty) {
+          UsuarioConsumidor user = UsuarioConsumidor(
+            nombre: _controllerName.text,
+            apellido: _controllerSurname.text,
+            email: userMail,
+          );
+          _databaseService.addUsuarioConsumidor(user);
+        } else {
+          setState(() {
+            errorMessage = 'Por favor, complete todos los campos correctamente.';
+          });
+        }
       },
       child: Text('Confirmar'),
     );
@@ -62,8 +78,6 @@ class UserRegister extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
- 
-
     return Scaffold(
       appBar: AppBar(
         title: _title(),
