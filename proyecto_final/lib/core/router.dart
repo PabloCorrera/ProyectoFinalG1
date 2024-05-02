@@ -33,4 +33,10 @@ final appRouter = GoRouter(routes: [
     path: '/mapsPage',
     builder: (context, state) => MapsPage(),
   ),
+GoRoute(
+    name: UsuarioHome.name,
+    path: '/usuarioHome',
+    builder: (context, state) => UsuarioHome(),
+  ),
+
 ]);
