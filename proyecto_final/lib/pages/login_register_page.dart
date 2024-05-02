@@ -6,6 +6,7 @@ import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/pages/garage_home.dart';
 import 'package:proyecto_final/pages/home_page.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:proyecto_final/pages/usuario_home.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 import 'package:proyecto_final/services/local_auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,7 +28,8 @@ class _LoginPageState extends State<LoginPage> {
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
-  DatabaseService databaseService = DatabaseService();
+   DatabaseService databaseService = DatabaseService();
+
 
   @override
   void initState() {
@@ -53,9 +55,8 @@ class _LoginPageState extends State<LoginPage> {
             try {
               await Auth().signInWithEmailAndPassword(
                   email: usuario, password: contrasena);
-              if (context.mounted) {
-                context.pushNamed(HomePage.name);
-              }
+
+    
             } on FirebaseAuthException catch (e) {
               setState(() {
                 errorMessage = e.message;
@@ -87,8 +88,30 @@ class _LoginPageState extends State<LoginPage> {
           }
         }
       }
+      bool registrado =
+          await databaseService.validarUsuario(_controllerEmail.text);
+      bool isConsumer =
+          await databaseService.getTipoUsuario(_controllerEmail.text) ==
+              "consumidor";
+      bool isOwner =
+          await databaseService.getTipoUsuario(_controllerEmail.text) ==
+              "cochera";
 
-      if (context.mounted) {
+      print("Registradoooooooooooooooooooooooooo");
+      print(registrado);
+      print("Is owner");
+      print(isOwner);
+      print(context.mounted);
+
+      if (context.mounted && registrado && isConsumer) {
+        print("Va por aca");
+        context.pushNamed(UsuarioHome.name);
+      }
+      else if (context.mounted && registrado && isOwner) {
+        print("Es usuario dueño");
+        context.pushNamed(GarageHome.name);
+      } else {
+        print("Va por aca tambien");
         context.pushNamed(HomePage.name);
       }
     } on FirebaseAuthException catch (e) {

@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart' as FirebaseAuth;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:proyecto_final/auth.dart';
-import 'package:proyecto_final/entities/user.dart';
+import 'package:proyecto_final/entities/usuario_consumidor.dart';
+import 'package:proyecto_final/pages/usuario_home.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 
 class UserRegister extends StatelessWidget {
@@ -36,16 +38,17 @@ class UserRegister extends StatelessWidget {
     );
   }
 
-  Widget _submitButton() {
+  Widget _submitButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        User user = User(
+        UsuarioConsumidor user = UsuarioConsumidor(
           nombre: _controllerName.text,
           apellido: _controllerSurname.text,
           email: userMail,
           
         );
-        _databaseService.addUser(user);
+        _databaseService.addUsuarioConsumidor(user);
+        context.pushNamed(UsuarioHome.name);
       },
       child: Text('Confirmar'),
     );
@@ -98,7 +101,7 @@ class UserRegister extends StatelessWidget {
             const SizedBox(height: 20),
             _errorMessage(),
             const SizedBox(height: 20),
-            _submitButton(),
+            _submitButton(context),
           ],
         ),
       ),

@@ -2,8 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:proyecto_final/entities/cochera.dart';
-import 'package:proyecto_final/entities/user.dart' as myUser;
+import 'package:proyecto_final/entities/usuario_cochera.dart';
 import 'package:proyecto_final/pages/garage_home.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 
@@ -24,36 +23,23 @@ class GarageRegister extends StatelessWidget {
   String? errorMessage = '';
   String? emailUsuario = FirebaseAuth.instance.currentUser?.email;
   
-  
   Widget _submitButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
         String email = emailUsuario ?? "";
-        myUser.User myUser1 = myUser.User(
+
+        UsuarioCochera usuarioCochera = UsuarioCochera(
           nombre: _controllerName.text,
           apellido: _controllerSurname.text,
           email: email,
-      
-        );    
-        _databaseService.addUser(myUser1);
-        String? userId = FirebaseAuth.instance.currentUser?.uid;
-        String idUser = userId ?? "";
-        print(idUser);
-      Cochera cochera = Cochera(
-        nombre: _controllerGarageName.text,
-        descripcion: _description.text,
-        direccion: _controllerGarageAdress.text,
-        price: double.parse(_controllerPrice.text),
+          nombreCochera: _controllerGarageName.text,
+          direccion: _controllerGarageAdress.text,
+          descripcion: _description.text,
+          price: double.parse(_controllerPrice.text),
         cantLugares: int.parse(_controllerQuantitySpaces.text),
-        ownerId: idUser,
-        //ownerId: 
-      );
-        _databaseService.addCochera(cochera);
-               context.pushNamed(
-        GarageHome.name,
-        extra: emailUsuario, // Pasando el objeto user como argumento
-      );
-        
+        );    
+        _databaseService.addUsuarioCochera(usuarioCochera);
+        context.pushNamed(GarageHome.name);
       },
       child: Text('Confirmar'),
     );

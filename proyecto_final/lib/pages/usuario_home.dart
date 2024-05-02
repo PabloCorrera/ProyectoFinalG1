@@ -4,6 +4,7 @@ import 'package:proyecto_final/entities/user.dart';
 import 'package:proyecto_final/services/database_sevice.dart'; // Importa el servicio de base de datos
 
 class UsuarioHome extends StatelessWidget {
+<<<<<<< HEAD
   final String userMail;
 
   UsuarioHome({Key? key, required this.userMail}) : super(key: key);
@@ -37,6 +38,21 @@ class UsuarioHome extends StatelessWidget {
             SizedBox(height: 20),
             // Puedes agregar más widgets aquí si es necesario
           ],
+=======
+  const UsuarioHome({Key? key}) : super(key: key);
+  static const String name = 'UsuarioHome';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Hola Usuario Consumidor'),
+      ),
+      body: Center(
+        child: Text(
+          '¡Hola usuario consumidor!',
+          style: TextStyle(fontSize: 24),
+>>>>>>> ramaPablo
         ),
       ),
     );
