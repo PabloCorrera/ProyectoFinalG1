@@ -40,4 +40,11 @@ GoRoute(
     builder: (context, state) => UsuarioHome(),
   ),
 
+  GoRoute(
+    name: UsuarioCocheraHome.name,
+    path: '/usuarioCochera',
+    builder: (context, state) => UsuarioCocheraHome(),
+  ),
+
+
 ]);

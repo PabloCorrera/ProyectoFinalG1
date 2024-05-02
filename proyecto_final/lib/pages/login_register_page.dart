@@ -49,9 +49,6 @@ class _LoginPageState extends State<LoginPage> {
             try {
               await Auth().signInWithEmailAndPassword(
                   email: usuario, password: contrasena);
-              if (context.mounted) {
-                context.pushNamed(HomePage.name);
-              }
             } on FirebaseAuthException catch (e) {
               setState(() {
                 errorMessage = e.message;
