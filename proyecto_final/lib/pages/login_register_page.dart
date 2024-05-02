@@ -40,8 +40,7 @@ class _LoginPageState extends State<LoginPage> {
       );
 
   Future<void> obtenerCredenciales() async {
-    print("ARRANCA");
-    final storage = FlutterSecureStorage(aOptions: _getAndroidOptions());
+     final storage = FlutterSecureStorage(aOptions: _getAndroidOptions());
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getBool('usarAutenticacionBiometrica') == true) {
       try {
@@ -53,6 +52,9 @@ class _LoginPageState extends State<LoginPage> {
             try {
               await Auth().signInWithEmailAndPassword(
                   email: usuario, password: contrasena);
+              if (context.mounted) {
+                context.pushNamed(HomePage.name);
+              }
             } on FirebaseAuthException catch (e) {
               setState(() {
                 errorMessage = e.message;
