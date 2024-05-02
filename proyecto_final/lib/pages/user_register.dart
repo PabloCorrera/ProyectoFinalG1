@@ -57,6 +57,7 @@ class _UserRegisterState extends State<UserRegister> {
             email: userMail,
           );
           _databaseService.addUsuarioConsumidor(user);
+          context.pushNamed(UsuarioHome.name);
         } else {
           setState(() {
             errorMessage = 'Por favor, complete todos los campos correctamente.';

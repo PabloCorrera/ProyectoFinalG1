@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
+import 'package:proyecto_final/pages/usuario_cochera_home.dart';
+import 'package:proyecto_final/pages/usuario_home.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 
 class GarageRegister extends StatelessWidget {
@@ -37,6 +40,8 @@ class GarageRegister extends StatelessWidget {
         cantLugares: int.parse(_controllerQuantitySpaces.text),
         );    
         _databaseService.addUsuarioCochera(usuarioCochera);
+        
+         
       },
       child: Text('Confirmar'),
     );

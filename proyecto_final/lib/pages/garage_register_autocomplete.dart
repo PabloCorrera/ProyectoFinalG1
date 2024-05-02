@@ -2,9 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
 import 'package:proyecto_final/models/autocomplete_prediction.dart';
+import 'package:proyecto_final/pages/usuario_cochera_home.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 import 'package:proyecto_final/services/location_list_tile.dart';
 import '../models/constant.dart';
@@ -85,6 +87,7 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
           cantLugares: int.parse(_controllerQuantitySpaces.text),
         );
         _databaseService.addUsuarioCochera(usuarioCochera);
+        context.pushNamed(UsuarioCocheraHome.name);
       } else {
         setState(() {
           errorMessage = 'Por favor, complete todos los campos correctamente.';

@@ -27,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
-  DatabaseService databaseService = new DatabaseService();
+  DatabaseService databaseService = DatabaseService();
 
   @override
   void initState() {
