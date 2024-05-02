@@ -43,9 +43,11 @@ class _LoginPageState extends State<LoginPage> {
     print("ARRANCA");
     final storage = FlutterSecureStorage(aOptions: _getAndroidOptions());
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    print(prefs.getBool('usarAutenticacionBiometrica'));
     if (prefs.getBool('usarAutenticacionBiometrica') == true) {
       try {
         bool isAuthorized = await LocalAuth.authenticate();
+        print(isAuthorized);
         if (isAuthorized) {
           String? usuario = await storage.read(key: 'usuario');
           String? contrasena = await storage.read(key: 'contrasena');
@@ -93,12 +95,6 @@ class _LoginPageState extends State<LoginPage> {
       bool isOwner =
           await databaseService.getTipoUsuario(_controllerEmail.text) ==
               "cochera";
-
-      print("Registradoooooooooooooooooooooooooo");
-      print(registrado);
-      print("Is owner");
-      print(isOwner);
-      print(context.mounted);
 
       if (context.mounted && registrado && isConsumer) {
         print("Va por aca");
