@@ -43,18 +43,16 @@ class _LoginPageState extends State<LoginPage> {
     print("ARRANCA");
     final storage = FlutterSecureStorage(aOptions: _getAndroidOptions());
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    print(prefs.getBool('usarAutenticacionBiometrica'));
     if (prefs.getBool('usarAutenticacionBiometrica') == true) {
       try {
         bool isAuthorized = await LocalAuth.authenticate();
-        print(isAuthorized);
         if (isAuthorized) {
           String? usuario = await storage.read(key: 'usuario');
           String? contrasena = await storage.read(key: 'contrasena');
           if (usuario != null && contrasena != null) {
             try {
               await Auth().signInWithEmailAndPassword(
-                  email: usuario, password: contrasena);
+                  email: usuario, password: contrasena).then((value) =>  redirigirUsuario());
             } on FirebaseAuthException catch (e) {
               setState(() {
                 errorMessage = e.message;
@@ -74,19 +72,25 @@ class _LoginPageState extends State<LoginPage> {
           email: _controllerEmail.text, password: _controllerPassword.text);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       if (prefs.getBool('usarAutenticacionBiometrica') == null) {
-        print("NO TIENE");
         bool? usarAutenticacionBiometrica = await _mostrarDialogo(context);
         if (usarAutenticacionBiometrica != null) {
           _guardarPreferencia(usarAutenticacionBiometrica);
-          print("ACA ESTOY" + usarAutenticacionBiometrica.toString());
           if (usarAutenticacionBiometrica) {
-            print("entro a guardarDatos");
             guardarCredenciales(
                 _controllerEmail.text, _controllerPassword.text);
           }
         }
       }
+      await redirigirUsuario();
 
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message;
+      });
+    }
+  }
+  
+  Future<void> redirigirUsuario() async{
        bool registrado =
           await databaseService.validarUsuario(_controllerEmail.text);
       bool isConsumer =
@@ -97,23 +101,14 @@ class _LoginPageState extends State<LoginPage> {
               "cochera";
 
       if (context.mounted && registrado && isConsumer) {
-        print("Va por aca");
         context.pushNamed(UsuarioHome.name);
       }
       else if (context.mounted && registrado && isOwner) {
-        print("Es usuario dueño");
         context.pushNamed(UsuarioCocheraHome.name);
       } else {
-        print("Va por aca tambien");
         context.pushNamed(HomePage.name);
       }
-
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        errorMessage = e.message;
-      });
-    }
-  }
+  } 
 
   Future<bool?> _mostrarDialogo(BuildContext context) async {
     return showDialog<bool>(
