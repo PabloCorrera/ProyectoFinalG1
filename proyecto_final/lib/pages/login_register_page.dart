@@ -51,10 +51,7 @@ class _LoginPageState extends State<LoginPage> {
           if (usuario != null && contrasena != null) {
             try {
               await Auth().signInWithEmailAndPassword(
-                  email: usuario, password: contrasena);
-              if (context.mounted) {
-                context.pushNamed(HomePage.name);
-              }
+                  email: usuario, password: contrasena).then((value) =>  redirigirUsuario());
             } on FirebaseAuthException catch (e) {
               setState(() {
                 errorMessage = e.message;
@@ -74,19 +71,25 @@ class _LoginPageState extends State<LoginPage> {
           email: _controllerEmail.text, password: _controllerPassword.text);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       if (prefs.getBool('usarAutenticacionBiometrica') == null) {
-        print("NO TIENE");
         bool? usarAutenticacionBiometrica = await _mostrarDialogo(context);
         if (usarAutenticacionBiometrica != null) {
           _guardarPreferencia(usarAutenticacionBiometrica);
-          print("ACA ESTOY" + usarAutenticacionBiometrica.toString());
           if (usarAutenticacionBiometrica) {
-            print("entro a guardarDatos");
             guardarCredenciales(
                 _controllerEmail.text, _controllerPassword.text);
           }
         }
       }
+      await redirigirUsuario();
 
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message;
+      });
+    }
+  }
+  
+  Future<void> redirigirUsuario() async{
        bool registrado =
           await databaseService.validarUsuario(_controllerEmail.text);
       bool isConsumer =
@@ -96,30 +99,15 @@ class _LoginPageState extends State<LoginPage> {
           await databaseService.getTipoUsuario(_controllerEmail.text) ==
               "cochera";
 
-      print("Registradoooooooooooooooooooooooooo");
-      print(registrado);
-      print("Is owner");
-      print(isOwner);
-      print(context.mounted);
-
       if (context.mounted && registrado && isConsumer) {
-        print("Va por aca");
         context.pushNamed(UsuarioHome.name);
       }
       else if (context.mounted && registrado && isOwner) {
-        print("Es usuario dueño");
         context.pushNamed(UsuarioCocheraHome.name);
       } else {
-        print("Va por aca tambien");
         context.pushNamed(HomePage.name);
       }
-
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        errorMessage = e.message;
-      });
-    }
-  }
+  } 
 
   Future<bool?> _mostrarDialogo(BuildContext context) async {
     return showDialog<bool>(
