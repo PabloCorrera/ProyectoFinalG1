@@ -1,15 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:proyecto_final/entities/reserva.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
 import 'package:proyecto_final/entities/usuario_consumidor.dart';
 
 const String USUARIO_CONSUMIDOR = "usuarioConsumidor";
 const String USUARIO_COCHERA = "usuarioCochera";
+const String RESERVA = "reserva";
 
 class DatabaseService {
   final _firestore = FirebaseFirestore.instance;
 
   late final CollectionReference _usuariosConsumidorRef;
   late final CollectionReference _usuariosCocheraRef;
+  late final CollectionReference _reservaRef;
   
   DatabaseService() {
     _usuariosConsumidorRef =
@@ -23,6 +26,13 @@ class DatabaseService {
           fromFirestore: (snapshots, _) => UsuarioCochera.fromJson(snapshots.data()!),
           toFirestore: (cochera, _) => cochera.toJson(),
         );
+
+    _reservaRef = _firestore.collection(RESERVA).withConverter<Reserva>(
+      fromFirestore: (snapshots, _)=> Reserva.fromJson(
+            snapshots.data()!,
+          ),
+          toFirestore: (res, _) =>res.toJson(),
+          );
   }
 
   Stream<QuerySnapshot> getUsuarios() {
@@ -135,4 +145,28 @@ Future<bool> validarUsuario(String email) async {
       });
     }
   }
+ Future<bool> addReserva(Reserva reserva) async {
+    try {
+        await _reservaRef.add(reserva);
+        return true;
+    } catch (e) {
+      print('Error al agregar el usuario: $e');
+      return false; 
+    }
+  }
+
+  Future<List<UsuarioCochera>> getUsuariosCochera() async {
+    final ref = _firestore.collection(USUARIO_COCHERA)
+    .withConverter(fromFirestore: UsuarioCochera.fromFirestore, toFirestore:(UsuarioCochera usuarioCochera,_)=> usuarioCochera.toFirestore());
+    List<UsuarioCochera> usuariosCochera = [];
+    final docSnap = await ref.get();
+    docSnap.docs.forEach((element) {
+      usuariosCochera.add(element.data());
+    }); 
+
+    return usuariosCochera;
+
+}
+
+
 }

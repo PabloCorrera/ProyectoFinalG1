@@ -1,7 +1,6 @@
-import 'reserva.dart'; // Importa la clase Reserva si aún no lo has hecho
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UsuarioCochera {
-  late String userId;
   late String nombre;
   late String apellido;
   late String email;
@@ -12,10 +11,8 @@ class UsuarioCochera {
   late double price;
   late String descripcion;
   late int cantLugares;
-  late List<Reserva> reservas;
 
   UsuarioCochera({
-    this.userId = "",
     this.nombre = "",
     this.apellido = "",
     this.email = "",
@@ -25,24 +22,21 @@ class UsuarioCochera {
     this.lng = 0.0,
     this.price = 0.0,
     required this.descripcion,
-    required this.cantLugares,
-    List<Reserva>? reservas,
-  }) : reservas = reservas ?? [];
+    required this.cantLugares});
 
 
 UsuarioCochera.fromJson(Map<String, Object?> json)
       : this(
           nombre: json['nombre']! as String,
-          apellido: json['apellido']! as String, // Added apellido
-          email: json['email']! as String, // Added email
-          nombreCochera: json['nombreCochera']! as String, // Added nombreCochera
+          apellido: json['apellido']! as String, 
+          email: json['email']! as String, 
+          nombreCochera: json['nombreCochera']! as String, 
           direccion: json['direccion']! as String,
           lat: json['lat']! as double,
           lng: json['lng']! as double,
           price: json['price']! as double,
           descripcion: json['descripcion']! as String,
           cantLugares: json['cantLugares']! as int,
-          reservas: json['reservas']! as List<Reserva>,
         );
 
    UsuarioCochera copyWith({
@@ -56,7 +50,6 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
   double? price,
   String? descripcion,
   int? cantLugares,
-  List<Reserva>? reservas,
 }) {
   return UsuarioCochera(
     nombre: nombre ?? this.nombre,
@@ -69,7 +62,6 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
     price: price ?? this.price,
     descripcion: descripcion ?? this.descripcion,
     cantLugares: cantLugares ?? this.cantLugares,
-    reservas: reservas ?? this.reservas,
   );
 }
 
@@ -85,15 +77,58 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
       'price': price,
       'descripcion': descripcion,
       'cantLugares': cantLugares,
-      'reservas': reservas
     };
   }
- 
-  void addReserva(Reserva reserva) {
-    reservas.add(reserva);
+  factory UsuarioCochera.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+    SnapshotOptions? options,
+  ) {
+    final data = snapshot.data();
+    return UsuarioCochera(
+      nombre: data?['nombre'],
+      apellido: data?['apellido'],
+      email: data?['email'],
+      nombreCochera: data?['nombreCochera'],
+      direccion: data?['direccion'],
+      lat: data?['lat'],
+      lng: data?['lng'],
+      price: data?['price'],
+      descripcion: data?['descripcion'],
+      cantLugares: data?['cantLugares'],
+    );
   }
 
 
+ Map<String, dynamic> toFirestore() {
+    return {
+      if (nombre != null) 'nombre': nombre,
+      if (apellido != null) 'apellido': apellido,
+      if (email != null) 'email': email,
+      if (nombreCochera != null) 'nombreCochera': nombreCochera,
+      if (direccion != null) 'direccion': direccion,
+      if (lat != null) 'lat': lat,
+      if (lng != null) 'lng': lng,
+      if (price != null) 'price': price,
+      if (descripcion != null) 'descripcion': descripcion,
+      if (cantLugares != null) 'cantLugares': cantLugares,
+    };
+  }
+
+    bool verificarDisponibilidad(Timestamp fechaEntrada, Timestamp fechaSalida) {
+    
+    for (Reserva reserva in reservas) {
+      if (fechaEntrada.isAfter(reserva.fechaEntrada!) && fechaEntrada.isBefore(reserva.fechaSalida!)) {
+        reservasEnFecha++;
+      }
+      if (fechaSalida.isAfter(reserva.fechaEntrada!) && fechaSalida.isBefore(reserva.fechaSalida!)) {
+        reservasEnFecha++;
+      }
+      if (fechaEntrada.isAtSameMomentAs(reserva.fechaEntrada!) || fechaSalida.isAtSameMomentAs(reserva.fechaSalida!)) {
+        reservasEnFecha++;
+      }
+    }
+    return reservasEnFecha < cantLugares;
+  }
 
 
 }
