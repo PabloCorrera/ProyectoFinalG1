@@ -1,3 +1,5 @@
+import 'package:proyecto_final/entities/usuario_consumidor.dart';
+import 'package:proyecto_final/pages/garageDetail.dart';
 import 'package:proyecto_final/pages/garage_home.dart';
 import 'package:proyecto_final/pages/garage_register.dart';
 import 'package:proyecto_final/pages/garage_register_autocomplete.dart';
@@ -6,6 +8,7 @@ import 'package:proyecto_final/pages/home_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:proyecto_final/pages/maps_page.dart';
 import 'package:proyecto_final/pages/user_register.dart';
+import 'package:proyecto_final/pages/usuario_cochera_home.dart';
 import 'package:proyecto_final/pages/usuario_home.dart';
 
 final appRouter = GoRouter(routes: [
@@ -24,32 +27,33 @@ final appRouter = GoRouter(routes: [
     path: '/userregister',
     builder: (context, state) => UserRegister(),
   ),
-  // GoRoute(
-  //   name: GarageRegisterAutoPlete.name,
-  //   path: '/garageRegisterAutoPlete',
-  //   builder: (context, state) => GarageRegisterAutoPlete(),
-  // ),
   GoRoute(
-    name: GarageHome.name,
-    path: '/garageHome',
-    builder: (context, state) => GarageHome(),
-  ),
-
-    GoRoute(
-    name: UsuarioHome.name,
-    path: '/usuarioHome',
-    builder: (context, state) => UsuarioHome(),
-  ),
-
-
-  GoRoute(
-    name: GarageRegister.name,
-    path: '/garageRegister',
-    builder: (context, state) => GarageRegister(),
+    name: GarageRegisterAutoPlete.name,
+    path: '/garageRegisterAutoPlete',
+    builder: (context, state) => GarageRegisterAutoPlete(),
   ),
   GoRoute(
     name: MapsPage.name,
     path: '/mapsPage',
     builder: (context, state) => MapsPage(),
   ),
+GoRoute(
+    name: UsuarioHome.name,
+    path: '/usuarioHome',
+    builder: (context, state) => UsuarioHome(),
+  ),
+
+  GoRoute(
+    name: UsuarioCocheraHome.name,
+    path: '/usuarioCochera',
+    builder: (context, state) => UsuarioCocheraHome(),
+  ),
+
+    GoRoute(
+    name: GarageDetail.name,
+    path: '/garageDetail',
+    builder: (context, state) => GarageDetail(),
+  ),
+
+
 ]);

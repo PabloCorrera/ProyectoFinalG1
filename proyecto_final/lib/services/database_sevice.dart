@@ -80,7 +80,7 @@ class DatabaseService {
     }
   }
 
-  Future<String?> getTipoUsuario(String email) async {
+ Future<String?> getTipoUsuario(String email) async {
     try {
       var queryConsumidor = await _usuariosConsumidorRef.where('email', isEqualTo: email).get();
       var queryCochera = await _usuariosCocheraRef.where('email', isEqualTo: email).get();
@@ -109,6 +109,19 @@ Future<bool> validarUsuario(String email) async {
   } catch (e) {
     print('Error al validar el usuario: $e');
     return false; // Manejo del error: en este caso, se asume que el usuario no existe
+  }
+}
+
+Future<List<UsuarioCochera>> getCocherasDisponibles() async {
+  try {
+    List<UsuarioCochera> cocherasDisponibles = usuariosCocheras
+        .where((cochera) => cochera.cantLugares > 0)
+        .toList();
+
+    return cocherasDisponibles;
+  } catch (e) {
+    print('Error al obtener las cocheras con lugares disponibles: $e');
+    return [];
   }
 }
 

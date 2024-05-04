@@ -97,3 +97,13 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
 
 
 }
+
+
+final List<UsuarioCochera> usuariosCocheras = [
+  UsuarioCochera(descripcion: 'La mejor Cochera', cantLugares: 17),
+  UsuarioCochera(descripcion: 'Cochera Copada', cantLugares: 2),
+  UsuarioCochera(descripcion: 'Alta cochera', cantLugares: 15),
+  UsuarioCochera(descripcion: 'Dale que va', cantLugares: 25),
+  UsuarioCochera(descripcion: 'Esta tampoco va', cantLugares: 0),
+  UsuarioCochera(descripcion: 'Esta no va', cantLugares: 0)
+];

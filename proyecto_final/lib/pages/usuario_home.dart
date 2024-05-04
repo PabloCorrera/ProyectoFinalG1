@@ -1,60 +1,81 @@
+
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart' as FirebaseAuth;
-import 'package:proyecto_final/entities/user.dart';
+import 'package:go_router/go_router.dart';
+import 'package:proyecto_final/entities/usuario_cochera.dart';
+import 'package:proyecto_final/pages/garageDetail.dart';
 import 'package:proyecto_final/services/database_sevice.dart'; // Importa el servicio de base de datos
 
-class UsuarioHome extends StatelessWidget {
-<<<<<<< HEAD
-  final String userMail;
+class UsuarioHome extends StatefulWidget {
+  UsuarioHome({Key? key}) : super(key: key);
 
-  UsuarioHome({Key? key, required this.userMail}) : super(key: key);
   static const String name = 'usuarioHome';
-  String? emailUsuario = FirebaseAuth.FirebaseAuth.instance.currentUser?.email;
-
-  // Instancia de DatabaseService
-  final DatabaseService _databaseService = DatabaseService();
- 
 
   @override
-  Widget build(BuildContext context) {
-    // Llama al método getUserByEmail para obtener el usuario correspondiente al correo electrónico actual
- 
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Inicio'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '¡Bienvenido, $emailUsuario!',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 20),
-            // Puedes agregar más widgets aquí si es necesario
-          ],
-=======
-  const UsuarioHome({Key? key}) : super(key: key);
-  static const String name = 'UsuarioHome';
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Hola Usuario Consumidor'),
-      ),
-      body: Center(
-        child: Text(
-          '¡Hola usuario consumidor!',
-          style: TextStyle(fontSize: 24),
->>>>>>> ramaPablo
-        ),
-      ),
-    );
-  }
+  _UsuarioHomeState createState() => _UsuarioHomeState();
 }
+
+class _UsuarioHomeState extends State<UsuarioHome> {
+  late Future<List<UsuarioCochera>> cocherasDisponibles;
+
+  @override
+void initState() {
+  super.initState();
+  print("TRAEMOS LAS COCHERAS DISPONIBLES");
+  cocherasDisponibles = DatabaseService().getCocherasDisponibles();
+  cocherasDisponibles.then((cocheras) {
+    if (cocheras.isNotEmpty) {
+      print(cocheras[0].descripcion);
+    } else {
+      print("No hay cocheras disponibles.");
+    }
+  });
+}
+
+  @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text('Welcome'), // Aquí estableces el título del AppBar
+    ),
+
+    body: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('Bienvenido Usuariooo'), // Agrega aquí el texto
+          SizedBox(height: 20), // Agrega un espacio entre el texto y el botón
+          _ListaCocherasDisponibles(),
+        ],
+      ),
+    ),
+  );
+}
+
+
+  }
+
+class _ListaCocherasDisponibles extends StatelessWidget {
+  const _ListaCocherasDisponibles({
+    super.key,
+  });
+
+  @override
+Widget build(BuildContext context) {
+  return ExpansionTile(
+    title: Text('Cocheras disponibles'),
+    children: usuariosCocheras
+        .map(
+          (cochera) => ListTile(
+            title: Text(cochera.descripcion), // Muestra la descripción de la cochera
+            subtitle: Text('Cantidad: ${cochera.cantLugares}'), // Muestra la cantidad de lugares disponibles
+            onTap: () {
+              context.pushNamed(GarageDetail.name);
+              // Aquí puedes manejar el evento al seleccionar la cochera
+            },
+          ),
+        )
+        .toList(),
+  );
+}
+}
+

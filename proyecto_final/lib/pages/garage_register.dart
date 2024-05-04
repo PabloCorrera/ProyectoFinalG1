@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
-import 'package:proyecto_final/pages/garage_home.dart';
+import 'package:proyecto_final/pages/usuario_cochera_home.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 
 class GarageRegister extends StatelessWidget {
@@ -39,7 +39,7 @@ class GarageRegister extends StatelessWidget {
         cantLugares: int.parse(_controllerQuantitySpaces.text),
         );    
         _databaseService.addUsuarioCochera(usuarioCochera);
-        context.pushNamed(GarageHome.name);
+        context.pushNamed(UsuarioCocheraHome.name);
       },
       child: Text('Confirmar'),
     );
@@ -139,6 +139,4 @@ Widget build(BuildContext context) {
     ),
   );
 }
-
-
 }
