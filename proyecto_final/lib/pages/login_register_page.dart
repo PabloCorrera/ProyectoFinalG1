@@ -40,7 +40,6 @@ class _LoginPageState extends State<LoginPage> {
       );
 
   Future<void> obtenerCredenciales() async {
-    print("ARRANCA");
     final storage = FlutterSecureStorage(aOptions: _getAndroidOptions());
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getBool('usarAutenticacionBiometrica') == true) {
@@ -52,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
           if (usuario != null && contrasena != null) {
             try {
               await Auth().signInWithEmailAndPassword(
-                  email: usuario, password: contrasena).then((value) =>  redirigirUsuario());
+                  email: usuario, password: contrasena).then((value) =>  redirigirUsuario(usuario));
             } on FirebaseAuthException catch (e) {
               setState(() {
                 errorMessage = e.message;
@@ -81,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
           }
         }
       }
-      await redirigirUsuario();
+      await redirigirUsuario(_controllerEmail.text);
 
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -90,14 +89,14 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
   
-  Future<void> redirigirUsuario() async{
+  Future<void> redirigirUsuario(String email) async{
        bool registrado =
-          await databaseService.validarUsuario(_controllerEmail.text);
+          await databaseService.validarUsuario(email);
       bool isConsumer =
-          await databaseService.getTipoUsuario(_controllerEmail.text) ==
+          await databaseService.getTipoUsuario(email) ==
               "consumidor";
       bool isOwner =
-          await databaseService.getTipoUsuario(_controllerEmail.text) ==
+          await databaseService.getTipoUsuario(email) ==
               "cochera";
 
       if (context.mounted && registrado && isConsumer) {

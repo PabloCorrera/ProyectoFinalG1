@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:proyecto_final/entities/reserva.dart';
 
 class UsuarioCochera {
   late String nombre;
@@ -114,21 +115,28 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
     };
   }
 
-    bool verificarDisponibilidad(Timestamp fechaEntrada, Timestamp fechaSalida) {
-    
-    for (Reserva reserva in reservas) {
-      if (fechaEntrada.isAfter(reserva.fechaEntrada!) && fechaEntrada.isBefore(reserva.fechaSalida!)) {
-        reservasEnFecha++;
-      }
-      if (fechaSalida.isAfter(reserva.fechaEntrada!) && fechaSalida.isBefore(reserva.fechaSalida!)) {
-        reservasEnFecha++;
-      }
-      if (fechaEntrada.isAtSameMomentAs(reserva.fechaEntrada!) || fechaSalida.isAtSameMomentAs(reserva.fechaSalida!)) {
-        reservasEnFecha++;
-      }
+double calcularPrecioTotal(Timestamp fechaEntrada, Timestamp fechaSalida) {
+  DateTime dateTimeEntrada = fechaEntrada.toDate();
+  DateTime dateTimeSalida = fechaSalida.toDate();
+  double precioPorHora = price;
+
+  Duration diferencia = dateTimeSalida.difference(dateTimeEntrada);
+  int totalMinutos = diferencia.inMinutes;
+
+  if (totalMinutos <= 60) {
+    return precioPorHora;
+  } else {
+    int horas = totalMinutos ~/ 60;
+    int minutosAdicionales = totalMinutos % 60;
+    double cargoAdicional = 0.0;
+    if (minutosAdicionales > 0) {
+      cargoAdicional = precioPorHora / 4 * ((minutosAdicionales - 1) ~/ 15 + 1);
     }
-    return reservasEnFecha < cantLugares;
+    double precioTotal = precioPorHora * horas + cargoAdicional;
+    return precioTotal;
   }
+}
+    
 
 
 }
