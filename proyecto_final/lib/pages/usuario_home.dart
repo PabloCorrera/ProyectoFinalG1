@@ -1,24 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
-=======
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
->>>>>>> main
 import 'package:go_router/go_router.dart';
 import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/entities/reserva.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
-<<<<<<< HEAD
-import 'package:proyecto_final/pages/login_register_page.dart';
-=======
 import 'package:proyecto_final/pages/maps_page.dart';
->>>>>>> main
+import 'package:proyecto_final/pages/login_register_page.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
-import 'package:proyecto_final/navBar/usuario/navbarUsuario.dart';
 
 class UsuarioHome extends StatefulWidget {
-  const UsuarioHome({Key? key}) : super(key: key);
+  const UsuarioHome({super.key});
   static const String name = 'UsuarioHome';
   @override
   State<UsuarioHome> createState() => _UsuarioHomeState();
@@ -60,11 +53,36 @@ class _UsuarioHomeState extends State<UsuarioHome> {
   Future<List<UsuarioCochera>> getCocheras() async {
     return databaseService.getUsuariosCochera();
   }
+
+  Widget _verMapa() {
+    return Container(
+      decoration: BoxDecoration(
+          color: Color.fromARGB(197, 223, 1, 227),
+          borderRadius: BorderRadius.circular(10)),
+      child: TextButton(
+          onPressed: () => {context.pushNamed(MapsPage.name)},
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Ver Mapa',
+                style: TextStyle(color: Colors.white),
+              ),
+              SizedBox(
+                width: 5,
+              ),
+              Icon(
+                FontAwesomeIcons.map,
+                color: Colors.white,
+              ),
+            ],
+          )),
+    );
+  }
    Future<List<Reserva>> getReservas() async {
     return databaseService.getReservasPorUsuario(user!.email!);
   }
 
-<<<<<<< HEAD
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -104,6 +122,15 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                     Navigator.pop(context);
                   })
             },
+          ),ListTile(
+            leading: const Icon(Icons.map),
+            title: const Text('Ver mapa'),
+            onTap: () => {
+              setState(() {
+                    context.pushNamed(MapsPage.name);
+                    Navigator.pop(context);
+                  })
+            },
           ),
           ListTile(
             leading: const Icon(Icons.logout),
@@ -118,34 +145,8 @@ class _UsuarioHomeState extends State<UsuarioHome> {
     ),
         body: aMostrar??vistaCocheras(),
       ),
-=======
-  Widget _verMapa() {
-    return Container(
-      decoration: BoxDecoration(
-          color: Color.fromARGB(197, 223, 1, 227),
-          borderRadius: BorderRadius.circular(10)),
-      child: TextButton(
-          onPressed: () => {context.pushNamed(MapsPage.name)},
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Ver Mapa',
-                style: TextStyle(color: Colors.white),
-              ),
-              SizedBox(
-                width: 5,
-              ),
-              Icon(
-                FontAwesomeIcons.map,
-                color: Colors.white,
-              ),
-            ],
-          )),
->>>>>>> main
     );
 
-<<<<<<< HEAD
 
 
     
@@ -180,37 +181,6 @@ Widget vistaReservas(){
           },
         );
   }
-=======
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('Home Usuario'),
-        ),
-        body: Column(children: <Widget>[
-          _verMapa(),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _cocherasFuture.length,
-              itemBuilder: (context, index) {
-                final cochera = _cocherasFuture[index];
-                return ListTile(
-                  title: Text(cochera.nombreCochera),
-                  subtitle: Text(cochera.direccion),
-                  trailing: ElevatedButton(
-                    onPressed: () {
-                      _showReservarDialog(context, cochera);
-                    },
-                    child: const Text('Reservar'),
-                  ),
-                );
-              },
-            ),
-          )
-        ]));
-  }
-
->>>>>>> main
   Future<void> _showReservarDialog(
       BuildContext context, UsuarioCochera cochera) async {
     DateTime? fechaEntrada = DateTime.now();
@@ -245,7 +215,6 @@ Widget vistaReservas(){
                             if (selectedDate != null) {
                               setState(() {
                                 fechaEntrada = selectedDate;
-<<<<<<< HEAD
                                 if (fechaEntrada!
                                     .isAtSameMomentAs(fechaSalida!)) {
                                   horaSalida!.minute !=
@@ -253,8 +222,6 @@ Widget vistaReservas(){
                                 }
                                 fechaSalida =
                                     fechaEntrada!.add(const Duration(days: 1));
-=======
->>>>>>> main
                               });
                             }
                           },
@@ -276,11 +243,7 @@ Widget vistaReservas(){
                             }
                           },
                           child: Text(
-<<<<<<< HEAD
                               '${horaEntrada!.hour}:${horaEntrada!.minute.toString().padLeft(2, '0')}'),
-=======
-                              '${horaEntrada!.hour}:${horaEntrada!.minute}'),
->>>>>>> main
                         ),
                       ),
                     ],
@@ -294,13 +257,8 @@ Widget vistaReservas(){
                           onPressed: () async {
                             final selectedDate = await showDatePicker(
                               context: context,
-<<<<<<< HEAD
                               initialDate: fechaEntrada!,
                               firstDate: fechaEntrada!,
-=======
-                              initialDate: fechaSalida!,
-                              firstDate: DateTime.now(),
->>>>>>> main
                               lastDate:
                                   DateTime.now().add(const Duration(days: 365)),
                             );
@@ -319,11 +277,7 @@ Widget vistaReservas(){
                           onPressed: () async {
                             final selectedTime = await showTimePicker(
                               context: context,
-<<<<<<< HEAD
                               initialTime: horaEntrada!,
-=======
-                              initialTime: horaSalida!,
->>>>>>> main
                             );
                             if (selectedTime != null) {
                               setState(() {
@@ -331,13 +285,8 @@ Widget vistaReservas(){
                               });
                             }
                           },
-<<<<<<< HEAD
                           child: Text(
                               '${horaSalida!.hour}:${horaSalida!.minute.toString().padLeft(2, '0')}'),
-=======
-                          child:
-                              Text('${horaSalida!.hour}:${horaSalida!.minute}'),
->>>>>>> main
                         ),
                       ),
                     ],
@@ -353,55 +302,8 @@ Widget vistaReservas(){
                 ),
                 ElevatedButton(
                   onPressed: () {
-<<<<<<< HEAD
                     reservar(fechaEntrada, horaEntrada, fechaSalida, horaSalida,
                         cochera, context);
-=======
-                    DateTime dateTimeEntradaCompleto = DateTime(
-                      fechaEntrada!.year,
-                      fechaEntrada!.month,
-                      fechaEntrada!.day,
-                      horaEntrada!.hour,
-                      horaEntrada!.minute,
-                    );
-                    DateTime dateTimeSalidaCompleto = DateTime(
-                      fechaSalida!.year,
-                      fechaSalida!.month,
-                      fechaSalida!.day,
-                      horaSalida!.hour,
-                      horaSalida!.minute,
-                    );
-                    Timestamp entrada =
-                        Timestamp.fromDate(dateTimeEntradaCompleto);
-                    Timestamp salida =
-                        Timestamp.fromDate(dateTimeSalidaCompleto);
-                    Reserva reserva = Reserva(
-                        usuarioEmail: user!.email!,
-                        cocheraEmail: cochera.email,
-                        fechaCreacion: Timestamp.now(),
-                        precioPorHora: cochera.price,
-                        fechaEntrada: entrada,
-                        fechaSalida: salida,
-                        precioTotal:
-                            cochera.calcularPrecioTotal(entrada, salida));
-                    databaseService
-                        .addReserva(reserva)
-                        .then((reservaExitosa) => {
-                              if (reservaExitosa)
-                                {Navigator.of(context).pop()}
-                              else
-                                {
-                                  Navigator.of(context).pop(),
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                          'No se pudo realizar la reserva.'),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  )
-                                }
-                            });
->>>>>>> main
                   },
                   child: const Text('Reservar'),
                 ),
