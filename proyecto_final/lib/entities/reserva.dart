@@ -42,4 +42,32 @@ class Reserva {
     'precioTotal': precioTotal,
   };
 }
+
+factory Reserva.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+    SnapshotOptions? options,
+  ) {
+    final data = snapshot.data();
+    return Reserva(
+      usuarioEmail: data?['usuarioEmail'] ?? '',
+      cocheraEmail: data?['cocheraEmail'] ?? '',
+      fechaCreacion: data?['fechaCreacion'] ?? Timestamp.now(),
+      precioPorHora: (data?['precioPorHora'] ?? 0.0).toDouble(),
+      fechaEntrada: data?['fechaEntrada'] ?? Timestamp.now(),
+      fechaSalida: data?['fechaSalida'] ?? Timestamp.now(),
+      precioTotal: (data?['precioTotal'] ?? 0.0).toDouble(),
+    );
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'usuarioEmail': usuarioEmail,
+      'cocheraEmail': cocheraEmail,
+      'fechaCreacion': fechaCreacion,
+      'precioPorHora': precioPorHora,
+      'fechaEntrada': fechaEntrada,
+      'fechaSalida': fechaSalida,
+      'precioTotal': precioTotal,
+    };
+  }
 }

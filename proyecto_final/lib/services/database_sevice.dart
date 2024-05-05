@@ -165,7 +165,32 @@ Future<bool> validarUsuario(String email) async {
     }); 
 
     return usuariosCochera;
+}
 
+Future<List<Reserva>> getReservasPorCochera(String mailCochera)async{
+final ref = _firestore.collection(RESERVA)
+.where("cocheraEmail",isEqualTo: mailCochera)
+.withConverter(fromFirestore: Reserva.fromFirestore, toFirestore: (Reserva reserva,_)=>reserva.toFirestore());
+List<Reserva> listaReservas = [];
+final docSnap = await ref.get();
+docSnap.docs.forEach((element) {
+  listaReservas.add(element.data());
+});
+
+return listaReservas;
+}
+
+Future<List<Reserva>> getReservasPorUsuario(String mailUsuario)async{
+final ref = _firestore.collection(RESERVA)
+.where("usuarioEmail",isEqualTo: mailUsuario)
+.withConverter(fromFirestore: Reserva.fromFirestore, toFirestore: (Reserva reserva,_)=>reserva.toFirestore());
+List<Reserva> listaReservas = [];
+final docSnap = await ref.get();
+docSnap.docs.forEach((element) {
+  listaReservas.add(element.data());
+});
+
+return listaReservas;
 }
 
 

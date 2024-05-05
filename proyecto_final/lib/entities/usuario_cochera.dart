@@ -1,5 +1,8 @@
+// ignore_for_file: avoid_print
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:proyecto_final/entities/reserva.dart';
+import 'package:proyecto_final/services/database_sevice.dart';
 
 class UsuarioCochera {
   late String nombre;
@@ -136,6 +139,28 @@ double calcularPrecioTotal(Timestamp fechaEntrada, Timestamp fechaSalida) {
     return precioTotal;
   }
 }
+
+Future<bool> tieneDisponibilidad(Timestamp entrada, Timestamp salida)async{
+    int reservasEnFecha = 0;
+    DatabaseService databaseService = DatabaseService();
+    DateTime dateEntrada = entrada.toDate();
+    DateTime dateSalida = salida.toDate();
+    await databaseService.getReservasPorCochera(email).then((reservas) => {
+      reservas.forEach((reserva) {
+        if (dateEntrada.isAfter(reserva.fechaEntrada.toDate()) && dateEntrada.isBefore(reserva.fechaSalida.toDate())) {
+        reservasEnFecha++;
+        }else if (dateSalida.isAfter(reserva.fechaEntrada.toDate()) && dateSalida.isBefore(reserva.fechaSalida.toDate())){
+          reservasEnFecha++;
+        } else if(dateEntrada.isAtSameMomentAs(reserva.fechaEntrada.toDate()!) || dateSalida.isAtSameMomentAs(reserva.fechaSalida.toDate()!)) {
+          reservasEnFecha++;
+        }
+       })
+  
+    });
+
+    return reservasEnFecha < cantLugares;
+}
+
     
 
 
