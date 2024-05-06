@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:proyecto_final/entities/reserva.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
@@ -151,7 +149,7 @@ Future<bool> tieneDisponibilidad(Timestamp entrada, Timestamp salida)async{
         reservasEnFecha++;
         }else if (dateSalida.isAfter(reserva.fechaEntrada.toDate()) && dateSalida.isBefore(reserva.fechaSalida.toDate())){
           reservasEnFecha++;
-        } else if(dateEntrada.isAtSameMomentAs(reserva.fechaEntrada.toDate()!) || dateSalida.isAtSameMomentAs(reserva.fechaSalida.toDate()!)) {
+        } else if(dateEntrada.isAtSameMomentAs(reserva.fechaEntrada.toDate()) || dateSalida.isAtSameMomentAs(reserva.fechaSalida.toDate())) {
           reservasEnFecha++;
         }
        })

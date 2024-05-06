@@ -155,6 +155,10 @@ Future<bool> validarUsuario(String email) async {
     }
   }
 
+  Future<void> eliminarReserva(String id)async{
+    _firestore.collection(RESERVA).doc(id).delete().then((value) => {null});
+  }
+
   Future<List<UsuarioCochera>> getUsuariosCochera() async {
     final ref = _firestore.collection(USUARIO_COCHERA)
     .withConverter(fromFirestore: UsuarioCochera.fromFirestore, toFirestore:(UsuarioCochera usuarioCochera,_)=> usuarioCochera.toFirestore());
@@ -179,6 +183,13 @@ docSnap.docs.forEach((element) {
 
 return listaReservas;
 }
+Future<Reserva?> getReservaById(String id)async{
+  final ref = _firestore.collection(RESERVA)
+.doc(id)
+.withConverter(fromFirestore: Reserva.fromFirestore, toFirestore: (Reserva reserva,_)=>reserva.toFirestore());
+  final docSnap = await ref.get();
+  return docSnap.data();
+}
 
 Future<List<Reserva>> getReservasPorUsuario(String mailUsuario)async{
 final ref = _firestore.collection(RESERVA)
@@ -192,6 +203,8 @@ docSnap.docs.forEach((element) {
 
 return listaReservas;
 }
+
+
 
 
 }

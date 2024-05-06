@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/entities/reserva.dart';
@@ -23,13 +22,11 @@ class _UsuarioHomeState extends State<UsuarioHome> {
   late List<Reserva> _reservasFuture = [];
   final User? user = Auth().currentUser;
   Widget? aMostrar;
-
   @override
   void initState() {
     super.initState();
     _loadCocheras();
     _loadReservas();
-    
   }
 
   Future<void> _loadCocheras() async {
@@ -38,6 +35,7 @@ class _UsuarioHomeState extends State<UsuarioHome> {
       _cocherasFuture = cocheras;
     });
   }
+
   Future<void> _loadReservas() async {
     List<Reserva> reservas = await getReservas();
     setState(() {
@@ -45,41 +43,11 @@ class _UsuarioHomeState extends State<UsuarioHome> {
     });
   }
 
-
-
-
-
-
   Future<List<UsuarioCochera>> getCocheras() async {
     return databaseService.getUsuariosCochera();
   }
 
-  Widget _verMapa() {
-    return Container(
-      decoration: BoxDecoration(
-          color: Color.fromARGB(197, 223, 1, 227),
-          borderRadius: BorderRadius.circular(10)),
-      child: TextButton(
-          onPressed: () => {context.pushNamed(MapsPage.name)},
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Ver Mapa',
-                style: TextStyle(color: Colors.white),
-              ),
-              SizedBox(
-                width: 5,
-              ),
-              Icon(
-                FontAwesomeIcons.map,
-                color: Colors.white,
-              ),
-            ],
-          )),
-    );
-  }
-   Future<List<Reserva>> getReservas() async {
+  Future<List<Reserva>> getReservas() async {
     return databaseService.getReservasPorUsuario(user!.email!);
   }
 
@@ -91,96 +59,178 @@ class _UsuarioHomeState extends State<UsuarioHome> {
           title: const Text('Home Usuario'),
           backgroundColor: Colors.pink,
         ),
-         drawer:Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          UserAccountsDrawerHeader(
-            accountName: const Text('Bienvenido'),
-            accountEmail: user != null ? Text(user!.email!) : null,
-            currentAccountPicture: const CircleAvatar(),
-            decoration: const BoxDecoration(
-              color: Colors.pinkAccent,
-            ),
-          ),
-           ListTile(
-            leading: const Icon(Icons.car_rental),
-            title: const Text('Reservar cochera'),
-            onTap: ()=> {
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              UserAccountsDrawerHeader(
+                accountName: const Text('Bienvenido'),
+                accountEmail: user != null ? Text(user!.email!) : null,
+                currentAccountPicture: const CircleAvatar(),
+                decoration: const BoxDecoration(
+                  color: Colors.pinkAccent,
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.car_rental),
+                title: const Text('Reservar cochera'),
+                onTap: () => {
                   setState(() {
                     aMostrar = vistaCocheras();
                     Navigator.pop(context);
                   })
-            },
-          ),
-           ListTile(
-            leading: const Icon(Icons.card_travel),
-            title: const Text('Mis reservas'),
-            onTap: () => {
-              setState(() {
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.card_travel),
+                title: const Text('Mis reservas'),
+                onTap: () => {
+                  setState(() {
                     aMostrar = vistaReservas();
                     Navigator.pop(context);
                   })
-            },
-          ),ListTile(
-            leading: const Icon(Icons.map),
-            title: const Text('Ver mapa'),
-            onTap: () => {
-              setState(() {
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.map),
+                title: const Text('Ver mapa'),
+                onTap: () => {
+                  setState(() {
                     context.pushNamed(MapsPage.name);
                     Navigator.pop(context);
                   })
-            },
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.logout),
+                title: const Text('Salir'),
+                onTap: () => {
+                  context.pushNamed(LoginPage.name),
+                  Auth().signOut(),
+                },
+              )
+            ],
           ),
-          ListTile(
-            leading: const Icon(Icons.logout),
-            title: const Text('Salir'),
-            onTap: () => {
-              context.pushNamed(LoginPage.name),
-              Auth().signOut(),
-            },
-          )
-        ],
-      ),
-    ),
-        body: aMostrar??vistaCocheras(),
+        ),
+        body: aMostrar ?? vistaCocheras(),
       ),
     );
-
-
-
-    
   }
-  
 
-  Widget vistaCocheras(){
-   return ListView.builder(
-          itemCount: _cocherasFuture.length,
-          itemBuilder: (context, index) {
-            final cochera = _cocherasFuture[index];
-            return ListTile(
-              title: Text(cochera.email),
-              trailing: ElevatedButton(
-                onPressed: () {
-                  _showReservarDialog(context, cochera);
-                },
-                child: const Text('Reservar'),
-              ),
-            );
-          },
+  Widget vistaCocheras() {
+    return ListView.builder(
+      itemCount: _cocherasFuture.length,
+      itemBuilder: (context, index) {
+        final cochera = _cocherasFuture[index];
+        return ListTile(
+          title: Text(cochera.nombreCochera),
+          subtitle: Text(cochera.direccion),
+          trailing: ElevatedButton(
+            onPressed: () {
+              _showReservarDialog(context, cochera);
+            },
+            child: const Text('Reservar'),
+          ),
         );
+      },
+    );
   }
-Widget vistaReservas(){
-   return ListView.builder(
-          itemCount: _reservasFuture.length,
-          itemBuilder: (context, index) {
-            final reserva = _reservasFuture[index];
-            return ListTile(
-              title: Text(reserva.cocheraEmail),
+
+Widget vistaReservas() {
+  return ListView.builder(
+    itemCount: _reservasFuture.length,
+    itemBuilder: (context, index) {
+      final reserva = _reservasFuture[index];
+      bool puedeCancelar = faltanMasDeSeisHoras(reserva.fechaEntrada);
+      String estado = estadoReserva(reserva.fechaEntrada);
+      return ListTile(
+        title: Text(reserva.direccion),
+        trailing: ElevatedButton(
+          style: ButtonStyle(
+            backgroundColor: !puedeCancelar?  MaterialStateProperty.all<Color>(Colors.grey) : null
+          ),
+            onPressed: puedeCancelar
+              ? () {
+                  showDialogCancelarReserva(context,reserva);
+                }
+              : (){
+                 ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Ya no puede cancelar reserva'),
+                      backgroundColor: Colors.red,
+                    ));
+              },
+            child: const Text('Cancelar'),
+            
+          ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Fecha entrada: ${reserva.fechaEntrada.toDate()}"),
+            Text("Fecha salida: ${reserva.fechaSalida.toDate()}"),
+            Text(
+              estado,
+              style: TextStyle(color: estado=="Reserva activa"? Colors.green : Colors.red),
+              )
+          ],
+        ),
+        onTap: () {
+          
+        },
+      );
+    },
+  );
+}
+
+void showDialogCancelarReserva(BuildContext context,Reserva reserva) {
+   showDialog(
+              context: context,
+              builder: (BuildContext context) {
+  return AlertDialog(
+    title: const Text("Cancelar reserva"),
+    content: const Text("¿Estás seguro de que quieres cancelar esta reserva?"),
+    actions: <Widget>[
+      TextButton(
+        onPressed: () {
+          Navigator.of(context).pop(); 
+        },
+        child: const Text("Cancelar"),
+      ),
+      TextButton(
+        onPressed: () async {
+          int cantReservasPre = _reservasFuture.length;
+          await databaseService.eliminarReserva(reserva.id!).then((value) =>  {
+             _loadReservas().then((value) => setState(() {
+              aMostrar = vistaReservas();
+              if(cantReservasPre>_reservasFuture.length){
+                ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Reserva cancelada satisfactoriamente'),
+                      backgroundColor: Colors.green,
+                    ));
+              }else
+              {ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('No se pudo cancelar la reserva, intente nuevamente.'),
+                      backgroundColor: Colors.red,
+                    ));}
+              Navigator.of(context).pop(); 
+            })),
+            
+          });
+          
+
+          
+        },
+        child: const Text("Confirmar"),
+      ),
+    ],
+  );
+              },
             );
-          },
-        );
-  }
+}
+
   Future<void> _showReservarDialog(
       BuildContext context, UsuarioCochera cochera) async {
     DateTime? fechaEntrada = DateTime.now();
@@ -211,7 +261,6 @@ Widget vistaReservas(){
                               lastDate:
                                   DateTime.now().add(const Duration(days: 365)),
                             );
-                            print(selectedDate);
                             if (selectedDate != null) {
                               setState(() {
                                 fechaEntrada = selectedDate;
@@ -314,6 +363,25 @@ Widget vistaReservas(){
       },
     );
   }
+  String estadoReserva(Timestamp timestamp) {
+  DateTime ahora = DateTime.now();
+  DateTime fechaTimestamp = timestamp.toDate();
+  
+  if (fechaTimestamp.isBefore(ahora) || fechaTimestamp.isAtSameMomentAs(ahora)) {
+    return "La reserva ya expiró";
+  } else {
+    return "Reserva activa";
+  }
+}
+
+
+  bool faltanMasDeSeisHoras(Timestamp timestamp) {
+  DateTime horaActual = DateTime.now();
+  DateTime horaEvento = timestamp.toDate();
+  Duration diferencia = horaEvento.difference(horaActual);
+  int horasFaltantes = diferencia.inHours;
+  return horasFaltantes >= 6;
+}
 
   void reservar(
       DateTime? fechaEntrada,
@@ -350,7 +418,9 @@ Widget vistaReservas(){
             precioPorHora: cochera.price,
             fechaEntrada: entrada,
             fechaSalida: salida,
-            precioTotal: cochera.calcularPrecioTotal(entrada, salida));
+            precioTotal: cochera.calcularPrecioTotal(entrada, salida),
+            direccion: cochera.direccion,
+            );
         databaseService.addReserva(res).then((reservaExitosa) => {
               if (reservaExitosa)
                 {
