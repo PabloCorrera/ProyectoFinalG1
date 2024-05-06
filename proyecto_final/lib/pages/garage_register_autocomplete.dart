@@ -70,7 +70,7 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
     return value.trim().isNotEmpty;
   }
 
-  void convertAdressToLatLng(String garageAdress) async {
+  Future<void> convertAdressToLatLng(String garageAdress) async {
     try {
       List<geo.Location> locations =
           await geo.locationFromAddress(_controllerGarageAdress.text);
@@ -84,9 +84,9 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
 
   Widget _submitButton() {
     return ElevatedButton(
-      onPressed: () {
+      onPressed: ()async {
         print("se recibio la direccion" + _controllerGarageAdress.text);
-        convertAdressToLatLng(_controllerGarageAdress.text);
+       await convertAdressToLatLng(_controllerGarageAdress.text);
         String email = emailUsuario ?? "";
         if (isNotBlank(_controllerName.text) &&
             isNotBlank(_controllerSurname.text) &&
