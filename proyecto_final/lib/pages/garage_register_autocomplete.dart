@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
 import 'package:proyecto_final/models/autocomplete_prediction.dart';
@@ -10,6 +11,7 @@ import 'package:proyecto_final/pages/usuario_cochera_home.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 import 'package:proyecto_final/services/location_list_tile.dart';
 import '../models/constant.dart';
+import 'package:geocoding/geocoding.dart' as geo;
 
 class GarageRegisterAutoPlete extends StatefulWidget {
   const GarageRegisterAutoPlete({Key? key}) : super(key: key);
@@ -25,10 +27,13 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
   final TextEditingController _description = TextEditingController();
   final TextEditingController _controllerGarageName = TextEditingController();
   final TextEditingController _controllerGarageAdress = TextEditingController();
-  final TextEditingController _controllerQuantitySpaces = TextEditingController();
+  final TextEditingController _controllerQuantitySpaces =
+      TextEditingController();
   final TextEditingController _controllerPrice = TextEditingController();
   final TextEditingController _controllerName = TextEditingController();
   final TextEditingController _controllerSurname = TextEditingController();
+  double latitud = 0;
+  double lngitud = 0;
 
   bool showSourceField = false;
   String? emailUsuario = FirebaseAuth.instance.currentUser?.email;
@@ -62,41 +67,58 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
   }
 
   static bool isNotBlank(String value) {
-  return value.trim().isNotEmpty;
-}
+    return value.trim().isNotEmpty;
+  }
+
+  Future<void> convertAdressToLatLng(String garageAdress) async {
+    try {
+      List<geo.Location> locations =
+          await geo.locationFromAddress(_controllerGarageAdress.text);
+      latitud = locations[0].latitude;
+      lngitud = locations[0].longitude;
+      print("Latitud" + "$latitud" + " Longitud " + "$lngitud");
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   Widget _submitButton() {
-  return ElevatedButton(
-    onPressed: () {
-      String email = emailUsuario ?? "";
-      if (isNotBlank(_controllerName.text) &&
-          isNotBlank(_controllerSurname.text) &&
-          isNotBlank(_controllerGarageName.text) &&
-          isNotBlank(_controllerGarageAdress.text) &&
-          isNotBlank(_description.text) &&
-          isNotBlank(_controllerPrice.text) &&
-          isNotBlank(_controllerQuantitySpaces.text)) {
-        UsuarioCochera usuarioCochera = UsuarioCochera(
-          nombre: _controllerName.text,
-          apellido: _controllerSurname.text,
-          email: email,
-          nombreCochera: _controllerGarageName.text,
-          direccion: _controllerGarageAdress.text,
-          descripcion: _description.text,
-          price: double.parse(_controllerPrice.text),
-          cantLugares: int.parse(_controllerQuantitySpaces.text),
-        );
-        _databaseService.addUsuarioCochera(usuarioCochera);
-        context.pushNamed(UsuarioCocheraHome.name);
-      } else {
-        setState(() {
-          errorMessage = 'Por favor, complete todos los campos correctamente.';
-        });
-      }
-    },
-    child: Text('Confirmar'),
-  );
-}
+    return ElevatedButton(
+      onPressed: ()async {
+        print("se recibio la direccion" + _controllerGarageAdress.text);
+       await convertAdressToLatLng(_controllerGarageAdress.text);
+        String email = emailUsuario ?? "";
+        if (isNotBlank(_controllerName.text) &&
+            isNotBlank(_controllerSurname.text) &&
+            isNotBlank(_controllerGarageName.text) &&
+            isNotBlank(_controllerGarageAdress.text) &&
+            isNotBlank(_description.text) &&
+            isNotBlank(_controllerPrice.text) &&
+            isNotBlank(_controllerQuantitySpaces.text)) {
+          UsuarioCochera usuarioCochera = UsuarioCochera(
+            nombre: _controllerName.text,
+            apellido: _controllerSurname.text,
+            email: email,
+            nombreCochera: _controllerGarageName.text,
+            direccion: _controllerGarageAdress.text,
+            descripcion: _description.text,
+            price: double.parse(_controllerPrice.text),
+            cantLugares: int.parse(_controllerQuantitySpaces.text),
+            lat: latitud,
+            lng: lngitud,
+          );
+          _databaseService.addUsuarioCochera(usuarioCochera);
+          context.pushNamed(UsuarioCocheraHome.name);
+        } else {
+          setState(() {
+            errorMessage =
+                'Por favor, complete todos los campos correctamente.';
+          });
+        }
+      },
+      child: Text('Confirmar'),
+    );
+  }
 
   Widget _entryField(String title, TextEditingController controller) {
     return TextField(
@@ -105,8 +127,8 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
         labelText: title,
       ),
       inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
-    ],
+        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
+      ],
     );
   }
 
