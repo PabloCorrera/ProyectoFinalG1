@@ -15,7 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LoginPage extends StatefulWidget {
   static const String name = 'LoginPage';
 
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -42,7 +42,6 @@ class _LoginPageState extends State<LoginPage> {
       );
 
   Future<void> obtenerCredenciales() async {
-    print("ARRANCA");
     final storage = FlutterSecureStorage(aOptions: _getAndroidOptions());
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getBool('usarAutenticacionBiometrica') == true) {
@@ -54,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
           if (usuario != null && contrasena != null) {
             try {
               await Auth().signInWithEmailAndPassword(
-                  email: usuario, password: contrasena).then((value) =>  redirigirUsuario());
+                  email: usuario, password: contrasena).then((value) =>  redirigirUsuario(usuario));
             } on FirebaseAuthException catch (e) {
               setState(() {
                 errorMessage = e.message;
@@ -83,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
           }
         }
       }
-      await redirigirUsuario();
+      await redirigirUsuario(_controllerEmail.text);
 
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -92,20 +91,18 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
   
-  Future<void> redirigirUsuario() async{
-       bool registrado =
-          await databaseService.validarUsuario(_controllerEmail.text);
+  Future<void> redirigirUsuario(String email) async{
       bool isConsumer =
-          await databaseService.getTipoUsuario(_controllerEmail.text) ==
+          await databaseService.getTipoUsuario(email) ==
               "consumidor";
       bool isOwner =
-          await databaseService.getTipoUsuario(_controllerEmail.text) ==
+          await databaseService.getTipoUsuario(email) ==
               "cochera";
 
-      if (context.mounted && registrado && isConsumer) {
+      if (isConsumer) {
         context.pushNamed(UsuarioHome.name);
       }
-      else if (context.mounted && registrado && isOwner) {
+      else if (isOwner) {
         context.pushNamed(UsuarioCocheraHome.name);
       } else {
         context.pushNamed(HomePage.name);
@@ -117,21 +114,21 @@ class _LoginPageState extends State<LoginPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Habilitar autenticación biométrica'),
-          content: Text(
+          title: const Text('Habilitar autenticación biométrica'),
+          content: const Text(
               '¿Desea utilizar autenticación biométrica para futuros inicios de sesión?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
-              child: Text('No'),
+              child: const Text('No'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
-              child: Text('Sí'),
+              child: const Text('Sí'),
             ),
           ],
         );
@@ -214,12 +211,12 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               Text(
                 isLogin ? 'Login' : 'Register',
-                style: TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.white),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 5,
               ),
-              Icon(
+              const Icon(
                 FontAwesomeIcons.car,
                 color: Colors.white,
               )
