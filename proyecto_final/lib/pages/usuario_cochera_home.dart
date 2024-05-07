@@ -94,21 +94,31 @@ Widget build(BuildContext context) {
           ],
         ),
       ),
-      body: FutureBuilder<List<Reserva>>(
-        future: getReservas(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            // Mientras espera la carga de datos
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            // Si hay un error
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else {
-            // Si los datos se cargan correctamente
-            _reservasFuture = snapshot.data!;
-            return vistaReservas();
-          }
-        },
+      body: Column(
+        children: [
+          FutureBuilder<List<Reserva>>(
+            future: getReservas(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else {
+      
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'Cantidad de Reservas: ${_reservasFuture.length}',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                );
+              }
+            },
+          ),
+          Expanded(
+            child: vistaReservas(),
+          ),
+        ],
       ),
     ),
   );
@@ -120,7 +130,8 @@ Widget vistaReservas() {
     itemBuilder: (context, index) {
       final reserva = _reservasFuture[index];
       return ListTile(
-        title: Text(reserva.direccion),
+        title: Text(reserva.usuarioEmail),
+        subtitle: Text(reserva.direccion),
         contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       );
     },
