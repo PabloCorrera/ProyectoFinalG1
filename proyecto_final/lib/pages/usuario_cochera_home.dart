@@ -32,25 +32,23 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   void initState() {
   super.initState();
     _loadReservas();
-   _loadUsuariosReservas();
 }
 
-
-
-
-
 Future<void> _loadReservas() async {
-    try {
-      List<Reserva> reservas = await getReservas();
-      print("CARGAAAAAAAAAAMOS LAS RESERVASSSSSSSSSS PRIMEROOOOOO");
-      setState(() {
-        _reservasFuture = reservas;
-        print('Cantidad de reservas: ${_reservasFuture.length}');
-      });
-    } catch (e) {
-      print(e);
-    }
+  try {
+    List<Reserva> reservas = await getReservas();
+    print("CARGAAAAAAAAAAMOS LAS RESERVASSSSSSSSSS PRIMEROOOOOO");
+    setState(() {
+      _reservasFuture = reservas;
+      print('Cantidad de reservas: ${_reservasFuture.length}');
+    });
+
+    // Después de cargar las reservas, cargar los usuarios de reservas
+    await _loadUsuariosReservas();
+  } catch (e) {
+    print(e);
   }
+}
 
   Future<void> _loadUsuariosReservas() async {
     print("CARGAAAAAAAAAAMOS LOS USUARIOS RESERRRVAAAAAAAS");
@@ -58,6 +56,8 @@ Future<void> _loadReservas() async {
     
     setState(() {
       _usuariosDeReserva = usuariosConsum;
+      print("A VER LOS USUARIOS DE RESERVA");
+      print(_usuariosDeReserva.length);
     });
   }
 
@@ -151,11 +151,18 @@ Widget build(BuildContext context) {
 
 Widget vistaReservas() {
   return ListView.builder(
-    itemCount: _reservasFuture.length,
+    itemCount: _usuariosDeReserva.length,
     itemBuilder: (context, index) {
       return ListTile(
-        title: Text("Hola"), // Si el nombre es nulo, muestra una cadena vacía
-        subtitle: Text("Hola"), // Si el email es nulo, muestra una cadena vacía
+        title: Text(_usuariosDeReserva[index]!.nombre + " " + _usuariosDeReserva[index]!.apellido),
+        subtitle: Text(_usuariosDeReserva[index]!.email!),
+        trailing: ElevatedButton(
+          onPressed: () {
+            // Aquí puedes agregar la lógica para manejar el evento cuando se presiona el botón "Detalle"
+            // Por ejemplo, puedes navegar a una nueva pantalla para ver más detalles sobre el usuario
+          },
+          child: Text('Detalle'),
+        ),
         contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       );
     },
@@ -166,15 +173,15 @@ Widget vistaReservas() {
 
   final List<UsuarioConsumidor?> consumidoresDeReserva = [];
   
- for (int i = 0; i <= _reservasFuture.length; i++) {
+ for (int i = 0; i < _reservasFuture.length; i++) {
   print("Entró al foreach");  
   print(_reservasFuture.length); //Esto da 0;
   print(_reservasFuture[i].usuarioEmail);
-  final UsuarioConsumidor? consumidor = await databaseService.buscarUsuario("clau@gmail.com");
- 
+  final UsuarioConsumidor? consumidor = await databaseService.buscarUsuario(_reservasFuture[i].usuarioEmail);
 
-  print("IMPRIMMMMMMMMMMMMMMMMMMIMOOOOOOOOOOOS EL METODOOOO");
-  // consumidoresDeReserva.add(await databaseService.buscarUsuario(_reservasFuture[i].usuarioEmail));
+  consumidoresDeReserva.add(await databaseService.buscarUsuario(_reservasFuture[i].usuarioEmail));
+  print("Imprimimos los consumidores de reservasssss");
+  print(consumidoresDeReserva[i]!.nombre);
 
     // Realiza alguna operación con 'cochera'
   }
