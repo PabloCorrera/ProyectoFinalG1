@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/entities/reserva.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
+import 'package:proyecto_final/entities/usuario_consumidor.dart';
 import 'package:proyecto_final/pages/login_register_page.dart';
 import 'package:proyecto_final/pages/maps_page.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
@@ -20,24 +21,48 @@ class UsuarioCocheraHome extends StatefulWidget {
 class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   DatabaseService databaseService = DatabaseService();
   late List<Reserva> _reservasFuture = [];
+  late List<UsuarioConsumidor?> _usuariosDeReserva = [];
   final User? user = Auth().currentUser;
+  final String nombreUsuario = "";
+  final String apellidoPersona= "";
+
+
   Widget? aMostrar;
   @override
   void initState() {
-    super.initState();
+  super.initState();
     _loadReservas();
+   _loadUsuariosReservas();
+}
+
+
+
+
+
+Future<void> _loadReservas() async {
+    try {
+      List<Reserva> reservas = await getReservas();
+      print("CARGAAAAAAAAAAMOS LAS RESERVASSSSSSSSSS PRIMEROOOOOO");
+      setState(() {
+        _reservasFuture = reservas;
+        print('Cantidad de reservas: ${_reservasFuture.length}');
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
-
-  Future<void> _loadReservas() async {
-    List<Reserva> reservas = await getReservas();
-    print("LOAAAAAAAAAAAD RESERVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAS");
-    print(reservas[0].usuarioEmail); ///Aca me trae bien la reserva
+  Future<void> _loadUsuariosReservas() async {
+    print("CARGAAAAAAAAAAMOS LOS USUARIOS RESERRRVAAAAAAAS");
+    List<UsuarioConsumidor?> usuariosConsum = await getUsuariosDeReservas() ?? [];
+    
     setState(() {
-      _reservasFuture = reservas;
-      print(_reservasFuture.length);
+      _usuariosDeReserva = usuariosConsum;
     });
   }
+
+
+
 
   Future<List<Reserva>> getReservas() async {
     return databaseService.getReservasPorCochera(user!.email!);
@@ -128,14 +153,35 @@ Widget vistaReservas() {
   return ListView.builder(
     itemCount: _reservasFuture.length,
     itemBuilder: (context, index) {
-      final reserva = _reservasFuture[index];
       return ListTile(
-        title: Text(reserva.usuarioEmail),
-        subtitle: Text(reserva.direccion),
+        title: Text("Hola"), // Si el nombre es nulo, muestra una cadena vacía
+        subtitle: Text("Hola"), // Si el email es nulo, muestra una cadena vacía
         contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       );
     },
   );
 }
+
+ Future<List<UsuarioConsumidor?>> getUsuariosDeReservas() async {
+
+  final List<UsuarioConsumidor?> consumidoresDeReserva = [];
+  
+ for (int i = 0; i <= _reservasFuture.length; i++) {
+  print("Entró al foreach");  
+  print(_reservasFuture.length); //Esto da 0;
+  print(_reservasFuture[i].usuarioEmail);
+  final UsuarioConsumidor? consumidor = await databaseService.buscarUsuario("clau@gmail.com");
+ 
+
+  print("IMPRIMMMMMMMMMMMMMMMMMMIMOOOOOOOOOOOS EL METODOOOO");
+  // consumidoresDeReserva.add(await databaseService.buscarUsuario(_reservasFuture[i].usuarioEmail));
+
+    // Realiza alguna operación con 'cochera'
+  }
+
+  return consumidoresDeReserva;
+}
+
+
 
 }

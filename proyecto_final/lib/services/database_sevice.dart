@@ -216,7 +216,31 @@ docSnap.docs.forEach((element) {
 return listaReservas;
 }
 
+  Future<UsuarioConsumidor?> buscarUsuario(String usuarioEmail) async {
+    try {
+      print("DATABASEEEEEEE");
+      // Realiza una consulta para buscar al usuario por su correo electrónico
+      var query = await _usuariosConsumidorRef
+          .where('email', isEqualTo: usuarioEmail)
+          .get();
 
-
-
+      // Verifica si la consulta devolvió algún documento
+      if (query.docs.isNotEmpty) {
+        // Si se encontró un documento, convierte los datos a un objeto UsuarioConsumidor y devuélvelo
+        return query.docs.first.data() as UsuarioConsumidor?;
+      } else {
+        // Si no se encontró ningún documento con el correo electrónico dado, devuelve null
+        return null;
+      }
+    } catch (e) {
+      // Manejar cualquier error que ocurra durante el proceso
+      print('Error al buscar el usuario: $e');
+      return null;
+    }
+  }
 }
+
+
+
+
+
