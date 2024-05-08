@@ -148,12 +148,12 @@ Widget build(BuildContext context) {
     ),
   );
 }
-
 Widget vistaReservas() {
   return ListView.builder(
     itemCount: _usuariosDeReserva.length,
     itemBuilder: (context, index) {
       return ListTile(
+        leading: Icon(Icons.account_circle, size: 40), // Tamaño del icono de perfil
         title: Text(_usuariosDeReserva[index]!.nombre + " " + _usuariosDeReserva[index]!.apellido),
         subtitle: Text(_usuariosDeReserva[index]!.email!),
         trailing: ElevatedButton(
