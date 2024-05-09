@@ -9,6 +9,7 @@ import 'package:proyecto_final/entities/usuario_consumidor.dart';
 import 'package:proyecto_final/pages/login_register_page.dart';
 import 'package:proyecto_final/pages/maps_page.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
+import 'package:intl/intl.dart';
 
 class UsuarioCocheraHome extends StatefulWidget {
   const UsuarioCocheraHome({super.key});
@@ -119,51 +120,94 @@ Widget build(BuildContext context) {
           ],
         ),
       ),
-      body: Column(
-        children: [
-          FutureBuilder<List<Reserva>>(
-            future: getReservas(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else {
-      
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'Cantidad de Reservas: ${_reservasFuture.length}',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                );
-              }
-            },
-          ),
-          Expanded(
-            child: vistaReservas(),
-          ),
-        ],
-      ),
+      body: aMostrar ?? vistaReservas(),
     ),
   );
 }
+
+
 Widget vistaReservas() {
-  return ListView.builder(
-    itemCount: _usuariosDeReserva.length,
-    itemBuilder: (context, index) {
-      return ListTile(
-        leading: Icon(Icons.account_circle, size: 40), // Tamaño del icono de perfil
-        title: Text(_usuariosDeReserva[index]!.nombre + " " + _usuariosDeReserva[index]!.apellido),
-        subtitle: Text(_usuariosDeReserva[index]!.email!),
-        trailing: ElevatedButton(
-          onPressed: () {
-            // Aquí puedes agregar la lógica para manejar el evento cuando se presiona el botón "Detalle"
-            // Por ejemplo, puedes navegar a una nueva pantalla para ver más detalles sobre el usuario
+  return Column(
+    children: [
+      Text(
+        'Cantidad de Reservas: ${_reservasFuture.length}',
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      Expanded(
+        child: ListView.builder(
+          itemCount: _usuariosDeReserva.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              leading: Icon(Icons.account_circle,
+                  size: 40), // Tamaño del icono de perfil
+              title: Text(_usuariosDeReserva[index]!.nombre +
+                  " " +
+                  _usuariosDeReserva[index]!.apellido),
+              subtitle: Text(_usuariosDeReserva[index]!.email!),
+              trailing: ElevatedButton(
+                onPressed: () {
+                  _mostrarDialogo(context, _reservasFuture[index], _usuariosDeReserva[index]!); // Pasar reserva como parámetro
+                },
+                child: Text('Detalle'),
+              ),
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            );
           },
-          child: Text('Detalle'),
         ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      ),
+    ],
+  );
+}
+
+void _mostrarDialogo(BuildContext context, Reserva reserva, UsuarioConsumidor usuarioConsumidor) {
+  final DateFormat formatter = DateFormat('dd/MM/yyyy HH:mm');
+
+  DateTime fechaEntrada = reserva.fechaEntrada.toDate(); 
+  DateTime fechaSalida = reserva.fechaSalida.toDate(); 
+   String nombreCompletoUsuario = "${usuarioConsumidor.nombre} ${usuarioConsumidor.apellido}";
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Dialog(
+        elevation: 8.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.0),
+        ),
+        child: Container(
+          padding: EdgeInsets.all(16.0),
+          height: MediaQuery.of(context).size.height * 0.3,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+          Text(
+                "Reserva de: $nombreCompletoUsuario",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 16.0),
+              Text(
+                "Fecha de entrada: ${formatter.format(fechaEntrada)}", 
+                style: TextStyle(fontSize: 16),
+              ),
+              Text(
+                "Fecha de salida: ${formatter.format(fechaSalida)}",
+                style: TextStyle(fontSize: 16),
+              ),
+              SizedBox(height: 16.0),
+              Align(
+                alignment: Alignment.center,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); 
+                  },
+                  child: Text("Cerrar"),
+                ),
+              ),
+            ],
+          ),
+        ),
       );
     },
   );
