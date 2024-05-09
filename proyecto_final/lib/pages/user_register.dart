@@ -46,7 +46,7 @@ class _UserRegisterState extends State<UserRegister> {
     );
   }
 
-  Widget _submitButton() {
+  Widget _submitButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
         if (_controllerName.text.trim().isNotEmpty &&
@@ -113,7 +113,7 @@ class _UserRegisterState extends State<UserRegister> {
             const SizedBox(height: 20),
             _errorMessage(),
             const SizedBox(height: 20),
-            _submitButton(),
+            _submitButton(context),
           ],
         ),
       ),
