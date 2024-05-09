@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/entities/reserva.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
-import 'package:proyecto_final/pages/garageDetail.dart';
 import 'package:proyecto_final/pages/maps_page.dart';
 import 'package:proyecto_final/pages/login_register_page.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
