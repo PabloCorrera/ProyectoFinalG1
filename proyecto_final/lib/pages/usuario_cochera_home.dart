@@ -10,6 +10,7 @@ import 'package:proyecto_final/pages/login_register_page.dart';
 import 'package:proyecto_final/pages/maps_page.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 import 'package:intl/intl.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class UsuarioCocheraHome extends StatefulWidget {
   const UsuarioCocheraHome({super.key});
@@ -129,6 +130,7 @@ Widget build(BuildContext context) {
 Widget vistaReservas() {
   return Column(
     children: [
+      SizedBox(height: 12.0),
       Text(
         'Cantidad de Reservas: ${_reservasFuture.length}',
         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -202,8 +204,12 @@ void _mostrarDialogo(BuildContext context, Reserva reserva, UsuarioConsumidor us
                           Icon(Icons.arrow_downward, size: 16, color: Colors.green), 
                           SizedBox(width: 8.0),
                           Text(
-                            "Entrada: ${formatter.format(fechaEntrada)}", 
-                            style: TextStyle(fontSize: 16),
+                            "Entrada: ", 
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold), // Texto en negrita
+                          ),
+                          Text(
+                            "${formatter.format(fechaEntrada)}", 
+                            style: TextStyle(fontSize: 16), // Texto normal
                           ),
                         ],
                       ),
@@ -213,7 +219,26 @@ void _mostrarDialogo(BuildContext context, Reserva reserva, UsuarioConsumidor us
                           Icon(Icons.arrow_upward, size: 16, color: Colors.red),
                           SizedBox(width: 8.0),
                           Text(
-                            "Salida: ${formatter.format(fechaSalida)}",
+                            "Salida: ",
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold), // Texto en negrita
+                          ),
+                          Text(
+                            "${formatter.format(fechaSalida)}",
+                            style: TextStyle(fontSize: 16), // Texto normal
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8.0),
+                      Row(
+                        children: [
+                          Icon(FontAwesomeIcons.moneyBillAlt, size: 16, color: Colors.blue),
+                          SizedBox(width: 8.0),
+                          Text(
+                            "Precio total: ",
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold), // Texto en negrita
+                          ),
+                          Text(
+                            "\$${reserva.precioTotal}", // Agrega el signo de pesos aquí
                             style: TextStyle(fontSize: 16),
                           ),
                         ],
