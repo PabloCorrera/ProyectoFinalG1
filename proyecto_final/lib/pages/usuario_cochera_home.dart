@@ -165,48 +165,75 @@ void _mostrarDialogo(BuildContext context, Reserva reserva, UsuarioConsumidor us
 
   DateTime fechaEntrada = reserva.fechaEntrada.toDate(); 
   DateTime fechaSalida = reserva.fechaSalida.toDate(); 
-   String nombreCompletoUsuario = "${usuarioConsumidor.nombre} ${usuarioConsumidor.apellido}";
+  String nombreCompletoUsuario = "${usuarioConsumidor.nombre} ${usuarioConsumidor.apellido}";
 
   showDialog(
     context: context,
     builder: (BuildContext context) {
-      return Dialog(
-        elevation: 8.0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
-        ),
-        child: Container(
-          padding: EdgeInsets.all(16.0),
-          height: MediaQuery.of(context).size.height * 0.3,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-          Text(
-                "Reserva de: $nombreCompletoUsuario",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 16.0),
-              Text(
-                "Fecha de entrada: ${formatter.format(fechaEntrada)}", 
-                style: TextStyle(fontSize: 16),
-              ),
-              Text(
-                "Fecha de salida: ${formatter.format(fechaSalida)}",
-                style: TextStyle(fontSize: 16),
-              ),
-              SizedBox(height: 16.0),
-              Align(
-                alignment: Alignment.center,
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(); 
-                  },
-                  child: Text("Cerrar"),
+      return Container(
+        color: Colors.transparent, 
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.topCenter, 
+              child: Dialog(
+                elevation: 8.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+                child: Container(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Reserva de $nombreCompletoUsuario",
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 16.0),
+                      Text(
+                        "Fechas :",
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 8.0),
+                      Row(
+                        children: [
+                          Icon(Icons.arrow_downward, size: 16, color: Colors.green), 
+                          SizedBox(width: 8.0),
+                          Text(
+                            "Entrada: ${formatter.format(fechaEntrada)}", 
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8.0),
+                      Row(
+                        children: [
+                          Icon(Icons.arrow_upward, size: 16, color: Colors.red),
+                          SizedBox(width: 8.0),
+                          Text(
+                            "Salida: ${formatter.format(fechaSalida)}",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 30.0),
+                      Align(
+                        alignment: Alignment.center,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); 
+                          },
+                          child: Text("Cerrar"),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       );
     },
