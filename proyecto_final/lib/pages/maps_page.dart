@@ -7,8 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/entities/reserva.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
-import 'package:proyecto_final/pages/usuario_home.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
+
+final DatabaseService databaseService = DatabaseService();
+final User? user = Auth().currentUser;
 
 class MapsPage extends StatefulWidget {
   static const String name = 'mapsPage';
@@ -36,26 +38,30 @@ class MapsPageState extends State<MapsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          title: const Text(
-        "Busca tu garage mas cercano",
-        style: TextStyle(color: Colors.black),
-      )),
-      body: GoogleMap(
-        mapType: MapType.normal,
-        initialCameraPosition: _kGooglePlex,
-        onMapCreated: (GoogleMapController controller) {
-          _controller.complete(controller);
-        },
-        markers: _cocherasDisponibles(),
-      ),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+            title: const Text(
+          "Busca tu garage mas cercano",
+          style: TextStyle(color: Colors.black),
+        )),
+        body: GoogleMap(
+          mapType: MapType.normal,
+          initialCameraPosition: _kGooglePlex,
+          onMapCreated: (GoogleMapController controller) {
+            _controller.complete(controller);
+          },
+          markers: _cocherasDisponibles(),
+          myLocationEnabled: true,
+          myLocationButtonEnabled: true,
+        ),
 
-      // Boton para agregar alguna funcionalidad
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _goToTheLake,
-        label: const Text('Buscar cocheras'),
-        icon: const Icon(Icons.directions_car_filled_outlined),
+        // Boton para agregar alguna funcionalidad
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: _goToTheLake,
+          label: const Text('Buscar cocheras'),
+          icon: const Icon(Icons.directions_car_filled_outlined),
+        ),
       ),
     );
   }
@@ -80,7 +86,8 @@ class MapsPageState extends State<MapsPage> {
           markerId: MarkerId(u.nombre),
           position: LatLng(u.lat, u.lng),
           infoWindow: InfoWindow(title: u.nombreCochera),
-          onTap: () => context.pushNamed(UsuarioHome.name)));
+          onTap: () async => await _showReservarDialog(context, u)));
+      //context.pushNamed(UsuarioHome.name)));
     }
 
     return marcadores;
@@ -94,4 +101,229 @@ class MapsPageState extends State<MapsPage> {
       _cocheras = usuarios;
     });
   }
+}
+
+Future<void> _showReservarDialog(
+    BuildContext context, UsuarioCochera cochera) async {
+  DateTime? fechaEntrada = DateTime.now();
+  TimeOfDay? horaEntrada = TimeOfDay.now();
+  DateTime? fechaSalida = DateTime.now().add(const Duration(days: 1));
+  TimeOfDay? horaSalida = TimeOfDay.now();
+
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: const Text('Reservar Cochera'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('Fecha y hora de entrada:'),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () async {
+                          final selectedDate = await showDatePicker(
+                            context: context,
+                            initialDate: fechaEntrada!,
+                            firstDate: DateTime.now(),
+                            lastDate:
+                                DateTime.now().add(const Duration(days: 365)),
+                          );
+                          if (selectedDate != null) {
+                            setState(() {
+                              fechaEntrada = selectedDate;
+                              if (fechaEntrada!
+                                  .isAtSameMomentAs(fechaSalida!)) {
+                                horaSalida!.minute != horaEntrada!.minute + 15;
+                              }
+                              fechaSalida =
+                                  fechaEntrada!.add(const Duration(days: 1));
+                            });
+                          }
+                        },
+                        child: Text(
+                            '${fechaEntrada!.day}/${fechaEntrada!.month}/${fechaEntrada!.year}'),
+                      ),
+                    ),
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () async {
+                          final selectedTime = await showTimePicker(
+                            context: context,
+                            initialTime: horaEntrada!,
+                          );
+                          if (selectedTime != null) {
+                            setState(() {
+                              horaEntrada = selectedTime;
+                            });
+                          }
+                        },
+                        child: Text(
+                            '${horaEntrada!.hour}:${horaEntrada!.minute.toString().padLeft(2, '0')}'),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                const Text('Fecha y hora de salida:'),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () async {
+                          final selectedDate = await showDatePicker(
+                            context: context,
+                            initialDate: fechaEntrada!,
+                            firstDate: fechaEntrada!,
+                            lastDate:
+                                DateTime.now().add(const Duration(days: 365)),
+                          );
+                          if (selectedDate != null) {
+                            setState(() {
+                              fechaSalida = selectedDate;
+                            });
+                          }
+                        },
+                        child: Text(
+                            '${fechaSalida!.day}/${fechaSalida!.month}/${fechaSalida!.year}'),
+                      ),
+                    ),
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () async {
+                          final selectedTime = await showTimePicker(
+                            context: context,
+                            initialTime: horaEntrada!,
+                          );
+                          if (selectedTime != null) {
+                            setState(() {
+                              horaSalida = selectedTime;
+                            });
+                          }
+                        },
+                        child: Text(
+                            '${horaSalida!.hour}:${horaSalida!.minute.toString().padLeft(2, '0')}'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  reservar(fechaEntrada, horaEntrada, fechaSalida, horaSalida,
+                      cochera, context);
+                },
+                child: const Text('Reservar'),
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+}
+
+String estadoReserva(Timestamp timestamp) {
+  DateTime ahora = DateTime.now();
+  DateTime fechaTimestamp = timestamp.toDate();
+
+  if (fechaTimestamp.isBefore(ahora) ||
+      fechaTimestamp.isAtSameMomentAs(ahora)) {
+    return "La reserva ya expiró";
+  } else {
+    return "Reserva activa";
+  }
+}
+
+bool faltanMasDeSeisHoras(Timestamp timestamp) {
+  DateTime horaActual = DateTime.now();
+  DateTime horaEvento = timestamp.toDate();
+  Duration diferencia = horaEvento.difference(horaActual);
+  int horasFaltantes = diferencia.inHours;
+  return horasFaltantes >= 6;
+}
+
+void reservar(
+    DateTime? fechaEntrada,
+    TimeOfDay? horaEntrada,
+    DateTime? fechaSalida,
+    TimeOfDay? horaSalida,
+    UsuarioCochera cochera,
+    BuildContext context) async {
+  DateTime dateTimeEntradaCompleto = DateTime(
+    fechaEntrada!.year,
+    fechaEntrada.month,
+    fechaEntrada.day,
+    horaEntrada!.hour,
+    horaEntrada.minute,
+  );
+  DateTime dateTimeSalidaCompleto = DateTime(
+    fechaSalida!.year,
+    fechaSalida.month,
+    fechaSalida.day,
+    horaSalida!.hour,
+    horaSalida.minute,
+  );
+  Timestamp entrada = Timestamp.fromDate(dateTimeEntradaCompleto);
+  Timestamp salida = Timestamp.fromDate(dateTimeSalidaCompleto);
+
+  await cochera
+      .tieneDisponibilidad(entrada, salida)
+      .then((tieneDisponibilidad) async {
+    if (tieneDisponibilidad) {
+      Reserva res = Reserva(
+        usuarioEmail: user!.email!,
+        cocheraEmail: cochera.email,
+        fechaCreacion: Timestamp.now(),
+        precioPorHora: cochera.price,
+        fechaEntrada: entrada,
+        fechaSalida: salida,
+        precioTotal: cochera.calcularPrecioTotal(entrada, salida),
+        direccion: cochera.direccion,
+      );
+      databaseService.addReserva(res).then((reservaExitosa) => {
+            if (reservaExitosa)
+              {
+                Navigator.of(context).pop(),
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Reserva exitosa.'),
+                    backgroundColor: Colors.green,
+                  ),
+                )
+              }
+            else
+              {
+                Navigator.of(context).pop(),
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('No se pudo realizar la reserva.'),
+                    backgroundColor: Colors.red,
+                  ),
+                )
+              }
+          });
+    } else {
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content:
+              Text('No hay disponibilidad para la fecha y hora seleccionadas.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  });
 }
