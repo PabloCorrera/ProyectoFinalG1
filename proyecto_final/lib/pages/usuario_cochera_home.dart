@@ -39,13 +39,10 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
 Future<void> _loadReservas() async {
   try {
     List<Reserva> reservas = await getReservas();
-    print("CARGAAAAAAAAAAMOS LAS RESERVASSSSSSSSSS PRIMEROOOOOO");
     setState(() {
       _reservasFuture = reservas;
-      print('Cantidad de reservas: ${_reservasFuture.length}');
     });
 
-    // Después de cargar las reservas, cargar los usuarios de reservas
     await _loadUsuariosReservas();
   } catch (e) {
     print(e);
@@ -53,13 +50,11 @@ Future<void> _loadReservas() async {
 }
 
   Future<void> _loadUsuariosReservas() async {
-    print("CARGAAAAAAAAAAMOS LOS USUARIOS RESERRRVAAAAAAAS");
     List<UsuarioConsumidor?> usuariosConsum = await getUsuariosDeReservas() ?? [];
     
     setState(() {
       _usuariosDeReserva = usuariosConsum;
-      print("A VER LOS USUARIOS DE RESERVA");
-      print(_usuariosDeReserva.length);
+
     });
   }
 
@@ -148,7 +143,7 @@ Widget vistaReservas() {
               subtitle: Text(_usuariosDeReserva[index]!.email!),
               trailing: ElevatedButton(
                 onPressed: () {
-                  _mostrarDialogo(context, _reservasFuture[index], _usuariosDeReserva[index]!); // Pasar reserva como parámetro
+                  _mostrarDialogo(context, _reservasFuture[index], _usuariosDeReserva[index]!); 
                 },
                 child: Text('Detalle'),
               ),
@@ -265,25 +260,19 @@ void _mostrarDialogo(BuildContext context, Reserva reserva, UsuarioConsumidor us
   );
 }
 
- Future<List<UsuarioConsumidor?>> getUsuariosDeReservas() async {
+  Future<List<UsuarioConsumidor?>> getUsuariosDeReservas() async {
+    final List<UsuarioConsumidor?> consumidoresDeReserva = [];
 
-  final List<UsuarioConsumidor?> consumidoresDeReserva = [];
-  
- for (int i = 0; i < _reservasFuture.length; i++) {
-  print("Entró al foreach");  
-  print(_reservasFuture.length); //Esto da 0;
-  print(_reservasFuture[i].usuarioEmail);
-  final UsuarioConsumidor? consumidor = await databaseService.buscarUsuario(_reservasFuture[i].usuarioEmail);
+    for (int i = 0; i < _reservasFuture.length; i++) {
+      final UsuarioConsumidor? consumidor =
+          await databaseService.buscarUsuario(_reservasFuture[i].usuarioEmail);
 
-  consumidoresDeReserva.add(await databaseService.buscarUsuario(_reservasFuture[i].usuarioEmail));
-  print("Imprimimos los consumidores de reservasssss");
-  print(consumidoresDeReserva[i]!.nombre);
+      consumidoresDeReserva.add(
+          await databaseService.buscarUsuario(_reservasFuture[i].usuarioEmail));
+    }
 
-    // Realiza alguna operación con 'cochera'
+    return consumidoresDeReserva;
   }
-
-  return consumidoresDeReserva;
-}
 
 
 
