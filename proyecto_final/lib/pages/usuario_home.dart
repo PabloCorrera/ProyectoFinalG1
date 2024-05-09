@@ -271,6 +271,11 @@ void showDialogCancelarReserva(BuildContext context,Reserva reserva) {
                                 }
                                 fechaSalida =
                                     fechaEntrada!.add(const Duration(days: 1));
+                                    if(fechaEntrada!.year==fechaSalida!.year&&fechaEntrada!.month==fechaSalida!.month&&fechaEntrada!.day==fechaSalida!.day){
+                                  if(horaSalida!.hour<=horaEntrada!.hour){
+                                    horaSalida = TimeOfDay(hour: horaSalida!.hour, minute: horaSalida!.minute>44?horaSalida!.minute+1:horaSalida!.minute+10);
+                                  }
+                                }
                               });
                             }
                           },
@@ -288,6 +293,13 @@ void showDialogCancelarReserva(BuildContext context,Reserva reserva) {
                             if (selectedTime != null) {
                               setState(() {
                                 horaEntrada = selectedTime;
+                                fechaEntrada = DateTime(fechaEntrada!.year,fechaEntrada!.month,fechaEntrada!.day,horaEntrada!.hour,horaEntrada!.minute);
+                                if(fechaEntrada!.year==fechaSalida!.year&&fechaEntrada!.month==fechaSalida!.month&&fechaEntrada!.day==fechaSalida!.day){
+                                  if(horaSalida!.hour<=horaEntrada!.hour){
+                                    horaSalida = TimeOfDay(hour: horaSalida!.hour, minute: horaSalida!.minute>44?horaSalida!.minute+1:horaSalida!.minute+10);
+                                  }
+                                }
+                                
                               });
                             }
                           },
@@ -306,7 +318,7 @@ void showDialogCancelarReserva(BuildContext context,Reserva reserva) {
                           onPressed: () async {
                             final selectedDate = await showDatePicker(
                               context: context,
-                              initialDate: fechaEntrada!,
+                              initialDate: fechaSalida!,
                               firstDate: fechaEntrada!,
                               lastDate:
                                   DateTime.now().add(const Duration(days: 365)),
@@ -314,6 +326,11 @@ void showDialogCancelarReserva(BuildContext context,Reserva reserva) {
                             if (selectedDate != null) {
                               setState(() {
                                 fechaSalida = selectedDate;
+                                if(fechaEntrada!.year==fechaSalida!.year&&fechaEntrada!.month==fechaSalida!.month&&fechaEntrada!.day==fechaSalida!.day){
+                                  if(horaSalida!.hour<=horaEntrada!.hour){
+                                    horaSalida = TimeOfDay(hour: horaSalida!.hour, minute: horaSalida!.minute>44?horaSalida!.minute+1:horaSalida!.minute+10);
+                                  }
+                                }
                               });
                             }
                           },
@@ -326,11 +343,12 @@ void showDialogCancelarReserva(BuildContext context,Reserva reserva) {
                           onPressed: () async {
                             final selectedTime = await showTimePicker(
                               context: context,
-                              initialTime: horaEntrada!,
+                              initialTime: horaSalida!,
                             );
                             if (selectedTime != null) {
                               setState(() {
                                 horaSalida = selectedTime;
+                                fechaSalida = DateTime(fechaSalida!.year,fechaSalida!.month,fechaSalida!.day,horaSalida!.hour,horaSalida!.minute);
                               });
                             }
                           },
@@ -338,7 +356,15 @@ void showDialogCancelarReserva(BuildContext context,Reserva reserva) {
                               '${horaSalida!.hour}:${horaSalida!.minute.toString().padLeft(2, '0')}'),
                         ),
                       ),
+                      const SizedBox(height: 20),
+                      
                     ],
+                  ),
+                  Center(
+                    child: Text(
+                            'Precio de la reserva: \$${cochera.calcularPrecioTotal(fechaEntrada!, fechaSalida!)}',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
                   ),
                 ],
               ),
@@ -418,7 +444,7 @@ void showDialogCancelarReserva(BuildContext context,Reserva reserva) {
             precioPorHora: cochera.price,
             fechaEntrada: entrada,
             fechaSalida: salida,
-            precioTotal: cochera.calcularPrecioTotal(entrada, salida),
+            precioTotal: cochera.calcularPrecioTotal(dateTimeEntradaCompleto, dateTimeSalidaCompleto),
             direccion: cochera.direccion,
             );
         databaseService.addReserva(res).then((reservaExitosa) => {
