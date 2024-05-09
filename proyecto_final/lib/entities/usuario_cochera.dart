@@ -116,9 +116,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
     };
   }
 
-double calcularPrecioTotal(Timestamp fechaEntrada, Timestamp fechaSalida) {
-  DateTime dateTimeEntrada = fechaEntrada.toDate();
-  DateTime dateTimeSalida = fechaSalida.toDate();
+double calcularPrecioTotal(DateTime dateTimeEntrada, DateTime dateTimeSalida) {
   double precioPorHora = price;
 
   Duration diferencia = dateTimeSalida.difference(dateTimeEntrada);
