@@ -13,6 +13,7 @@ class UsuarioCochera {
   late double price;
   late String descripcion;
   late int cantLugares;
+  late String CBU;
 
   UsuarioCochera({
     this.nombre = "",
@@ -24,7 +25,8 @@ class UsuarioCochera {
     this.lng = 0.0,
     this.price = 0.0,
     required this.descripcion,
-    required this.cantLugares});
+    required this.cantLugares,
+    this.CBU =""});
 
 
 UsuarioCochera.fromJson(Map<String, Object?> json)
@@ -39,6 +41,8 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
           price: json['price']! as double,
           descripcion: json['descripcion']! as String,
           cantLugares: json['cantLugares']! as int,
+          CBU: json['CBU']! as String,
+          
         );
 
    UsuarioCochera copyWith({
@@ -52,6 +56,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
   double? price,
   String? descripcion,
   int? cantLugares,
+  String? CBU,
 }) {
   return UsuarioCochera(
     nombre: nombre ?? this.nombre,
@@ -64,6 +69,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
     price: price ?? this.price,
     descripcion: descripcion ?? this.descripcion,
     cantLugares: cantLugares ?? this.cantLugares,
+    CBU: CBU ?? this.CBU,
   );
 }
 
@@ -79,6 +85,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
       'price': price,
       'descripcion': descripcion,
       'cantLugares': cantLugares,
+      'CBU' : CBU,
     };
   }
   factory UsuarioCochera.fromFirestore(
@@ -97,6 +104,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
       price: data?['price'],
       descripcion: data?['descripcion'],
       cantLugares: data?['cantLugares'],
+      CBU : data ? ['CBU'],
     );
   }
 
@@ -113,6 +121,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
       if (price != null) 'price': price,
       if (descripcion != null) 'descripcion': descripcion,
       if (cantLugares != null) 'cantLugares': cantLugares,
+      if (CBU != null) 'CBU': CBU,
     };
   }
 

@@ -19,6 +19,7 @@ class GarageRegister extends StatelessWidget {
   final TextEditingController _controllerPrice = TextEditingController();
   final TextEditingController _controllerName = TextEditingController();
   final TextEditingController _controllerSurname = TextEditingController();
+  final TextEditingController _controllerCBU = TextEditingController();
   
   String? errorMessage = '';
   String? emailUsuario = FirebaseAuth.instance.currentUser?.email;
@@ -37,6 +38,7 @@ class GarageRegister extends StatelessWidget {
           descripcion: _description.text,
           price: double.parse(_controllerPrice.text),
         cantLugares: int.parse(_controllerQuantitySpaces.text),
+        CBU: _controllerCBU.text,
         );    
         _databaseService.addUsuarioCochera(usuarioCochera);
         context.pushNamed(UsuarioCocheraHome.name);
@@ -130,6 +132,8 @@ Widget build(BuildContext context) {
             _entryFieldNumber('Precio por hora', _controllerPrice),
             const SizedBox(height: 20),
             _entryFieldNumber('Cantidad de lugares', _controllerQuantitySpaces),
+             const SizedBox(height: 20),
+            _entryField('CBU', _controllerCBU),
       
             _errorMessage(),
             _submitButton(context),

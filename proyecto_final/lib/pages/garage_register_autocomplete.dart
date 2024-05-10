@@ -32,6 +32,8 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
   final TextEditingController _controllerPrice = TextEditingController();
   final TextEditingController _controllerName = TextEditingController();
   final TextEditingController _controllerSurname = TextEditingController();
+  final TextEditingController _controllerCBU = TextEditingController();
+  
   double latitud = 0;
   double lngitud = 0;
 
@@ -84,9 +86,9 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
 
   Widget _submitButton() {
     return ElevatedButton(
-      onPressed: ()async {
+      onPressed: () async {
         print("se recibio la direccion" + _controllerGarageAdress.text);
-       await convertAdressToLatLng(_controllerGarageAdress.text);
+        await convertAdressToLatLng(_controllerGarageAdress.text);
         String email = emailUsuario ?? "";
         if (isNotBlank(_controllerName.text) &&
             isNotBlank(_controllerSurname.text) &&
@@ -94,7 +96,9 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
             isNotBlank(_controllerGarageAdress.text) &&
             isNotBlank(_description.text) &&
             isNotBlank(_controllerPrice.text) &&
-            isNotBlank(_controllerQuantitySpaces.text)) {
+            isNotBlank(_controllerQuantitySpaces.text) &&
+            isNotBlank(_controllerCBU.text)) 
+             {
           UsuarioCochera usuarioCochera = UsuarioCochera(
             nombre: _controllerName.text,
             apellido: _controllerSurname.text,
@@ -106,6 +110,7 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
             cantLugares: int.parse(_controllerQuantitySpaces.text),
             lat: latitud,
             lng: lngitud,
+            CBU: _controllerCBU.text,
           );
           _databaseService.addUsuarioCochera(usuarioCochera);
           context.pushNamed(UsuarioCocheraHome.name);
@@ -242,6 +247,8 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
               const SizedBox(height: 20),
               _entryFieldNumber(
                   'Cantidad de lugares', _controllerQuantitySpaces),
+                                _entryField(
+                  'CBU', _controllerCBU),
 
               _errorMessage(),
               _submitButton(),
