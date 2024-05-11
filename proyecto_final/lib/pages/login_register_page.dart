@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:proyecto_final/auth.dart';
-import 'package:proyecto_final/pages/garage_home.dart';
 import 'package:proyecto_final/pages/home_page.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:proyecto_final/pages/usuario_cochera_home.dart';
