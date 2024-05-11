@@ -1,8 +1,6 @@
 import 'package:proyecto_final/entities/reserva.dart';
 import 'package:proyecto_final/entities/usuario_consumidor.dart';
-import 'package:proyecto_final/pages/garage_register.dart';
 import 'package:proyecto_final/pages/garage_register_autocomplete.dart';
-import 'package:proyecto_final/pages/income_home.dart';
 import 'package:proyecto_final/pages/login_register_page.dart';
 import 'package:proyecto_final/pages/home_page.dart';
 import 'package:go_router/go_router.dart';
@@ -49,11 +47,6 @@ GoRoute(
     builder: (context, state) => UsuarioCocheraHome(),
   ),
 
-    GoRoute(
-    name: IncomeHome.name,
-    path: '/recaudado',
-    builder: (context, state) => IncomeHome(reservas : state.extra as List<Reserva>),
-  ),
 
 
 

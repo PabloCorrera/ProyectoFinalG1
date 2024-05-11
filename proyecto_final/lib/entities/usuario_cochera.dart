@@ -13,7 +13,7 @@ class UsuarioCochera {
   late double price;
   late String descripcion;
   late int cantLugares;
-  late String CBU;
+  late String cbu;
 
   UsuarioCochera({
     this.nombre = "",
@@ -24,24 +24,24 @@ class UsuarioCochera {
     this.lat = 0.0,
     this.lng = 0.0,
     this.price = 0.0,
+    this.cbu = "",
     required this.descripcion,
-    required this.cantLugares,
-    this.CBU =""});
+    required this.cantLugares});
 
 
 UsuarioCochera.fromJson(Map<String, Object?> json)
       : this(
-          nombre: json['nombre'] as String? ?? '',
-          apellido: json['apellido'] as String? ?? '', 
-          email: json['email'] as String? ?? '', 
-          nombreCochera: json['nombreCochera'] as String? ?? '', 
-          direccion: json['direccion'] as String? ?? '',
-          lat: json['lat'] as double? ?? 0.0,
-          lng: json['lng'] as double? ?? 0.0,
-          price: json['price'] as double? ?? 0.0,
-          descripcion: json['descripcion'] as String? ?? '',
-          cantLugares: json['cantLugares'] as int? ?? 0,
-          CBU: json['CBU'] as String? ?? '',
+          nombre: json['nombre']! as String,
+          apellido: json['apellido']! as String, 
+          email: json['email']! as String, 
+          nombreCochera: json['nombreCochera']! as String, 
+          direccion: json['direccion']! as String,
+          lat: json['lat']! as double,
+          lng: json['lng']! as double,
+          price: json['price']! as double,
+          cbu: json['cbu'] != null ? json['cbu']! as String : "",
+          descripcion: json['descripcion']! as String,
+          cantLugares: json['cantLugares']! as int,
         );
 
    UsuarioCochera copyWith({
@@ -53,9 +53,9 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
   double? lat,
   double? lng,
   double? price,
+  String? cbu,
   String? descripcion,
   int? cantLugares,
-  String? CBU,
 }) {
   return UsuarioCochera(
     nombre: nombre ?? this.nombre,
@@ -66,46 +66,46 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
     lat: lat ?? this.lat,
     lng: lng ?? this.lng,
     price: price ?? this.price,
+    cbu: cbu ?? this.cbu,
     descripcion: descripcion ?? this.descripcion,
     cantLugares: cantLugares ?? this.cantLugares,
-    CBU: CBU ?? this.CBU,
   );
 }
 
   Map<String, Object?> toJson() {
     return {
       'nombre': nombre,
-      'apellido': apellido, // Added apellido
+      'apellido': apellido,
       'email': email,
-      'nombreCochera': nombreCochera, // Added nombreCochera
+      'nombreCochera': nombreCochera, 
       'direccion': direccion,
       'lat': lat,
       'lng': lng,
       'price': price,
+      'cbu': cbu,
       'descripcion': descripcion,
       'cantLugares': cantLugares,
-      'CBU' : CBU,
     };
   }
-factory UsuarioCochera.fromFirestore(
-  DocumentSnapshot<Map<String, dynamic>> snapshot,
-  SnapshotOptions? options,
-) {
-  final data = snapshot.data();
-  return UsuarioCochera(
-    nombre: data?['nombre'] ?? '',
-    apellido: data?['apellido'] ?? '',
-    email: data?['email'] ?? '',
-    nombreCochera: data?['nombreCochera'] ?? '',
-    direccion: data?['direccion'] ?? '',
-    lat: data?['lat'] ?? 0.0,
-    lng: data?['lng'] ?? 0.0,
-    price: data?['price'] ?? 0.0,
-    descripcion: data?['descripcion'] ?? '',
-    cantLugares: data?['cantLugares'] ?? 0,
-    CBU: data?['CBU'] ?? '',
-  );
-}
+  factory UsuarioCochera.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+    SnapshotOptions? options,
+  ) {
+    final data = snapshot.data();
+    return UsuarioCochera(
+      nombre: data?['nombre'],
+      apellido: data?['apellido'],
+      email: data?['email'],
+      nombreCochera: data?['nombreCochera'],
+      direccion: data?['direccion'],
+      lat: data?['lat'],
+      lng: data?['lng'],
+      price: data?['price'],
+      cbu: data?['cbu'] != null ? data!['cbu']! as String : "",
+      descripcion: data?['descripcion'],
+      cantLugares: data?['cantLugares'],
+    );
+  }
 
 
  Map<String, dynamic> toFirestore() {
@@ -118,9 +118,9 @@ factory UsuarioCochera.fromFirestore(
       if (lat != null) 'lat': lat,
       if (lng != null) 'lng': lng,
       if (price != null) 'price': price,
+      if (cbu != null) 'cbu': cbu,
       if (descripcion != null) 'descripcion': descripcion,
       if (cantLugares != null) 'cantLugares': cantLugares,
-      if (CBU != null) 'CBU': CBU,
     };
   }
 
