@@ -24,7 +24,11 @@ class UsuarioCocheraHome extends StatefulWidget {
 class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   DatabaseService databaseService = DatabaseService();
   late List<Reserva> _reservasFuture = [];
+  late List<Reserva> _reservasActivas = [];
+  late List<UsuarioConsumidor?> _usuariosDeReservasActivas = [];
   late List<UsuarioConsumidor?> _usuariosDeReserva = [];
+
+
   late List<Reserva> _reservasAnteriores = [];
   late List<UsuarioConsumidor?> _usuariosDeReservaAnteriores = [];
   late double _recaudacionTotal = 0;
@@ -33,6 +37,8 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   final String apellidoPersona = "";
 
   Widget? aMostrar;
+  Widget? reservasAMostrar;
+
   @override
   void initState() {
     super.initState();
@@ -48,10 +54,33 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
 
       _loadReservasAnteriores();
       await _loadUsuariosReservas();
+      await _loadReservasActivas();
+      await _loadUsuariosReservasActivas();
     } catch (e) {
       print(e);
     }
   }
+
+    Future<void> _loadUsuariosReservasActivas() async {
+    List<UsuarioConsumidor?> usuariosReserv = await getUsuariosDeReservas(_reservasActivas);
+    setState(() {
+      _usuariosDeReservasActivas = usuariosReserv;
+    });
+  }
+
+  
+  Future<void> _loadReservasActivas() async {
+    List<Reserva> reservas = await getReservas();
+    List<Reserva> reservasActivas = reservas
+        .where(
+            (reserva) => reserva.fechaSalida.toDate().isAfter(DateTime.now()))
+        .toList();
+    setState(() {
+      _reservasActivas = reservasActivas;
+    });
+  }
+
+  
 
   Future<void> _loadUsuariosReservas() async {
     List<UsuarioConsumidor?> usuariosConsum =
@@ -191,41 +220,73 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
       return usuarioCochera as UsuarioCochera;
     }
   }
+Widget vistaReservas() {
+  String titulo = 'Cantidad de Reservas: ';
+  return Column(
+    children: [
+      SizedBox(height: 12.0),
+      Text(
+        titulo + _usuariosDeReservasActivas.length.toString(),
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      
+      listaReservasTotales(),
+    ],
+  );
+}
 
-  Widget vistaReservas() {
-    return Column(
-      children: [
-        SizedBox(height: 12.0),
-        Text(
-          'Cantidad de Reservas: ${_reservasFuture.length}',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: _usuariosDeReserva.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                leading: Icon(Icons.account_circle, size: 40),
-                title: Text(_usuariosDeReserva[index]!.nombre +
-                    " " +
-                    _usuariosDeReserva[index]!.apellido),
-                subtitle: Text(_usuariosDeReserva[index]!.email!),
-                trailing: ElevatedButton(
-                  onPressed: () {
-                    _mostrarDialogo(context, _reservasFuture[index],
-                        _usuariosDeReserva[index]!);
-                  },
-                  child: Text('Detalle'),
-                ),
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-              );
+
+
+Widget listaReservasActivas() {
+  
+
+
+  return Expanded(
+    child: ListView.builder(
+      itemCount: _usuariosDeReservasActivas.length,
+      itemBuilder: (context, index) {
+        var usuario = _usuariosDeReservasActivas[index]!;
+        return ListTile(
+          leading: Icon(Icons.account_circle, size: 40),
+          title: Text(usuario.nombre + "" + usuario.apellido),
+          subtitle: Text(usuario.email!),
+          trailing: ElevatedButton(
+            onPressed: () {
+            _mostrarDialogo(context, _reservasActivas[index], usuario);
             },
+            child: Text('Detalle'),
           ),
-        ),
-      ],
-    );
-  }
+          contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        );
+      },
+    ),
+  );
+}
+ 
+  
+
+Widget listaReservasTotales() {
+  return Expanded(
+    child: ListView.builder(
+      itemCount: _usuariosDeReserva.length,
+      itemBuilder: (context, index) {
+        var usuario = _usuariosDeReserva[index]!;
+        return ListTile(
+          leading: Icon(Icons.account_circle, size: 40),
+          title: Text('${usuario.nombre} ${usuario.apellido}'),
+          subtitle: Text(usuario.email ?? ''),
+          trailing: ElevatedButton(
+            onPressed: () {
+              _mostrarDialogo(context, _reservasFuture[index], usuario);
+            },
+            child: Text('Detalle'),
+          ),
+          contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        );
+      },
+    ),
+  );
+}
 
   Widget vistaEditar() {
     // Define controladores para los campos de texto
@@ -542,7 +603,8 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
       },
     );
   }
-}
+  
+
 
 Widget _entryField(String title, TextEditingController controller) {
   return TextFormField(
@@ -567,4 +629,6 @@ Widget _entryFieldNumber(String title, TextEditingController controller) {
       inputFormatters: <TextInputFormatter>[
         FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
       ]);
+}
+
 }
