@@ -215,7 +215,7 @@ Widget vistaReservas() {
         nombreCocheraController.text = usuarioCochera.nombreCochera;
         descripcionController.text = usuarioCochera.descripcion;
         precioController.text = usuarioCochera.price.toString();
-        //cbuController.text = usuarioCochera.cbu;
+        cbuController.text = usuarioCochera.cbu;
 
         return Scaffold(
             body: SingleChildScrollView(
@@ -239,12 +239,13 @@ Widget vistaReservas() {
                   const SizedBox(height: 20),
                   _entryFieldNumber('Precio', precioController),
                   const SizedBox(height: 20),
-                  _entryField('CBU', cbuController),
+                  _entryFieldNumber('CBU', cbuController),
                   const SizedBox(height: 20),
                   _submitButton(
                     nombreCocheraController,
                     descripcionController,
                     precioController,
+                    cbuController
                   ),
                 ],
               ),
@@ -259,19 +260,22 @@ Widget vistaReservas() {
 
 
 
-Widget _submitButton(TextEditingController nombreCocheraController, TextEditingController descripcionController, TextEditingController precioController) {
+Widget _submitButton(TextEditingController nombreCocheraController, TextEditingController descripcionController, TextEditingController precioController, TextEditingController cbuController) {
   return ElevatedButton(
     onPressed: () async {
       String errorMessage = '';
-      if(isNotBlank(nombreCocheraController.text) && isNotBlank(descripcionController.text) && isNotBlank(precioController.text)){
+      if(isNotBlank(nombreCocheraController.text) && isNotBlank(descripcionController.text) && isNotBlank(precioController.text) && isNotBlank(cbuController.text)){
+       if (cbuController.text.length == 22) {
       String nombreCochera = nombreCocheraController.text;
       String descripcion = descripcionController.text;
       double precio = double.parse(precioController.text);
+      String cbu = cbuController.text;
       print(precioController);
       Map<String, dynamic> updatedAttributes = {
         'nombreCochera': nombreCochera,
         'descripcion': descripcion,
         'price': precio,
+        'cbu': cbu
       };
       ScaffoldMessenger.of(context).showSnackBar(
        const SnackBar(
@@ -284,7 +288,15 @@ Widget _submitButton(TextEditingController nombreCocheraController, TextEditingC
         aMostrar = vistaReservas();
       });
       await databaseService.updateUsuarioCochera(user!.email!, updatedAttributes);
-
+      } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('El CBU debe tener 22 números'),
+              duration: Duration(seconds: 3),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       } else {
       ScaffoldMessenger.of(context).showSnackBar(
        const SnackBar(
@@ -450,5 +462,5 @@ Widget _entryFieldNumber(String title, TextEditingController controller) {
     inputFormatters: <TextInputFormatter>[
     FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
     ]);
-  
+
 }
