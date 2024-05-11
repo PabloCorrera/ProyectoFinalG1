@@ -7,6 +7,7 @@ import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/entities/reserva.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
 import 'package:proyecto_final/entities/usuario_consumidor.dart';
+import 'package:proyecto_final/pages/income_home.dart';
 import 'package:proyecto_final/pages/login_register_page.dart';
 import 'package:proyecto_final/pages/maps_page.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
@@ -111,6 +112,16 @@ Widget build(BuildContext context) {
               onTap: () => {
                 setState(() {
                   context.pushNamed(MapsPage.name);
+                  Navigator.pop(context);
+                })
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.bar_chart),
+              title: const Text('Recaudado'),
+              onTap: () => {
+                setState(() {
+                  context.pushNamed(IncomeHome.name, extra: _reservasFuture );
                   Navigator.pop(context);
                 })
               },

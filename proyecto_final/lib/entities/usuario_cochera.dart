@@ -13,6 +13,7 @@ class UsuarioCochera {
   late double price;
   late String descripcion;
   late int cantLugares;
+  late String CBU;
 
   UsuarioCochera({
     this.nombre = "",
@@ -24,21 +25,23 @@ class UsuarioCochera {
     this.lng = 0.0,
     this.price = 0.0,
     required this.descripcion,
-    required this.cantLugares});
+    required this.cantLugares,
+    this.CBU =""});
 
 
 UsuarioCochera.fromJson(Map<String, Object?> json)
       : this(
-          nombre: json['nombre']! as String,
-          apellido: json['apellido']! as String, 
-          email: json['email']! as String, 
-          nombreCochera: json['nombreCochera']! as String, 
-          direccion: json['direccion']! as String,
-          lat: json['lat']! as double,
-          lng: json['lng']! as double,
-          price: json['price']! as double,
-          descripcion: json['descripcion']! as String,
-          cantLugares: json['cantLugares']! as int,
+          nombre: json['nombre'] as String? ?? '',
+          apellido: json['apellido'] as String? ?? '', 
+          email: json['email'] as String? ?? '', 
+          nombreCochera: json['nombreCochera'] as String? ?? '', 
+          direccion: json['direccion'] as String? ?? '',
+          lat: json['lat'] as double? ?? 0.0,
+          lng: json['lng'] as double? ?? 0.0,
+          price: json['price'] as double? ?? 0.0,
+          descripcion: json['descripcion'] as String? ?? '',
+          cantLugares: json['cantLugares'] as int? ?? 0,
+          CBU: json['CBU'] as String? ?? '',
         );
 
    UsuarioCochera copyWith({
@@ -52,6 +55,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
   double? price,
   String? descripcion,
   int? cantLugares,
+  String? CBU,
 }) {
   return UsuarioCochera(
     nombre: nombre ?? this.nombre,
@@ -64,6 +68,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
     price: price ?? this.price,
     descripcion: descripcion ?? this.descripcion,
     cantLugares: cantLugares ?? this.cantLugares,
+    CBU: CBU ?? this.CBU,
   );
 }
 
@@ -79,26 +84,28 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
       'price': price,
       'descripcion': descripcion,
       'cantLugares': cantLugares,
+      'CBU' : CBU,
     };
   }
-  factory UsuarioCochera.fromFirestore(
-    DocumentSnapshot<Map<String, dynamic>> snapshot,
-    SnapshotOptions? options,
-  ) {
-    final data = snapshot.data();
-    return UsuarioCochera(
-      nombre: data?['nombre'],
-      apellido: data?['apellido'],
-      email: data?['email'],
-      nombreCochera: data?['nombreCochera'],
-      direccion: data?['direccion'],
-      lat: data?['lat'],
-      lng: data?['lng'],
-      price: data?['price'],
-      descripcion: data?['descripcion'],
-      cantLugares: data?['cantLugares'],
-    );
-  }
+factory UsuarioCochera.fromFirestore(
+  DocumentSnapshot<Map<String, dynamic>> snapshot,
+  SnapshotOptions? options,
+) {
+  final data = snapshot.data();
+  return UsuarioCochera(
+    nombre: data?['nombre'] ?? '',
+    apellido: data?['apellido'] ?? '',
+    email: data?['email'] ?? '',
+    nombreCochera: data?['nombreCochera'] ?? '',
+    direccion: data?['direccion'] ?? '',
+    lat: data?['lat'] ?? 0.0,
+    lng: data?['lng'] ?? 0.0,
+    price: data?['price'] ?? 0.0,
+    descripcion: data?['descripcion'] ?? '',
+    cantLugares: data?['cantLugares'] ?? 0,
+    CBU: data?['CBU'] ?? '',
+  );
+}
 
 
  Map<String, dynamic> toFirestore() {
@@ -113,6 +120,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
       if (price != null) 'price': price,
       if (descripcion != null) 'descripcion': descripcion,
       if (cantLugares != null) 'cantLugares': cantLugares,
+      if (CBU != null) 'CBU': CBU,
     };
   }
 
