@@ -41,26 +41,22 @@ class DatabaseService {
 
   Future<bool> addUsuarioConsumidor(UsuarioConsumidor user) async {
     try {
-      // Realizar una consulta para verificar si el correo electrónico ya existe
+
       var query = await _usuariosConsumidorRef
           .where('email', isEqualTo: user.email)
           .get();
 
-      // Verificar si la consulta devolvió algún documento
       if (query.docs.isEmpty) {
-        // Si no se encontró ningún documento con el mismo correo electrónico, agregar el usuario
         await _usuariosConsumidorRef.add(user);
-        return true; // Indicar que el usuario se agregó con éxito
+        return true;
       } else {
-        // Si se encontró algún documento, el correo electrónico ya existe en la base de datos
-        // Aquí puedes manejar la lógica para mostrar un mensaje de error o realizar otras acciones
         print('El correo electrónico ya existe en la base de datos');
-        return false; // Indicar que hubo un problema al agregar el usuario
+        return false;
       }
     } catch (e) {
-      // Manejar cualquier error que ocurra durante el proceso
+     
       print('Error al agregar el usuario: $e');
-      return false; // Indicar que hubo un problema al agregar el usuario
+      return false;
     }
   }
 
@@ -89,6 +85,30 @@ class DatabaseService {
       return false; // Indicar que hubo un problema al agregar el usuario
     }
   }
+
+  Future<void> updateUsuarioCochera(String email, Map<String, dynamic> updatedAttributes) async {
+  try {
+    // Realiza una consulta para obtener el documento del usuario cochera usando su correo electrónico
+    var querySnapshot = await _usuariosCocheraRef.where('email', isEqualTo: email).get();
+    print(updatedAttributes);
+    // Verifica si se encontró un documento con el correo electrónico proporcionado
+    if (querySnapshot.docs.isNotEmpty) {
+      // Si se encontró un documento, actualiza sus datos
+      String docId = querySnapshot.docs.first.id;
+      DocumentReference userRef = _usuariosCocheraRef.doc(docId);
+
+      // Actualiza los atributos proporcionados en el mapa
+      await userRef.update(updatedAttributes);
+      print('Usuario cochera actualizado correctamente');
+    } else {
+      // Si no se encontró ningún documento con el correo electrónico dado, muestra un mensaje de error
+      print('No se encontró ningún usuario cochera con el correo electrónico proporcionado');
+    }
+  } catch (e) {
+    // Manejar cualquier error que ocurra durante el proceso
+    print('Error al actualizar el usuario cochera: $e');
+  }
+}
 
  Future<String?> getTipoUsuario(String email) async {
     try {
@@ -228,6 +248,30 @@ return listaReservas;
       if (query.docs.isNotEmpty) {
         // Si se encontró un documento, convierte los datos a un objeto UsuarioConsumidor y devuélvelo
         return query.docs.first.data() as UsuarioConsumidor?;
+      } else {
+        // Si no se encontró ningún documento con el correo electrónico dado, devuelve null
+        return null;
+      }
+    } catch (e) {
+      // Manejar cualquier error que ocurra durante el proceso
+      print('Error al buscar el usuario: $e');
+      return null;
+    }
+  }
+
+
+  Future<UsuarioCochera?> buscarUsuarioCochera(String usuarioEmail) async {
+    try {
+      print("DATABASE COCHERA");
+      // Realiza una consulta para buscar al usuario por su correo electrónico
+      var query = await _usuariosCocheraRef
+          .where('email', isEqualTo: usuarioEmail)
+          .get();
+
+      // Verifica si la consulta devolvió algún documento
+      if (query.docs.isNotEmpty) {
+        // Si se encontró un documento, convierte los datos a un objeto UsuarioConsumidor y devuélvelo
+        return query.docs.first.data() as UsuarioCochera?;
       } else {
         // Si no se encontró ningún documento con el correo electrónico dado, devuelve null
         return null;
