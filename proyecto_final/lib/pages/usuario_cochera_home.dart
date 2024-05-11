@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:proyecto_final/auth.dart';
@@ -28,7 +29,6 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   final User? user = Auth().currentUser;
   final String nombreUsuario = "";
   final String apellidoPersona= "";
-
 
   Widget? aMostrar;
   @override
@@ -97,6 +97,16 @@ Widget build(BuildContext context) {
               },
             ),
             ListTile(
+              leading: const Icon(Icons.edit),
+              title: const Text('Editar mis datos'),
+              onTap: () => {
+                setState(() {
+                  aMostrar = vistaEditar();
+                  Navigator.pop(context);
+                })
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.map),
               title: const Text('Ver mapa'),
               onTap: () => {
@@ -130,6 +140,19 @@ Widget build(BuildContext context) {
       body: aMostrar ?? vistaReservas(),
     ),
   );
+}
+
+Future<UsuarioCochera> getUsuarioCochera(DatabaseService databaseService, email) async {
+
+  UsuarioCochera? usuarioCochera = await  databaseService.buscarUsuarioCochera(email);
+
+  if (usuarioCochera != null) {
+    print('Usuario encontrado: ${usuarioCochera.nombre}');
+    return usuarioCochera;
+  } else {
+    print('Usuario no encontrado');
+    return usuarioCochera as UsuarioCochera;
+  }
 }
 
 
@@ -167,6 +190,120 @@ Widget vistaReservas() {
     ],
   );
 }
+
+ Widget vistaEditar() {
+  // Define controladores para los campos de texto
+  final TextEditingController nombreCocheraController = TextEditingController();
+  final TextEditingController descripcionController = TextEditingController();
+  final TextEditingController precioController = TextEditingController();
+  final TextEditingController cbuController = TextEditingController();
+
+  return FutureBuilder<UsuarioCochera>(
+    future: getUsuarioCochera(databaseService, user!.email!),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return Center(
+          child: 
+          CircularProgressIndicator()
+        );
+      } else if (snapshot.hasError) {
+        return Text('Error: ${snapshot.error}');
+      } else {
+        UsuarioCochera usuarioCochera = snapshot.data!;
+        
+        // Asigna los valores iniciales a los controladores
+        nombreCocheraController.text = usuarioCochera.nombreCochera;
+        descripcionController.text = usuarioCochera.descripcion;
+        precioController.text = usuarioCochera.price.toString();
+        //cbuController.text = usuarioCochera.cbu;
+
+        return Scaffold(
+            body: SingleChildScrollView(
+            child: Container(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const Text(
+                    'EDITAR COCHERA',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  _entryField('Nombre Cochera', nombreCocheraController),
+                  const SizedBox(height: 20),
+                  _entryField('Descripción', descripcionController),
+                  const SizedBox(height: 20),
+                  _entryFieldNumber('Precio', precioController),
+                  const SizedBox(height: 20),
+                  _entryField('CBU', cbuController),
+                  const SizedBox(height: 20),
+                  _submitButton(
+                    nombreCocheraController,
+                    descripcionController,
+                    precioController,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }
+    },
+  );
+}
+
+
+
+
+Widget _submitButton(TextEditingController nombreCocheraController, TextEditingController descripcionController, TextEditingController precioController) {
+  return ElevatedButton(
+    onPressed: () async {
+      String errorMessage = '';
+      if(isNotBlank(nombreCocheraController.text) && isNotBlank(descripcionController.text) && isNotBlank(precioController.text)){
+      String nombreCochera = nombreCocheraController.text;
+      String descripcion = descripcionController.text;
+      double precio = double.parse(precioController.text);
+      print(precioController);
+      Map<String, dynamic> updatedAttributes = {
+        'nombreCochera': nombreCochera,
+        'descripcion': descripcion,
+        'price': precio,
+      };
+      ScaffoldMessenger.of(context).showSnackBar(
+       const SnackBar(
+          content: Text('Los datos del usuario fueron editados correctamente'),
+          duration: Duration(seconds: 3),
+          backgroundColor: Colors.green,
+        ),
+      );
+       setState(() {
+        aMostrar = vistaReservas();
+      });
+      await databaseService.updateUsuarioCochera(user!.email!, updatedAttributes);
+
+      } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+       const SnackBar(
+          content: Text('Complete los datos correctamente por favor'),
+          duration: Duration(seconds: 3),
+          backgroundColor: Colors.red,
+        ),
+      );
+        }
+     
+      
+    },
+    child: Text('Editar'),
+  );
+}
+  
+bool isNotBlank(String value) {
+    return value.trim().isNotEmpty;
+  }
 
 void _mostrarDialogo(BuildContext context, Reserva reserva, UsuarioConsumidor usuarioConsumidor) {
   final DateFormat formatter = DateFormat('dd/MM/yyyy HH:mm');
@@ -284,7 +421,34 @@ void _mostrarDialogo(BuildContext context, Reserva reserva, UsuarioConsumidor us
 
     return consumidoresDeReserva;
   }
+  
 
 
+}
 
+
+Widget _entryField(String title, TextEditingController controller) {
+  return TextFormField(
+    controller: controller,
+    decoration: InputDecoration(
+      labelText: title,
+    ),
+    inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
+      ],
+  );
+}
+
+// Función para construir un campo de entrada de número
+Widget _entryFieldNumber(String title, TextEditingController controller) {
+  return TextFormField(
+    controller: controller,
+    keyboardType: TextInputType.number,
+    decoration: InputDecoration(
+      labelText: title,
+    ),
+    inputFormatters: <TextInputFormatter>[
+    FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+    ]);
+  
 }
