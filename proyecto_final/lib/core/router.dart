@@ -1,3 +1,4 @@
+import 'package:proyecto_final/entities/usuario_consumidor.dart';
 import 'package:proyecto_final/pages/garage_register.dart';
 import 'package:proyecto_final/pages/garage_register_autocomplete.dart';
 import 'package:proyecto_final/pages/login_register_page.dart';
@@ -45,6 +46,7 @@ GoRoute(
     path: '/usuarioCochera',
     builder: (context, state) => UsuarioCocheraHome(),
   ),
+
 
 
 ]);

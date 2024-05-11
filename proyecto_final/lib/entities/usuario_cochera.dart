@@ -116,9 +116,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
     };
   }
 
-double calcularPrecioTotal(Timestamp fechaEntrada, Timestamp fechaSalida) {
-  DateTime dateTimeEntrada = fechaEntrada.toDate();
-  DateTime dateTimeSalida = fechaSalida.toDate();
+double calcularPrecioTotal(DateTime dateTimeEntrada, DateTime dateTimeSalida) {
   double precioPorHora = price;
 
   Duration diferencia = dateTimeSalida.difference(dateTimeEntrada);
@@ -163,3 +161,13 @@ Future<bool> tieneDisponibilidad(Timestamp entrada, Timestamp salida)async{
 
 
 }
+
+
+final List<UsuarioCochera> usuariosCocheras = [
+  UsuarioCochera(descripcion: 'La mejor Cochera', cantLugares: 17),
+  UsuarioCochera(descripcion: 'Cochera Copada', cantLugares: 2),
+  UsuarioCochera(descripcion: 'Alta cochera', cantLugares: 15),
+  UsuarioCochera(descripcion: 'Dale que va', cantLugares: 25),
+  UsuarioCochera(descripcion: 'Esta tampoco va', cantLugares: 0),
+  UsuarioCochera(descripcion: 'Esta no va', cantLugares: 0)
+];
