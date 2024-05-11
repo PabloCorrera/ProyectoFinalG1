@@ -84,9 +84,9 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
 
   Widget _submitButton() {
     return ElevatedButton(
-      onPressed: ()async {
+      onPressed: () async {
         print("se recibio la direccion" + _controllerGarageAdress.text);
-       await convertAdressToLatLng(_controllerGarageAdress.text);
+        await convertAdressToLatLng(_controllerGarageAdress.text);
         String email = emailUsuario ?? "";
         if (isNotBlank(_controllerName.text) &&
             isNotBlank(_controllerSurname.text) &&
@@ -198,7 +198,7 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
               const SizedBox(height: 20),
               _entryField('Apellido', _controllerSurname),
               const SizedBox(height: 20),
-              _entryField('Nombre Estacionamiento', _controllerGarageName),
+              _entryField('Nombre cochera', _controllerGarageName),
               const SizedBox(height: 20),
               _entryField('Descripcion', _description),
               const SizedBox(height: 20),

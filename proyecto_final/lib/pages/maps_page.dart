@@ -8,6 +8,8 @@ import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/entities/reserva.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
+import 'package:proyecto_final/assets/payment_config.dart';
+import 'package:pay/pay.dart';
 
 final DatabaseService databaseService = DatabaseService();
 final User? user = Auth().currentUser;
@@ -31,10 +33,9 @@ class MapsPageState extends State<MapsPage> {
   );
 
   static const CameraPosition _kLake = CameraPosition(
-      bearing: 192.8334901395799,
       target: LatLng(-34.61014682261275, -58.429135724657954),
       tilt: 59.440717697143555,
-      zoom: 19.151926040649414);
+      zoom: 15.4555);
 
   @override
   Widget build(BuildContext context) {
@@ -57,11 +58,13 @@ class MapsPageState extends State<MapsPage> {
         ),
 
         // Boton para agregar alguna funcionalidad
+        /*
         floatingActionButton: FloatingActionButton.extended(
           onPressed: _goToTheLake,
           label: const Text('Buscar cocheras'),
           icon: const Icon(Icons.directions_car_filled_outlined),
         ),
+        */
       ),
     );
   }
@@ -87,7 +90,6 @@ class MapsPageState extends State<MapsPage> {
           position: LatLng(u.lat, u.lng),
           infoWindow: InfoWindow(title: u.nombreCochera),
           onTap: () async => await _showReservarDialog(context, u)));
-      //context.pushNamed(UsuarioHome.name)));
     }
 
     return marcadores;
@@ -142,6 +144,17 @@ Future<void> _showReservarDialog(
                               }
                               fechaSalida =
                                   fechaEntrada!.add(const Duration(days: 1));
+                              if (fechaEntrada!.year == fechaSalida!.year &&
+                                  fechaEntrada!.month == fechaSalida!.month &&
+                                  fechaEntrada!.day == fechaSalida!.day) {
+                                if (horaSalida!.hour <= horaEntrada!.hour) {
+                                  horaSalida = TimeOfDay(
+                                      hour: horaSalida!.hour,
+                                      minute: horaSalida!.minute > 44
+                                          ? horaSalida!.minute + 1
+                                          : horaSalida!.minute + 10);
+                                }
+                              }
                             });
                           }
                         },
@@ -159,6 +172,23 @@ Future<void> _showReservarDialog(
                           if (selectedTime != null) {
                             setState(() {
                               horaEntrada = selectedTime;
+                              fechaEntrada = DateTime(
+                                  fechaEntrada!.year,
+                                  fechaEntrada!.month,
+                                  fechaEntrada!.day,
+                                  horaEntrada!.hour,
+                                  horaEntrada!.minute);
+                              if (fechaEntrada!.year == fechaSalida!.year &&
+                                  fechaEntrada!.month == fechaSalida!.month &&
+                                  fechaEntrada!.day == fechaSalida!.day) {
+                                if (horaSalida!.hour <= horaEntrada!.hour) {
+                                  horaSalida = TimeOfDay(
+                                      hour: horaSalida!.hour,
+                                      minute: horaSalida!.minute > 44
+                                          ? horaSalida!.minute + 1
+                                          : horaSalida!.minute + 10);
+                                }
+                              }
                             });
                           }
                         },
@@ -177,7 +207,7 @@ Future<void> _showReservarDialog(
                         onPressed: () async {
                           final selectedDate = await showDatePicker(
                             context: context,
-                            initialDate: fechaEntrada!,
+                            initialDate: fechaSalida!,
                             firstDate: fechaEntrada!,
                             lastDate:
                                 DateTime.now().add(const Duration(days: 365)),
@@ -185,6 +215,17 @@ Future<void> _showReservarDialog(
                           if (selectedDate != null) {
                             setState(() {
                               fechaSalida = selectedDate;
+                              if (fechaEntrada!.year == fechaSalida!.year &&
+                                  fechaEntrada!.month == fechaSalida!.month &&
+                                  fechaEntrada!.day == fechaSalida!.day) {
+                                if (horaSalida!.hour <= horaEntrada!.hour) {
+                                  horaSalida = TimeOfDay(
+                                      hour: horaSalida!.hour,
+                                      minute: horaSalida!.minute > 44
+                                          ? horaSalida!.minute + 1
+                                          : horaSalida!.minute + 10);
+                                }
+                              }
                             });
                           }
                         },
@@ -197,11 +238,17 @@ Future<void> _showReservarDialog(
                         onPressed: () async {
                           final selectedTime = await showTimePicker(
                             context: context,
-                            initialTime: horaEntrada!,
+                            initialTime: horaSalida!,
                           );
                           if (selectedTime != null) {
                             setState(() {
                               horaSalida = selectedTime;
+                              fechaSalida = DateTime(
+                                  fechaSalida!.year,
+                                  fechaSalida!.month,
+                                  fechaSalida!.day,
+                                  horaSalida!.hour,
+                                  horaSalida!.minute);
                             });
                           }
                         },
@@ -209,7 +256,14 @@ Future<void> _showReservarDialog(
                             '${horaSalida!.hour}:${horaSalida!.minute.toString().padLeft(2, '0')}'),
                       ),
                     ),
+                    const SizedBox(height: 20),
                   ],
+                ),
+                Center(
+                  child: Text(
+                    'Precio de la reserva: \$${cochera.calcularPrecioTotal(fechaEntrada!, fechaSalida!)}',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ],
             ),
@@ -220,12 +274,26 @@ Future<void> _showReservarDialog(
                 },
                 child: const Text('Cancelar'),
               ),
-              ElevatedButton(
-                onPressed: () {
+              GooglePayButton(
+                paymentConfiguration:
+                    PaymentConfiguration.fromJsonString(defaultGooglePay),
+                paymentItems: [
+                  PaymentItem(
+                      amount: cochera
+                          .calcularPrecioTotal(fechaEntrada!, fechaSalida!)
+                          .toString(),
+                      label: 'Total',
+                      status: PaymentItemStatus.final_price)
+                ],
+                type: GooglePayButtonType.plain,
+                margin: const EdgeInsets.only(top: 15.0),
+                onPaymentResult: (result) {
                   reservar(fechaEntrada, horaEntrada, fechaSalida, horaSalida,
                       cochera, context);
                 },
-                child: const Text('Reservar'),
+                loadingIndicator: const Center(
+                  child: CircularProgressIndicator(),
+                ),
               ),
             ],
           );
@@ -290,7 +358,8 @@ void reservar(
         precioPorHora: cochera.price,
         fechaEntrada: entrada,
         fechaSalida: salida,
-        precioTotal: cochera.calcularPrecioTotal(entrada, salida),
+        precioTotal: cochera.calcularPrecioTotal(
+            dateTimeEntradaCompleto, dateTimeSalidaCompleto),
         direccion: cochera.direccion,
       );
       databaseService.addReserva(res).then((reservaExitosa) => {
