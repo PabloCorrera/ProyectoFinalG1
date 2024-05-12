@@ -206,6 +206,7 @@ Future<Reserva?> getReservaById(String id)async{
 Future<List<Reserva>> getReservasPorUsuario(String mailUsuario)async{
 final ref = _firestore.collection(RESERVA)
 .where("usuarioEmail",isEqualTo: mailUsuario)
+.orderBy("fechaCreacion",descending: true)
 .withConverter(fromFirestore: Reserva.fromFirestore, toFirestore: (Reserva reserva,_)=>reserva.toFirestore());
 List<Reserva> listaReservas = [];
 final docSnap = await ref.get();
@@ -214,6 +215,18 @@ docSnap.docs.forEach((element) {
 });
 
 return listaReservas;
+}
+
+Future<UsuarioConsumidor> getConsumidorByEmail(String mailUsuario) async {
+  final ref = _firestore.collection(USUARIO_CONSUMIDOR)
+  .where("email",isEqualTo: mailUsuario)
+  .withConverter(fromFirestore: UsuarioConsumidor.fromFirestore, toFirestore: (UsuarioConsumidor user,_)=>user.toFirestore());
+  final docSnap = await ref.get();
+  UsuarioConsumidor uc = UsuarioConsumidor();
+    docSnap.docs.forEach((element){ 
+      uc = element.data();
+    });
+    return uc;
 }
 
   Future<UsuarioConsumidor?> buscarUsuario(String usuarioEmail) async {
