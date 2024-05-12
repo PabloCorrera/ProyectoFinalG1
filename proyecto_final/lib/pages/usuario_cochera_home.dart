@@ -119,7 +119,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     final DateTime now = DateTime.now();
     double totalRecaudado = 0;
     late List<Reserva> reservasAnteriores = _reservasFuture
-        .where((reserva) => reserva.fechaSalida.toDate().isBefore(now))
+        .where((reserva) => reserva.fechaEntrada.toDate().isBefore(now))
         .toList();
     _reservasAnteriores = reservasAnteriores;
 
@@ -166,6 +166,16 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                 onTap: () => {
                   setState(() {
                     aMostrar = vistaReservas();
+                    Navigator.pop(context);
+                  })
+                },
+              ),
+                ListTile(
+                leading: const Icon(Icons.card_travel),
+                title: const Text('Historial reservas'),
+                onTap: () => {
+                  setState(() {
+                    aMostrar = vistaHistorialDeReservas();
                     Navigator.pop(context);
                   })
                 },
@@ -230,7 +240,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     }
   }
 Widget vistaReservas() {
-  String titulo = 'Cantidad de Reservas: ';
+  String titulo = 'Reservas Activas: ';
   String opcionSeleccionada = 'Reservas actuales'; // Inicialmente seleccionamos "Reservas actuales"
 
 return Column(
@@ -240,25 +250,23 @@ return Column(
       titulo + _usuariosDeReservasActivas.length.toString(),
       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
     ),
-    DropdownButton<String>(
-      value: opcionSeleccionada,
-      onChanged: (String? newValue) {
-        setState(() {
-          opcionSeleccionada = newValue!;
-        });
-      },
-      items: <String>['Reservas actuales', 'Historial de reservas']
-          .map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-    ),
-    // Aquí debajo puedes mostrar la lista correspondiente según la opción seleccionada
-  
-      historialDeReservas()
+      listaReservasActivas()
 
+  ],
+);
+}
+
+Widget vistaHistorialDeReservas() {
+  String titulo = 'Cantidad de Reservas: ';
+  String opcionSeleccionada = 'Reservas actuales'; // Inicialmente seleccionamos "Reservas actuales"
+return Column(
+  children: [
+    SizedBox(height: 12.0),
+    Text(
+      titulo + _usuariosDeReserva.length.toString(),
+      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    ),
+      historialDeReservas()
   ],
 );
 
@@ -276,7 +284,7 @@ Widget listaReservasActivas() {
         var usuario = _usuariosDeReservasActivas[index]!;
         return ListTile(
           leading: Icon(Icons.account_circle, size: 40),
-          title: Text(usuario.nombre + "" + usuario.apellido),
+          title: Text(usuario.nombre + " " + usuario.apellido),
           subtitle: Text(usuario.email!),
           trailing: ElevatedButton(
             onPressed: () {
@@ -307,6 +315,7 @@ Widget historialDeReservas() {
         return ListTile(
           leading: Icon(Icons.account_circle, size: 40),
           title: Text(
+            
             '${_usuariosDeReserva[index]!.nombre} ${_usuariosDeReserva[index]!.apellido}',
             style: TextStyle(color: colorTexto), // Establecer el color del texto
           ),
@@ -385,7 +394,7 @@ Widget historialDeReservas() {
   }
 
   
- String titulo1 = "Hola";
+ String titulo1 = "Total recaudado";
   @override
   Widget VistaIncome() {
 
@@ -455,20 +464,13 @@ Widget historialDeReservas() {
                         onChanged: (value) {
                           setState(() {
                             opcionSeleccionada = value as OpcionesRecaudacion;
-                            print("Holaaaaaaaaaaaa");
-                            titulo1 = "DALEEEEEEEEEE";
-                            print(titulo1);
+                       
                           });
                         },
                         title: Text("Personalziado"))
                   ],
                 ),
                 
-
-
-
-
-
              
               ],
             ),
