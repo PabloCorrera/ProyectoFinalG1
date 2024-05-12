@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart' as FirebaseAuth;
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -27,6 +29,7 @@ class _UserRegisterState extends State<UserRegister> {
   String? userMail = FirebaseAuth.FirebaseAuth.instance.currentUser?.email;
   String? errorMessage = '';
   Uint8List? imagen;
+  XFile? fileImagen;
 
   Widget _entryField(String title, TextEditingController controller) {
     return TextField(
@@ -50,25 +53,45 @@ class _UserRegisterState extends State<UserRegister> {
     );
   }
 
+  void registrarUsuario() async {
+    if (_controllerName.text.trim().isNotEmpty &&
+        _controllerSurname.text.trim().isNotEmpty) {
+      UsuarioConsumidor user = UsuarioConsumidor(
+        nombre: _controllerName.text,
+        apellido: _controllerSurname.text,
+        email: userMail,
+        imageUrl: ""
+      );
+      String urlImagen = "";
+      if (fileImagen != null) {
+        String uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
+
+        Reference referenceRoot = FirebaseStorage.instance.ref();
+        Reference referenceDirImages = referenceRoot.child('images');
+        Reference imagenASubir = referenceDirImages.child(uniqueName);
+        try {
+          await imagenASubir.putFile(File(fileImagen!.path));
+          await imagenASubir.getDownloadURL().then((value) => urlImagen = value);
+        } catch (error) {
+          print(error);
+          urlImagen = "";
+        }
+      }
+      user.imageUrl = urlImagen;
+
+      _databaseService.addUsuarioConsumidor(user);
+       await Future.delayed(const Duration(seconds: 3)); 
+      context.pushNamed(UsuarioHome.name);
+    } else {
+      setState(() {
+        errorMessage = 'Por favor, complete todos los campos correctamente.';
+      });
+    }
+  }
+
   Widget _submitButton(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {
-        if (_controllerName.text.trim().isNotEmpty &&
-            _controllerSurname.text.trim().isNotEmpty) {
-          UsuarioConsumidor user = UsuarioConsumidor(
-            nombre: _controllerName.text,
-            apellido: _controllerSurname.text,
-            email: userMail,
-          );
-          _databaseService.addUsuarioConsumidor(user);
-          context.pushNamed(UsuarioHome.name);
-        } else {
-          setState(() {
-            errorMessage =
-                'Por favor, complete todos los campos correctamente.';
-          });
-        }
-      },
+      onPressed: () => registrarUsuario(),
       child: const Text('Confirmar'),
     );
   }
@@ -85,21 +108,21 @@ class _UserRegisterState extends State<UserRegister> {
   Widget imagePicker() {
     return Stack(
       children: [
-        imagen!=null?
-         CircleAvatar(
-          radius: 64,
-          backgroundImage: MemoryImage(imagen!),
-        ):
-        const CircleAvatar(
-          radius: 64,
-          backgroundImage: NetworkImage(
-              'https://cdn-icons-png.flaticon.com/512/9131/9131529.png'),
-        ),
+        imagen != null
+            ? CircleAvatar(
+                radius: 64,
+                backgroundImage: MemoryImage(imagen!),
+              )
+            : const CircleAvatar(
+                radius: 64,
+                backgroundImage: NetworkImage(
+                    'https://cdn-icons-png.flaticon.com/512/9131/9131529.png'),
+              ),
         Positioned(
           bottom: -10,
           left: 80,
           child: IconButton(
-            onPressed:()=>selectImage(),
+            onPressed: () => selectImage(),
             icon: const Icon(Icons.add_a_photo),
           ),
         )
@@ -108,10 +131,15 @@ class _UserRegisterState extends State<UserRegister> {
   }
 
   selectImage() async {
-    Uint8List? img = await pickImage(ImageSource.gallery);
-    setState(() {
-      imagen = img;
-    });
+    XFile? img = await pickImage(ImageSource.gallery);
+    if (img != null) {
+      img.readAsBytes().then((foto) => {
+            setState(() {
+              imagen = foto;
+              fileImagen = img;
+            })
+          });
+    }
   }
 
   @override

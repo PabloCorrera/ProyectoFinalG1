@@ -7,6 +7,7 @@ import 'package:proyecto_final/assets/payment_config.dart';
 import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/entities/reserva.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
+import 'package:proyecto_final/entities/usuario_consumidor.dart';
 import 'package:proyecto_final/pages/maps_page.dart';
 import 'package:proyecto_final/pages/login_register_page.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
@@ -23,12 +24,14 @@ class _UsuarioHomeState extends State<UsuarioHome> {
   late List<UsuarioCochera> _cocherasFuture = [];
   late List<Reserva> _reservasFuture = [];
   final User? user = Auth().currentUser;
+  late UsuarioConsumidor? consumidor = UsuarioConsumidor();
   Widget? aMostrar;
   @override
   void initState() {
     super.initState();
     _loadCocheras();
     _loadReservas();
+    _loadConsumidor();
   }
 
   Future<void> _loadCocheras() async {
@@ -53,6 +56,15 @@ class _UsuarioHomeState extends State<UsuarioHome> {
     return databaseService.getReservasPorUsuario(user!.email!);
   }
 
+  Future<void> _loadConsumidor() async {
+    UsuarioConsumidor uc =
+        await databaseService.getConsumidorByEmail(user!.email!);
+    setState(() {
+      print('ente');
+      consumidor = uc;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -61,62 +73,66 @@ class _UsuarioHomeState extends State<UsuarioHome> {
           title: const Text('Home Usuario'),
           backgroundColor: Colors.pink,
         ),
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              UserAccountsDrawerHeader(
-                accountName: const Text('Bienvenido'),
-                accountEmail: user != null ? Text(user!.email!) : null,
-                currentAccountPicture: const CircleAvatar(),
-                decoration: const BoxDecoration(
-                  color: Colors.pinkAccent,
-                ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.car_rental),
-                title: const Text('Reservar cochera'),
-                onTap: () => {
-                  setState(() {
-                    aMostrar = vistaCocheras();
-                    Navigator.pop(context);
-                  })
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.card_travel),
-                title: const Text('Mis reservas'),
-                onTap: () => {
-                  setState(() {
-                    aMostrar = vistaReservas();
-                    Navigator.pop(context);
-                  })
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.map),
-                title: const Text('Ver mapa'),
-                onTap: () => {
-                  setState(() {
-                    context.pushNamed(MapsPage.name);
-                    Navigator.pop(context);
-                  })
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.logout),
-                title: const Text('Salir'),
-                onTap: () => {
-                  context.pushNamed(LoginPage.name),
-                  Auth().signOut(),
-                },
-              )
-            ],
-          ),
-        ),
+        drawer: buildDrawer(),
         body: aMostrar ?? vistaCocheras(),
       ),
     );
+  }
+
+  Widget buildDrawer() {
+    return Drawer(
+        child: ListView(
+      padding: EdgeInsets.zero,
+      children: [
+        UserAccountsDrawerHeader(
+          accountName:  Text('Bienvenido ${consumidor!.nombre}'),
+          accountEmail: user != null ? Text(user!.email!) : null,
+          currentAccountPicture: CircleAvatar(
+              backgroundImage: consumidor!.imageUrl!=""? NetworkImage(consumidor!.imageUrl!):null),
+          decoration: const BoxDecoration(
+            color: Colors.pinkAccent,
+          ),
+        ),
+        ListTile(
+          leading: const Icon(Icons.car_rental),
+          title: const Text('Reservar cochera'),
+          onTap: () => {
+            setState(() {
+              aMostrar = vistaCocheras();
+              Navigator.pop(context);
+            })
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.card_travel),
+          title: const Text('Mis reservas'),
+          onTap: () => {
+            setState(() {
+              aMostrar = vistaReservas();
+              Navigator.pop(context);
+            })
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.map),
+          title: const Text('Ver mapa'),
+          onTap: () => {
+            setState(() {
+              context.pushNamed(MapsPage.name);
+              Navigator.pop(context);
+            })
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.logout),
+          title: const Text('Salir'),
+          onTap: () => {
+            context.pushNamed(LoginPage.name),
+            Auth().signOut(),
+          },
+        )
+      ],
+    ));
   }
 
   Widget vistaCocheras() {
@@ -125,8 +141,8 @@ class _UsuarioHomeState extends State<UsuarioHome> {
       itemBuilder: (context, index) {
         final cochera = _cocherasFuture[index];
         return ListTile(
-          title: Text(cochera.nombreCochera),
-          subtitle: Text(cochera.direccion),
+          title: Text(cochera.direccion),
+          subtitle: Text("Precio por hora: ${cochera.price}"),
           trailing: ElevatedButton(
             onPressed: () {
               _showReservarDialog(context, cochera);
@@ -143,7 +159,8 @@ class _UsuarioHomeState extends State<UsuarioHome> {
       itemCount: _reservasFuture.length,
       itemBuilder: (context, index) {
         final reserva = _reservasFuture[index];
-        bool puedeCancelar = faltanMasDeCuarentaYcincoMinutos(reserva.fechaEntrada);
+        bool puedeCancelar =
+            faltanMasDeCuarentaYcincoMinutos(reserva.fechaEntrada);
         String estado = estadoReserva(reserva.fechaEntrada);
         return ListTile(
           title: Text(reserva.direccion),
@@ -319,12 +336,13 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                                             ? horaSalida!.minute + 1
                                             : horaSalida!.minute + 10);
                                   }
-                                    
                                 }
-                                DateTime ahoraMasHora = DateTime.now().add(const Duration(hours: 1));
-                                    if (fechaEntrada!.isBefore(ahoraMasHora)) {
-                                      horaEntrada = TimeOfDay.fromDateTime(ahoraMasHora);
-                                    }  
+                                DateTime ahoraMasHora = DateTime.now()
+                                    .add(const Duration(hours: 1));
+                                if (fechaEntrada!.isBefore(ahoraMasHora)) {
+                                  horaEntrada =
+                                      TimeOfDay.fromDateTime(ahoraMasHora);
+                                }
                               });
                             }
                           },
@@ -452,12 +470,12 @@ class _UsuarioHomeState extends State<UsuarioHome> {
   }
 
   bool faltanMasDeCuarentaYcincoMinutos(Timestamp timestamp) {
-  DateTime horaActual = DateTime.now();
-  DateTime horaEvento = timestamp.toDate();
-  Duration diferencia = horaEvento.difference(horaActual);
-  int minutosFaltantes = diferencia.inMinutes;
-  return minutosFaltantes >= 45;
-}
+    DateTime horaActual = DateTime.now();
+    DateTime horaEvento = timestamp.toDate();
+    Duration diferencia = horaEvento.difference(horaActual);
+    int minutosFaltantes = diferencia.inMinutes;
+    return minutosFaltantes >= 45;
+  }
 
   void reservar(
       DateTime? fechaEntrada,
@@ -532,5 +550,13 @@ class _UsuarioHomeState extends State<UsuarioHome> {
       }
     });
     _loadReservas();
+  }
+
+  String obtenerImagenConsumidor() {
+    String url = "";
+    databaseService.getConsumidorByEmail(user!.email!).then((value) => {
+          if (value.imageUrl != null) {url = value.imageUrl!} else {url = ""}
+        });
+    return url;
   }
 }
