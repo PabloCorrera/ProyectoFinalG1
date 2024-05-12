@@ -13,6 +13,9 @@ import 'package:proyecto_final/services/database_sevice.dart';
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+enum OpcionesRecaudacion { total , estemes, ultimasemana, personalizado }
+
+
 class UsuarioCocheraHome extends StatefulWidget {
   const UsuarioCocheraHome({super.key});
   static const String name = 'UsuarioCocheraHome';
@@ -27,6 +30,9 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   late List<Reserva> _reservasActivas = [];
   late List<UsuarioConsumidor?> _usuariosDeReservasActivas = [];
   late List<UsuarioConsumidor?> _usuariosDeReserva = [];
+  OpcionesRecaudacion opcionSeleccionada = OpcionesRecaudacion.total;
+   String titulo = 'Total Recaudado:';
+  
 
 
   late List<Reserva> _reservasAnteriores = [];
@@ -38,6 +44,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
 
   Widget? aMostrar;
   Widget? reservasAMostrar;
+  String dropdownValue = 'Total'; 
 
   @override
   void initState() {
@@ -89,6 +96,8 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     setState(() {
       _usuariosDeReserva = usuariosConsum;
     });
+    print("FIIJATEEEEEEEEEEE ACAAAAAAAAAAAAAAAAAAAAAAAAAAAAA CHEEEEEEE");
+    print(_usuariosDeReserva.length);
   }
 
   Future<List<UsuarioConsumidor?>> getUsuariosDeReservas(
@@ -222,19 +231,38 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   }
 Widget vistaReservas() {
   String titulo = 'Cantidad de Reservas: ';
-  return Column(
-    children: [
-      SizedBox(height: 12.0),
-      Text(
-        titulo + _usuariosDeReservasActivas.length.toString(),
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-      
-      listaReservasTotales(),
-    ],
-  );
-}
+  String opcionSeleccionada = 'Reservas actuales'; // Inicialmente seleccionamos "Reservas actuales"
 
+return Column(
+  children: [
+    SizedBox(height: 12.0),
+    Text(
+      titulo + _usuariosDeReservasActivas.length.toString(),
+      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    ),
+    DropdownButton<String>(
+      value: opcionSeleccionada,
+      onChanged: (String? newValue) {
+        setState(() {
+          opcionSeleccionada = newValue!;
+        });
+      },
+      items: <String>['Reservas actuales', 'Historial de reservas']
+          .map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+    ),
+    // Aquí debajo puedes mostrar la lista correspondiente según la opción seleccionada
+  
+      historialDeReservas()
+
+  ],
+);
+
+}
 
 
 Widget listaReservasActivas() {
@@ -264,20 +292,28 @@ Widget listaReservasActivas() {
 }
  
   
+Widget historialDeReservas() {
+  DateTime fechaHoy = DateTime.now();
 
-Widget listaReservasTotales() {
   return Expanded(
     child: ListView.builder(
       itemCount: _usuariosDeReserva.length,
       itemBuilder: (context, index) {
-        var usuario = _usuariosDeReserva[index]!;
+        DateTime fechaSalida = _reservasFuture[index].fechaSalida.toDate();
+
+        // Determinar el color del texto basado en la fecha de salida
+        Color colorTexto = fechaSalida.isBefore(fechaHoy) ? Colors.red : Colors.green;
+
         return ListTile(
           leading: Icon(Icons.account_circle, size: 40),
-          title: Text('${usuario.nombre} ${usuario.apellido}'),
-          subtitle: Text(usuario.email ?? ''),
+          title: Text(
+            '${_usuariosDeReserva[index]!.nombre} ${_usuariosDeReserva[index]!.apellido}',
+            style: TextStyle(color: colorTexto), // Establecer el color del texto
+          ),
+          subtitle: Text(_usuariosDeReserva[index]!.email ?? ''),
           trailing: ElevatedButton(
             onPressed: () {
-              _mostrarDialogo(context, _reservasFuture[index], usuario);
+              _mostrarDialogo(context, _reservasFuture[index], _usuariosDeReserva[index]!);
             },
             child: Text('Detalle'),
           ),
@@ -287,7 +323,6 @@ Widget listaReservasTotales() {
     ),
   );
 }
-
   Widget vistaEditar() {
     // Define controladores para los campos de texto
     final TextEditingController nombreCocheraController =
@@ -349,10 +384,12 @@ Widget listaReservasTotales() {
     );
   }
 
-  String dropdownValue = 'Total'; //
-
+  
+ String titulo1 = "Hola";
   @override
   Widget VistaIncome() {
+
+   
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -362,7 +399,7 @@ Widget listaReservasTotales() {
             child: Column(
               children: [
                 Text(
-                  'Total Recaudado :',
+                  titulo1,
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 Row(
@@ -381,35 +418,58 @@ Widget listaReservasTotales() {
                   ],
                 ),
                 SizedBox(height: 16),
-                DropdownButton<String>(
-                  value: dropdownValue,
-                  icon: const Icon(Icons.arrow_downward),
-                  iconSize: 24,
-                  elevation: 16,
-                  style: const TextStyle(color: Colors.deepPurple),
-                  underline: Container(
-                    height: 2,
-                    color: Colors.deepPurpleAccent,
-                  ),
-                  onChanged: (String? newValue) {
-                    if (newValue != dropdownValue) {
-                      setState(() {
-                        dropdownValue = newValue!;
-                      });
-                    }
-                  },
-                  items: <String>[
-                    'Total',
-                    'Últimos 7 días',
-                    'Este mes',
-                    'Búsqueda avanzada'
-                  ].map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
+
+                ExpansionTile(
+                  title: Text('Opciones'),
+                  children: [
+                    RadioListTile(
+                        value: OpcionesRecaudacion.total,
+                        groupValue: opcionSeleccionada,
+                        onChanged: (value) {
+                          opcionSeleccionada = value as OpcionesRecaudacion;
+
+                          setState(() {});
+                        },
+                        title: Text("Total")),
+                    RadioListTile(
+                        value: OpcionesRecaudacion.ultimasemana,
+                        groupValue: opcionSeleccionada,
+                        onChanged: (value) {
+                          opcionSeleccionada = value as OpcionesRecaudacion;
+
+                          setState(() {});
+                        },
+                        title: Text("Ultima semana")),
+                    RadioListTile(
+                        value: OpcionesRecaudacion.estemes,
+                        groupValue: opcionSeleccionada,
+                        onChanged: (value) {
+                          opcionSeleccionada = value as OpcionesRecaudacion;
+
+                          setState(() {});
+                        },
+                        title: Text("Este mes")),
+                    RadioListTile(
+                        value: OpcionesRecaudacion.personalizado,
+                        groupValue: opcionSeleccionada,
+                        onChanged: (value) {
+                          setState(() {
+                            opcionSeleccionada = value as OpcionesRecaudacion;
+                            print("Holaaaaaaaaaaaa");
+                            titulo1 = "DALEEEEEEEEEE";
+                            print(titulo1);
+                          });
+                        },
+                        title: Text("Personalziado"))
+                  ],
                 ),
+                
+
+
+
+
+
+             
               ],
             ),
           ),
