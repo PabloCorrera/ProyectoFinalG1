@@ -143,27 +143,26 @@ class _UsuarioHomeState extends State<UsuarioHome> {
       itemCount: _reservasFuture.length,
       itemBuilder: (context, index) {
         final reserva = _reservasFuture[index];
-        bool puedeCancelar = faltanMasDeSeisHoras(reserva.fechaEntrada);
+        bool puedeCancelar = faltanMasDeCuarentaYcincoMinutos(reserva.fechaEntrada);
         String estado = estadoReserva(reserva.fechaEntrada);
         return ListTile(
           title: Text(reserva.direccion),
-          trailing: ElevatedButton(
-            style: ButtonStyle(
-                backgroundColor: !puedeCancelar
-                    ? MaterialStateProperty.all<Color>(Colors.grey)
-                    : null),
-            onPressed: puedeCancelar
-                ? () {
-                    showDialogCancelarReserva(context, reserva);
-                  }
-                : () {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('Ya no puede cancelar reserva'),
-                      backgroundColor: Colors.red,
-                    ));
-                  },
-            child: const Text('Cancelar'),
-          ),
+          trailing: puedeCancelar
+              ? ElevatedButton(
+                  onPressed: puedeCancelar
+                      ? () {
+                          showDialogCancelarReserva(context, reserva);
+                        }
+                      : () {
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(const SnackBar(
+                            content: Text('Ya no puede cancelar reserva'),
+                            backgroundColor: Colors.red,
+                          ));
+                        },
+                  child: const Text('Cancelar'),
+                )
+              : null,
           contentPadding:
               const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
           subtitle: Column(
@@ -237,10 +236,11 @@ class _UsuarioHomeState extends State<UsuarioHome> {
 
   Future<void> _showReservarDialog(
       BuildContext context, UsuarioCochera cochera) async {
-    DateTime? fechaEntrada = DateTime.now();
-    TimeOfDay? horaEntrada = TimeOfDay.now();
-    DateTime? fechaSalida = DateTime.now().add(const Duration(days: 1));
-    TimeOfDay? horaSalida = TimeOfDay.now();
+    DateTime? fechaEntrada = DateTime.now().add(const Duration(hours: 1));
+    TimeOfDay? horaEntrada = TimeOfDay.fromDateTime(fechaEntrada);
+    DateTime? fechaSalida =
+        DateTime.now().add(const Duration(days: 1, hours: 1));
+    TimeOfDay? horaSalida = TimeOfDay.fromDateTime(fechaSalida);
 
     return showDialog(
       context: context,
@@ -319,7 +319,12 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                                             ? horaSalida!.minute + 1
                                             : horaSalida!.minute + 10);
                                   }
+                                    
                                 }
+                                DateTime ahoraMasHora = DateTime.now().add(const Duration(hours: 1));
+                                    if (fechaEntrada!.isBefore(ahoraMasHora)) {
+                                      horaEntrada = TimeOfDay.fromDateTime(ahoraMasHora);
+                                    }  
                               });
                             }
                           },
@@ -406,19 +411,21 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                   child: const Text('Cancelar'),
                 ),
                 GooglePayButton(
-                  paymentConfiguration: PaymentConfiguration.fromJsonString(
-                      defaultGooglePay),
+                  paymentConfiguration:
+                      PaymentConfiguration.fromJsonString(defaultGooglePay),
                   paymentItems: [
                     PaymentItem(
-                      amount: cochera.calcularPrecioTotal(fechaEntrada!, fechaSalida!).toString(),
-                      label: 'Total',
-                      status: PaymentItemStatus.final_price
-                      )
-                    ],
+                        amount: cochera
+                            .calcularPrecioTotal(fechaEntrada!, fechaSalida!)
+                            .toString(),
+                        label: 'Total',
+                        status: PaymentItemStatus.final_price)
+                  ],
                   type: GooglePayButtonType.plain,
                   margin: const EdgeInsets.only(top: 15.0),
-                  onPaymentResult: (result){
-                    reservar(fechaEntrada, horaEntrada, fechaSalida, horaSalida, cochera, context);
+                  onPaymentResult: (result) {
+                    reservar(fechaEntrada, horaEntrada, fechaSalida, horaSalida,
+                        cochera, context);
                   },
                   loadingIndicator: const Center(
                     child: CircularProgressIndicator(),
@@ -444,14 +451,13 @@ class _UsuarioHomeState extends State<UsuarioHome> {
     }
   }
 
-  bool faltanMasDeSeisHoras(Timestamp timestamp) {
-    DateTime horaActual = DateTime.now();
-    DateTime horaEvento = timestamp.toDate();
-    Duration diferencia = horaEvento.difference(horaActual);
-    int horasFaltantes = diferencia.inHours;
-    return horasFaltantes >= 6;
-  }
-
+  bool faltanMasDeCuarentaYcincoMinutos(Timestamp timestamp) {
+  DateTime horaActual = DateTime.now();
+  DateTime horaEvento = timestamp.toDate();
+  Duration diferencia = horaEvento.difference(horaActual);
+  int minutosFaltantes = diferencia.inMinutes;
+  return minutosFaltantes >= 45;
+}
 
   void reservar(
       DateTime? fechaEntrada,

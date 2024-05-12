@@ -206,6 +206,7 @@ Future<Reserva?> getReservaById(String id)async{
 Future<List<Reserva>> getReservasPorUsuario(String mailUsuario)async{
 final ref = _firestore.collection(RESERVA)
 .where("usuarioEmail",isEqualTo: mailUsuario)
+.orderBy("fechaCreacion",descending: true)
 .withConverter(fromFirestore: Reserva.fromFirestore, toFirestore: (Reserva reserva,_)=>reserva.toFirestore());
 List<Reserva> listaReservas = [];
 final docSnap = await ref.get();
