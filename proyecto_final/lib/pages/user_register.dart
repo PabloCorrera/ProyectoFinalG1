@@ -1,8 +1,12 @@
+import 'dart:typed_data';
+
 import 'package:firebase_auth/firebase_auth.dart' as FirebaseAuth;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_final/auth.dart';
+import 'package:proyecto_final/core/utils.dart';
 import 'package:proyecto_final/entities/usuario_consumidor.dart';
 import 'package:proyecto_final/pages/usuario_home.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
@@ -21,8 +25,8 @@ class _UserRegisterState extends State<UserRegister> {
   final TextEditingController _controllerName = TextEditingController();
   final TextEditingController _controllerSurname = TextEditingController();
   String? userMail = FirebaseAuth.FirebaseAuth.instance.currentUser?.email;
-
   String? errorMessage = '';
+  Uint8List? imagen;
 
   Widget _entryField(String title, TextEditingController controller) {
     return TextField(
@@ -60,21 +64,54 @@ class _UserRegisterState extends State<UserRegister> {
           context.pushNamed(UsuarioHome.name);
         } else {
           setState(() {
-            errorMessage = 'Por favor, complete todos los campos correctamente.';
+            errorMessage =
+                'Por favor, complete todos los campos correctamente.';
           });
         }
       },
-      child: Text('Confirmar'),
+      child: const Text('Confirmar'),
     );
   }
 
   Widget _errorMessage() {
     return Text(
       errorMessage == '' ? '' : '¡Ups! $errorMessage',
-      style: TextStyle(
+      style: const TextStyle(
         color: Colors.red,
       ),
     );
+  }
+
+  Widget imagePicker() {
+    return Stack(
+      children: [
+        imagen!=null?
+         CircleAvatar(
+          radius: 64,
+          backgroundImage: MemoryImage(imagen!),
+        ):
+        const CircleAvatar(
+          radius: 64,
+          backgroundImage: NetworkImage(
+              'https://cdn-icons-png.flaticon.com/512/9131/9131529.png'),
+        ),
+        Positioned(
+          bottom: -10,
+          left: 80,
+          child: IconButton(
+            onPressed:()=>selectImage(),
+            icon: const Icon(Icons.add_a_photo),
+          ),
+        )
+      ],
+    );
+  }
+
+  selectImage() async {
+    Uint8List? img = await pickImage(ImageSource.gallery);
+    setState(() {
+      imagen = img;
+    });
   }
 
   @override
@@ -93,12 +130,12 @@ class _UserRegisterState extends State<UserRegister> {
             begin: Alignment.topCenter,
           ),
         ),
-        padding: EdgeInsets.symmetric(horizontal: 40),
+        padding: const EdgeInsets.symmetric(horizontal: 40),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
+            const Text(
               'REGISTRO DE USUARIO',
               style: TextStyle(
                 fontSize: 24,
@@ -110,6 +147,8 @@ class _UserRegisterState extends State<UserRegister> {
             _entryField('Nombre', _controllerName),
             const SizedBox(height: 20),
             _entryField('Apellido', _controllerSurname),
+            const SizedBox(height: 20),
+            imagePicker(),
             const SizedBox(height: 20),
             _errorMessage(),
             const SizedBox(height: 20),
