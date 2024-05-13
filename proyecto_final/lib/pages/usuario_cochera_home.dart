@@ -32,10 +32,10 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   late List<UsuarioConsumidor?> _usuariosDeReserva = [];
   OpcionesRecaudacion opcionSeleccionada = OpcionesRecaudacion.total;
    String titulo = 'Total Recaudado:';
-  
+ 
 
 
-  late List<Reserva> _reservasAnteriores = [];
+  late List<Reserva> _reservasExpiradas = [];
   late List<UsuarioConsumidor?> _usuariosDeReservaAnteriores = [];
   late double _recaudacionTotal = 0;
   final User? user = Auth().currentUser;
@@ -44,7 +44,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
 
   Widget? aMostrar;
   Widget? reservasAMostrar;
-  String dropdownValue = 'Total'; 
+  String dropdownValue = 'Total';
 
   @override
   void initState() {
@@ -75,7 +75,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     });
   }
 
-  
+ 
   Future<void> _loadReservasActivas() async {
     List<Reserva> reservas = await getReservas();
     List<Reserva> reservasActivas = reservas
@@ -87,7 +87,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     });
   }
 
-  
+ 
 
   Future<void> _loadUsuariosReservas() async {
     List<UsuarioConsumidor?> usuariosConsum =
@@ -96,8 +96,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     setState(() {
       _usuariosDeReserva = usuariosConsum;
     });
-    print("FIIJATEEEEEEEEEEE ACAAAAAAAAAAAAAAAAAAAAAAAAAAAAA CHEEEEEEE");
-    print(_usuariosDeReserva.length);
+
   }
 
   Future<List<UsuarioConsumidor?>> getUsuariosDeReservas(
@@ -119,9 +118,9 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     final DateTime now = DateTime.now();
     double totalRecaudado = 0;
     late List<Reserva> reservasAnteriores = _reservasFuture
-        .where((reserva) => reserva.fechaEntrada.toDate().isBefore(now))
+        .where((reserva) => reserva.fechaSalida.toDate().isBefore(now))
         .toList();
-    _reservasAnteriores = reservasAnteriores;
+    _reservasExpiradas = reservasAnteriores;
 
     for (final reserva in reservasAnteriores) {
       totalRecaudado += reserva.precioTotal;
@@ -129,7 +128,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     _recaudacionTotal = totalRecaudado;
 
     List<UsuarioConsumidor?> usuariosConsumAnteriores =
-        await getUsuariosDeReservas(_reservasAnteriores) ?? [];
+        await getUsuariosDeReservas(_reservasExpiradas) ?? [];
 
     setState(() {
       _usuariosDeReservaAnteriores = usuariosConsumAnteriores;
@@ -162,7 +161,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               ),
               ListTile(
                 leading: const Icon(Icons.card_travel),
-                title: const Text('Mis reservas'),
+                title: const Text('Reservas activas'),
                 onTap: () => {
                   setState(() {
                     aMostrar = vistaReservas();
@@ -257,7 +256,7 @@ return Column(
 }
 
 Widget vistaHistorialDeReservas() {
-  String titulo = 'Cantidad de Reservas: ';
+  String titulo = 'Historial de Reservas: ';
   String opcionSeleccionada = 'Reservas actuales'; // Inicialmente seleccionamos "Reservas actuales"
 return Column(
   children: [
@@ -274,7 +273,7 @@ return Column(
 
 
 Widget listaReservasActivas() {
-  
+ 
 
 
   return Expanded(
@@ -299,7 +298,7 @@ Widget listaReservasActivas() {
   );
 }
  
-  
+ 
 Widget historialDeReservas() {
   DateTime fechaHoy = DateTime.now();
 
@@ -315,7 +314,7 @@ Widget historialDeReservas() {
         return ListTile(
           leading: Icon(Icons.account_circle, size: 40),
           title: Text(
-            
+           
             '${_usuariosDeReserva[index]!.nombre} ${_usuariosDeReserva[index]!.apellido}',
             style: TextStyle(color: colorTexto), // Establecer el color del texto
           ),
@@ -446,10 +445,11 @@ Widget _submitButton(TextEditingController nombreCocheraController, TextEditingC
     );
   }
 
-  
- String titulo1 = "Total recaudado";
+ 
+ 
   @override
   Widget VistaIncome() {
+    String titulo = "Total recaudado";
 
    
     return Scaffold(
@@ -461,7 +461,7 @@ Widget _submitButton(TextEditingController nombreCocheraController, TextEditingC
             child: Column(
               children: [
                 Text(
-                  titulo1,
+                  titulo,
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 Row(
@@ -481,58 +481,59 @@ Widget _submitButton(TextEditingController nombreCocheraController, TextEditingC
                 ),
                 SizedBox(height: 16),
 
-                ExpansionTile(
-                  title: Text('Opciones'),
-                  children: [
-                    RadioListTile(
-                        value: OpcionesRecaudacion.total,
-                        groupValue: opcionSeleccionada,
-                        onChanged: (value) {
-                          opcionSeleccionada = value as OpcionesRecaudacion;
+                // ExpansionTile(
+                //   title: Text('Opciones'),
+                //   children: [
+                //     RadioListTile(
+                //         value: OpcionesRecaudacion.total,
+                //         groupValue: opcionSeleccionada,
+                //         onChanged: (value) {
+                //            setState(() {
+                //             opcionSeleccionada = value as OpcionesRecaudacion;
+                //            });
+                          
+                //         },
+                //         title: Text("Total")),
+                //     RadioListTile(
+                //         value: OpcionesRecaudacion.ultimasemana,
+                //         groupValue: opcionSeleccionada,
+                //         onChanged: (value) {
+                //           opcionSeleccionada = value as OpcionesRecaudacion;
 
-                          setState(() {});
-                        },
-                        title: Text("Total")),
-                    RadioListTile(
-                        value: OpcionesRecaudacion.ultimasemana,
-                        groupValue: opcionSeleccionada,
-                        onChanged: (value) {
-                          opcionSeleccionada = value as OpcionesRecaudacion;
+                //           setState(() {});
+                //         },
+                //         title: Text("Ultima semana")),
+                //     RadioListTile(
+                //         value: OpcionesRecaudacion.estemes,
+                //         groupValue: opcionSeleccionada,
+                //         onChanged: (value) {
+                //           opcionSeleccionada = value as OpcionesRecaudacion;
 
-                          setState(() {});
-                        },
-                        title: Text("Ultima semana")),
-                    RadioListTile(
-                        value: OpcionesRecaudacion.estemes,
-                        groupValue: opcionSeleccionada,
-                        onChanged: (value) {
-                          opcionSeleccionada = value as OpcionesRecaudacion;
-
-                          setState(() {});
-                        },
-                        title: Text("Este mes")),
-                    RadioListTile(
-                        value: OpcionesRecaudacion.personalizado,
-                        groupValue: opcionSeleccionada,
-                        onChanged: (value) {
-                          setState(() {
-                            opcionSeleccionada = value as OpcionesRecaudacion;
+                //           setState(() {});
+                //         },
+                //         title: Text("Este mes")),
+                //     RadioListTile(
+                //         value: OpcionesRecaudacion.personalizado,
+                //         groupValue: opcionSeleccionada,
+                //         onChanged: (value) {
+                //           setState(() {
+                //             opcionSeleccionada = value as OpcionesRecaudacion;
                        
-                          });
-                        },
-                        title: Text("Personalziado"))
-                  ],
-                ),
-                
+                //           });
+                //         },
+                //         title: Text("Personalziado"))
+                //   ],
+                // ),
+               
              
               ],
             ),
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: _reservasAnteriores.length,
+              itemCount: _reservasExpiradas.length,
               itemBuilder: (context, index) {
-                final reserva = _reservasAnteriores[index];
+                final reserva = _reservasExpiradas[index];
                 return ListTile(
                   leading: const Icon(Icons.event),
                   title: Text("Reserva de " +
@@ -540,7 +541,7 @@ Widget _submitButton(TextEditingController nombreCocheraController, TextEditingC
                       " " +
                       _usuariosDeReservaAnteriores[index]!.apellido),
                   subtitle:
-                      Text(_reservasAnteriores[index].precioTotal.toString()),
+                      Text(_reservasExpiradas[index].precioTotal.toString()),
                 );
               },
             ),
@@ -597,6 +598,27 @@ Widget _submitButton(TextEditingController nombreCocheraController, TextEditingC
                         SizedBox(height: 8.0),
                         Row(
                           children: [
+                            Icon(Icons.calendar_today,
+                                size: 16,
+                                color: Colors.blue), // Icono de calendario
+                            SizedBox(width: 8.0),
+                            Text(
+                              "Creación: ",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight:
+                                      FontWeight.bold), // Texto en negrita
+                            ),
+                            Text(
+                              "${formatter.format(reserva.fechaCreacion.toDate())}", // Mostrar la fecha de creación
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8.0),
+                        Row(
+                          children: [
+                            
                             Icon(Icons.arrow_downward,
                                 size: 16, color: Colors.green),
                             SizedBox(width: 8.0),
@@ -636,7 +658,7 @@ Widget _submitButton(TextEditingController nombreCocheraController, TextEditingC
                         Row(
                           children: [
                             Icon(FontAwesomeIcons.moneyBillAlt,
-                                size: 16, color: Colors.blue),
+                                size: 16, color: Colors.green),
                             SizedBox(width: 8.0),
                             Text(
                               "Precio total: ",
@@ -672,7 +694,7 @@ Widget _submitButton(TextEditingController nombreCocheraController, TextEditingC
       },
     );
   }
-  
+ 
 
 
 Widget _entryField(String title, TextEditingController controller) {
