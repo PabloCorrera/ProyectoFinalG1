@@ -32,6 +32,8 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
   final TextEditingController _controllerPrice = TextEditingController();
   final TextEditingController _controllerName = TextEditingController();
   final TextEditingController _controllerSurname = TextEditingController();
+  final TextEditingController _controllerCbu = TextEditingController();
+  
   double latitud = 0;
   double lngitud = 0;
 
@@ -82,19 +84,22 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
     }
   }
 
-  Widget _submitButton() {
-    return ElevatedButton(
-      onPressed: () async {
-        print("se recibio la direccion" + _controllerGarageAdress.text);
-        await convertAdressToLatLng(_controllerGarageAdress.text);
-        String email = emailUsuario ?? "";
-        if (isNotBlank(_controllerName.text) &&
-            isNotBlank(_controllerSurname.text) &&
-            isNotBlank(_controllerGarageName.text) &&
-            isNotBlank(_controllerGarageAdress.text) &&
-            isNotBlank(_description.text) &&
-            isNotBlank(_controllerPrice.text) &&
-            isNotBlank(_controllerQuantitySpaces.text)) {
+Widget _submitButton() {
+  return ElevatedButton(
+    onPressed: () async {
+      print("se recibio la direccion" + _controllerGarageAdress.text);
+      await convertAdressToLatLng(_controllerGarageAdress.text);
+      String email = emailUsuario ?? "";
+      if (isNotBlank(_controllerName.text) &&
+          isNotBlank(_controllerSurname.text) &&
+          isNotBlank(_controllerGarageName.text) &&
+          isNotBlank(_controllerGarageAdress.text) &&
+          isNotBlank(_description.text) &&
+          isNotBlank(_controllerPrice.text) &&
+          isNotBlank(_controllerQuantitySpaces.text) &&
+          isNotBlank(_controllerCbu.text)) 
+      {
+        if (_controllerCbu.text.length == 22) {
           UsuarioCochera usuarioCochera = UsuarioCochera(
             nombre: _controllerName.text,
             apellido: _controllerSurname.text,
@@ -106,19 +111,33 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
             cantLugares: int.parse(_controllerQuantitySpaces.text),
             lat: latitud,
             lng: lngitud,
+            cbu: _controllerCbu.text
           );
           _databaseService.addUsuarioCochera(usuarioCochera);
           context.pushNamed(UsuarioCocheraHome.name);
         } else {
-          setState(() {
-            errorMessage =
-                'Por favor, complete todos los campos correctamente.';
-          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('El CBU debe tener 22 números'),
+              duration: Duration(seconds: 3),
+              backgroundColor: Colors.red,
+            ),
+          );
         }
-      },
-      child: Text('Confirmar'),
-    );
-  }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Por favor, complete todos los campos correctamente.'),
+            duration: Duration(seconds: 3),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    },
+    child: Text('Confirmar'),
+  );
+}
+
 
   Widget _entryField(String title, TextEditingController controller) {
     return TextField(
@@ -143,6 +162,7 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
           FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
         ]);
   }
+
 
   Widget _title() {
     return const Text(
@@ -240,9 +260,9 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
 
               _entryFieldNumber('Precio por hora', _controllerPrice),
               const SizedBox(height: 20),
-              _entryFieldNumber(
-                  'Cantidad de lugares', _controllerQuantitySpaces),
-
+              _entryFieldNumber('Cantidad de lugares', _controllerQuantitySpaces),
+              const SizedBox(height: 20),
+              _entryFieldNumber('CBU', _controllerCbu),
               _errorMessage(),
               _submitButton(),
             ],
