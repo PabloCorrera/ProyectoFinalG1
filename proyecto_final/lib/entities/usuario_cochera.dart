@@ -13,6 +13,7 @@ class UsuarioCochera {
   late double price;
   late String descripcion;
   late int cantLugares;
+  late String cbu;
 
   UsuarioCochera({
     this.nombre = "",
@@ -23,6 +24,7 @@ class UsuarioCochera {
     this.lat = 0.0,
     this.lng = 0.0,
     this.price = 0.0,
+    this.cbu = "",
     required this.descripcion,
     required this.cantLugares});
 
@@ -37,6 +39,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
           lat: json['lat']! as double,
           lng: json['lng']! as double,
           price: json['price']! as double,
+          cbu: json['cbu'] != null ? json['cbu']! as String : "",
           descripcion: json['descripcion']! as String,
           cantLugares: json['cantLugares']! as int,
         );
@@ -50,6 +53,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
   double? lat,
   double? lng,
   double? price,
+  String? cbu,
   String? descripcion,
   int? cantLugares,
 }) {
@@ -62,6 +66,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
     lat: lat ?? this.lat,
     lng: lng ?? this.lng,
     price: price ?? this.price,
+    cbu: cbu ?? this.cbu,
     descripcion: descripcion ?? this.descripcion,
     cantLugares: cantLugares ?? this.cantLugares,
   );
@@ -70,13 +75,14 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
   Map<String, Object?> toJson() {
     return {
       'nombre': nombre,
-      'apellido': apellido, // Added apellido
+      'apellido': apellido,
       'email': email,
-      'nombreCochera': nombreCochera, // Added nombreCochera
+      'nombreCochera': nombreCochera, 
       'direccion': direccion,
       'lat': lat,
       'lng': lng,
       'price': price,
+      'cbu': cbu,
       'descripcion': descripcion,
       'cantLugares': cantLugares,
     };
@@ -95,6 +101,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
       lat: data?['lat'],
       lng: data?['lng'],
       price: data?['price'],
+      cbu: data?['cbu'] != null ? data!['cbu']! as String : "",
       descripcion: data?['descripcion'],
       cantLugares: data?['cantLugares'],
     );
@@ -111,6 +118,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
       if (lat != null) 'lat': lat,
       if (lng != null) 'lng': lng,
       if (price != null) 'price': price,
+      if (cbu != null) 'cbu': cbu,
       if (descripcion != null) 'descripcion': descripcion,
       if (cantLugares != null) 'cantLugares': cantLugares,
     };
