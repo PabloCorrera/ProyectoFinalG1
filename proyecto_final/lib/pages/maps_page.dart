@@ -107,10 +107,10 @@ class MapsPageState extends State<MapsPage> {
 
 Future<void> _showReservarDialog(
     BuildContext context, UsuarioCochera cochera) async {
-  DateTime? fechaEntrada = DateTime.now();
-  TimeOfDay? horaEntrada = TimeOfDay.now();
-  DateTime? fechaSalida = DateTime.now().add(const Duration(days: 1));
-  TimeOfDay? horaSalida = TimeOfDay.now();
+  DateTime? fechaEntrada = DateTime.now().add(const Duration(hours: 1));
+  TimeOfDay? horaEntrada = TimeOfDay.fromDateTime(fechaEntrada);
+  DateTime? fechaSalida = DateTime.now().add(const Duration(days: 1, hours: 1));
+  TimeOfDay? horaSalida = TimeOfDay.fromDateTime(fechaSalida);
 
   return showDialog(
     context: context,
@@ -188,6 +188,12 @@ Future<void> _showReservarDialog(
                                           ? horaSalida!.minute + 1
                                           : horaSalida!.minute + 10);
                                 }
+                              }
+                              DateTime ahoraMasHora =
+                                  DateTime.now().add(const Duration(hours: 1));
+                              if (fechaEntrada!.isBefore(ahoraMasHora)) {
+                                horaEntrada =
+                                    TimeOfDay.fromDateTime(ahoraMasHora);
                               }
                             });
                           }
@@ -315,12 +321,12 @@ String estadoReserva(Timestamp timestamp) {
   }
 }
 
-bool faltanMasDeSeisHoras(Timestamp timestamp) {
+bool faltanMasDeCuarentaYcincoMinutos(Timestamp timestamp) {
   DateTime horaActual = DateTime.now();
   DateTime horaEvento = timestamp.toDate();
   Duration diferencia = horaEvento.difference(horaActual);
-  int horasFaltantes = diferencia.inHours;
-  return horasFaltantes >= 6;
+  int minutosFaltantes = diferencia.inMinutes;
+  return minutosFaltantes >= 45;
 }
 
 void reservar(
