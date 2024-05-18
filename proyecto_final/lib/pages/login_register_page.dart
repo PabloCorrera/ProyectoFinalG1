@@ -100,7 +100,6 @@ class _LoginPageState extends State<LoginPage> {
       bool isOwner =
           await databaseService.getTipoUsuario(email) ==
               "cochera";
-
       if(!kIsWeb){
         if (isConsumer) {
         context.pushNamed(UsuarioHome.name);
@@ -171,7 +170,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       await Auth().signInWithGoogle();
       if (context.mounted) {
-        context.pushNamed(HomePage.name);
+        redirigirUsuario(Auth().currentUser!.email!);
       }
     } catch (e) {
       setState(() {
@@ -307,7 +306,7 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(
               height: 5,
             ),
-            !kIsWeb? _signInWithGoogle():const SizedBox(),
+            _signInWithGoogle(),
             !kIsWeb?_loginOrRegisterButton():const SizedBox(),
           ],
         ),
