@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -148,7 +149,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               UserAccountsDrawerHeader(
                 accountName: const Text('Bienvenido'),
                 accountEmail: user != null ? Text(user!.email!) : null,
-                currentAccountPicture: const CircleAvatar(),
+                currentAccountPicture: !kIsWeb? const CircleAvatar():null,
                 decoration: const BoxDecoration(
                   color: Colors.pinkAccent,
                 ),
@@ -241,10 +242,10 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
 
     return Column(
       children: [
-        SizedBox(height: 12.0),
+        const SizedBox(height: 12.0),
         Text(
           titulo + _usuariosDeReservasActivas.length.toString(),
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         listaReservasActivas()
       ],
@@ -257,10 +258,10 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
         'Reservas actuales'; // Inicialmente seleccionamos "Reservas actuales"
     return Column(
       children: [
-        SizedBox(height: 12.0),
+        const SizedBox(height: 12.0),
         Text(
           titulo + _usuariosDeReserva.length.toString(),
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         historialDeReservas()
       ],
@@ -274,17 +275,17 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
         itemBuilder: (context, index) {
           var usuario = _usuariosDeReservasActivas[index]!;
           return ListTile(
-            leading: Icon(Icons.account_circle, size: 40),
+            leading: const Icon(Icons.account_circle, size: 40),
             title: Text(usuario.nombre + " " + usuario.apellido),
             subtitle: Text(usuario.email!),
             trailing: ElevatedButton(
               onPressed: () {
                 _mostrarDialogo(context, _reservasActivas[index], usuario);
               },
-              child: Text('Detalle'),
+              child: const Text('Detalle'),
             ),
             contentPadding:
-                EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
           );
         },
       ),
@@ -305,7 +306,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               fechaSalida.isBefore(fechaHoy) ? Colors.red : Colors.green;
 
           return ListTile(
-            leading: Icon(Icons.account_circle, size: 40),
+            leading: const Icon(Icons.account_circle, size: 40),
             title: Text(
               '${_usuariosDeReserva[index]!.nombre} ${_usuariosDeReserva[index]!.apellido}',
               style:
@@ -317,10 +318,10 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                 _mostrarDialogo(context, _reservasFuture[index],
                     _usuariosDeReserva[index]!);
               },
-              child: Text('Detalle'),
+              child: const Text('Detalle'),
             ),
             contentPadding:
-                EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
           );
         },
       ),
@@ -338,7 +339,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
       future: getUsuarioCochera(databaseService, user!.email!),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {
@@ -444,7 +445,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
           );
         }
       },
-      child: Text('Submit'),
+      child: const Text('Submit'),
     );
   }
 
@@ -462,24 +463,24 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               children: [
                 Text(
                   titulo,
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.money,
                       color: Colors.green,
                       size: 24,
                     ),
-                    SizedBox(width: 5),
+                    const SizedBox(width: 5),
                     Text(
                       '\$${_recaudacionTotal.toStringAsFixed(2)}',
-                      style: TextStyle(fontSize: 24),
+                      style: const TextStyle(fontSize: 24),
                     ),
                   ],
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
                 // ExpansionTile(
                 //   title: Text('Opciones'),
@@ -577,30 +578,30 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                     borderRadius: BorderRadius.circular(16.0),
                   ),
                   child: Container(
-                    padding: EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(16.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           "Reserva de $nombreCompletoUsuario",
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
-                        SizedBox(height: 16.0),
-                        Text(
+                        const SizedBox(height: 16.0),
+                        const Text(
                           "Fechas :",
                           style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
-                        SizedBox(height: 8.0),
+                        const SizedBox(height: 8.0),
                         Row(
                           children: [
-                            Icon(Icons.calendar_today,
+                            const Icon(Icons.calendar_today,
                                 size: 16,
                                 color: Colors.blue), // Icono de calendario
-                            SizedBox(width: 8.0),
-                            Text(
+                            const SizedBox(width: 8.0),
+                            const Text(
                               "Creación: ",
                               style: TextStyle(
                                   fontSize: 16,
@@ -609,17 +610,17 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                             ),
                             Text(
                               "${formatter.format(reserva.fechaCreacion.toDate())}", // Mostrar la fecha de creación
-                              style: TextStyle(fontSize: 16),
+                              style: const TextStyle(fontSize: 16),
                             ),
                           ],
                         ),
-                        SizedBox(height: 8.0),
+                        const SizedBox(height: 8.0),
                         Row(
                           children: [
-                            Icon(Icons.arrow_downward,
+                            const Icon(Icons.arrow_downward,
                                 size: 16, color: Colors.green),
-                            SizedBox(width: 8.0),
-                            Text(
+                            const SizedBox(width: 8.0),
+                            const Text(
                               "Entrada: ",
                               style: TextStyle(
                                   fontSize: 16,
@@ -628,17 +629,17 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                             ),
                             Text(
                               "${formatter.format(fechaEntrada)}",
-                              style: TextStyle(fontSize: 16),
+                              style: const TextStyle(fontSize: 16),
                             ),
                           ],
                         ),
-                        SizedBox(height: 8.0),
+                        const SizedBox(height: 8.0),
                         Row(
                           children: [
-                            Icon(Icons.arrow_upward,
+                            const Icon(Icons.arrow_upward,
                                 size: 16, color: Colors.red),
-                            SizedBox(width: 8.0),
-                            Text(
+                            const SizedBox(width: 8.0),
+                            const Text(
                               "Salida: ",
                               style: TextStyle(
                                   fontSize: 16,
@@ -647,17 +648,17 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                             ),
                             Text(
                               "${formatter.format(fechaSalida)}",
-                              style: TextStyle(fontSize: 16),
+                              style: const TextStyle(fontSize: 16),
                             ),
                           ],
                         ),
-                        SizedBox(height: 8.0),
+                        const SizedBox(height: 8.0),
                         Row(
                           children: [
-                            Icon(FontAwesomeIcons.moneyBillAlt,
+                            const Icon(FontAwesomeIcons.moneyBillAlt,
                                 size: 16, color: Colors.green),
-                            SizedBox(width: 8.0),
-                            Text(
+                            const SizedBox(width: 8.0),
+                            const Text(
                               "Precio total: ",
                               style: TextStyle(
                                   fontSize: 16,
@@ -666,18 +667,18 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                             ),
                             Text(
                               "\$${reserva.precioTotal}",
-                              style: TextStyle(fontSize: 16),
+                              style: const TextStyle(fontSize: 16),
                             ),
                           ],
                         ),
-                        SizedBox(height: 30.0),
+                        const SizedBox(height: 30.0),
                         Align(
                           alignment: Alignment.center,
                           child: TextButton(
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
-                            child: Text("Cerrar"),
+                            child: const Text("Cerrar"),
                           ),
                         ),
                       ],

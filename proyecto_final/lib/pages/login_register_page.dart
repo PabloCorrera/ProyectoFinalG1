@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -70,7 +71,8 @@ class _LoginPageState extends State<LoginPage> {
     try {
       await Auth().signInWithEmailAndPassword(
           email: _controllerEmail.text, password: _controllerPassword.text);
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+          if(!kIsWeb){
+            SharedPreferences prefs = await SharedPreferences.getInstance();
       if (prefs.getBool('usarAutenticacionBiometrica') == null) {
         bool? usarAutenticacionBiometrica = await _mostrarDialogo(context);
         if (usarAutenticacionBiometrica != null) {
@@ -81,6 +83,7 @@ class _LoginPageState extends State<LoginPage> {
           }
         }
       }
+          }
       await redirigirUsuario(_controllerEmail.text);
 
     } on FirebaseAuthException catch (e) {
@@ -98,14 +101,31 @@ class _LoginPageState extends State<LoginPage> {
           await databaseService.getTipoUsuario(email) ==
               "cochera";
 
-      if (isConsumer) {
+      if(!kIsWeb){
+        if (isConsumer) {
         context.pushNamed(UsuarioHome.name);
       }
       else if (isOwner) {
         context.pushNamed(UsuarioCocheraHome.name);
-      } else {
+      } else{
         context.pushNamed(HomePage.name);
       }
+      } else
+      {
+        if (isConsumer) {
+       setState(() {
+        errorMessage = "Utilice la version mobile de la aplicación";
+      });
+      } else if(isOwner){
+        context.pushNamed(UsuarioCocheraHome.name);
+      }
+      else{
+        setState(() {
+        errorMessage = "Por favor, complete el proceso de registro desde la aplicación";
+      });
+      }
+      }
+      
   } 
 
   Future<bool?> _mostrarDialogo(BuildContext context) async {
@@ -287,8 +307,8 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(
               height: 5,
             ),
-            _signInWithGoogle(),
-            _loginOrRegisterButton(),
+            !kIsWeb? _signInWithGoogle():const SizedBox(),
+            !kIsWeb?_loginOrRegisterButton():const SizedBox(),
           ],
         ),
       ),
