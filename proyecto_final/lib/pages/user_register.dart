@@ -105,31 +105,49 @@ class _UserRegisterState extends State<UserRegister> {
     );
   }
 
-  Widget imagePicker() {
-    return Stack(
-      children: [
-        imagen != null
-            ? CircleAvatar(
-                radius: 64,
-                backgroundImage: MemoryImage(imagen!),
-              )
-            : const CircleAvatar(
-                radius: 64,
-                backgroundImage: NetworkImage(
-                    'https://cdn-icons-png.flaticon.com/512/9131/9131529.png'),
-              ),
-        Positioned(
-          bottom: -10,
-          left: 80,
-          child: IconButton(
+Widget imagePicker() {
+  return Column(
+    children: [
+      imagen != null
+          ? CircleAvatar(
+              radius: 64,
+              backgroundImage: MemoryImage(imagen!),
+            )
+          : const CircleAvatar(
+              radius: 64,
+              backgroundImage: NetworkImage(
+                  'https://cdn-icons-png.flaticon.com/512/9131/9131529.png'),
+            ),
+      const SizedBox(height: 10), // Espacio entre la imagen y los botones
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ElevatedButton(
             onPressed: () => selectImage(),
-            icon: const Icon(Icons.add_a_photo),
+            child: const Text('Elegir imagen'),
           ),
-        )
-      ],
-    );
-  }
+          const SizedBox(width: 10), // Espacio entre los botones
+          ElevatedButton(
+            onPressed: () => takeImage(),
+            child: const Text('Tomar imagen'),
+          ),
+        ],
+      ),
+    ],
+  );
+}
 
+  takeImage()async{
+ XFile? img = await pickImage(ImageSource.camera);
+    if (img != null) {
+      img.readAsBytes().then((foto) => {
+            setState(() {
+              imagen = foto;
+              fileImagen = img;
+            })
+          });
+    }
+  }
   selectImage() async {
     XFile? img = await pickImage(ImageSource.gallery);
     if (img != null) {
