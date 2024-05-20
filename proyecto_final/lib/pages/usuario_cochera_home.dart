@@ -161,20 +161,10 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               ),
               ListTile(
                 leading: const Icon(Icons.card_travel),
-                title: const Text('Reservas activas'),
+                title: const Text('Mis reservas'),
                 onTap: () => {
                   setState(() {
                     aMostrar = vistaReservas();
-                    Navigator.pop(context);
-                  })
-                },
-              ),
-                ListTile(
-                leading: const Icon(Icons.card_travel),
-                title: const Text('Historial reservas'),
-                onTap: () => {
-                  setState(() {
-                    aMostrar = vistaHistorialDeReservas();
                     Navigator.pop(context);
                   })
                 },
@@ -190,18 +180,8 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.map),
-                title: const Text('Ver mapa'),
-                onTap: () => {
-                  setState(() {
-                    context.pushNamed(MapsPage.name);
-                    Navigator.pop(context);
-                  })
-                },
-              ),
-              ListTile(
                 leading: const Icon(Icons.bar_chart),
-                title: const Text('Recaudado'),
+                title: const Text('Estadísticas'),
                 onTap: () => {
                   setState(() {
                     aMostrar = VistaIncome();
@@ -241,18 +221,52 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
 Widget vistaReservas() {
   String titulo = 'Reservas Activas: ';
   String opcionSeleccionada = 'Reservas actuales'; // Inicialmente seleccionamos "Reservas actuales"
+  bool _reservasActivasChecked = false;
+  bool _reservasExpiradasChecked = false;
+  bool _totalReservasChecked = false;
 
-return Column(
-  children: [
-    SizedBox(height: 12.0),
-    Text(
-      titulo + _usuariosDeReservasActivas.length.toString(),
-      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-    ),
-      listaReservasActivas()
-
-  ],
-);
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      SizedBox(height: 12.0),
+      Text(
+        titulo + _usuariosDeReservasActivas.length.toString(),
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      CheckboxListTile(
+        title: Text('Reservas Activas'),
+        value: _reservasActivasChecked,
+        onChanged: (bool? value) {
+          setState(() {
+            _reservasActivasChecked = value ?? false;
+            // Aquí puedes realizar alguna acción en función del valor seleccionado, si es necesario
+          });
+        },
+      ),
+      CheckboxListTile(
+        title: Text('Reservas Expiradas'),
+        value: _reservasExpiradasChecked,
+        onChanged: (bool? value) {
+          setState(() {
+            _reservasExpiradasChecked = value ?? false;
+            // Aquí puedes realizar alguna acción en función del valor seleccionado, si es necesario
+          });
+        },
+      ),
+      CheckboxListTile(
+        title: Text('Total Reservas'),
+        value: _totalReservasChecked,
+        onChanged: (bool? value) {
+          setState(() {
+            _totalReservasChecked = value ?? false;
+            print("Holasaaaaaa");
+            // Aquí puedes realizar alguna acción en función del valor seleccionado, si es necesario
+          });
+        },
+      ),
+      listaReservasActivas(),
+    ],
+  );
 }
 
 Widget vistaHistorialDeReservas() {
@@ -260,6 +274,8 @@ Widget vistaHistorialDeReservas() {
   String opcionSeleccionada = 'Reservas actuales'; // Inicialmente seleccionamos "Reservas actuales"
 return Column(
   children: [
+
+    
     SizedBox(height: 12.0),
     Text(
       titulo + _usuariosDeReserva.length.toString(),
