@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/entities/reserva.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
+import 'package:proyecto_final/models/constant.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 import 'package:proyecto_final/assets/payment_config.dart';
 import 'package:pay/pay.dart';
@@ -56,15 +57,6 @@ class MapsPageState extends State<MapsPage> {
           myLocationEnabled: true,
           myLocationButtonEnabled: true,
         ),
-
-        // Boton para agregar alguna funcionalidad
-        /*
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: _goToTheLake,
-          label: const Text('Buscar cocheras'),
-          icon: const Icon(Icons.directions_car_filled_outlined),
-        ),
-        */
       ),
     );
   }
@@ -118,10 +110,12 @@ Future<void> _showReservarDialog(
       return StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
-            title: const Text('Reservar Cochera'),
+            title: Text("Reservar en ${cochera.nombreCochera}"),
+            titleTextStyle: TextStyle(color: primaryColor, fontSize: 20),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                Text(cochera.direccion),
                 const Text('Fecha y hora de entrada:'),
                 Row(
                   children: [

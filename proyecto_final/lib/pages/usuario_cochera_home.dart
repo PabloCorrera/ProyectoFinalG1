@@ -66,14 +66,6 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     }
   }
 
-  Future<void> _loadUsuariosReservasActivas() async {
-    List<UsuarioConsumidor?> usuariosReserv =
-        await getUsuariosDeReservas(_reservasActivas);
-    setState(() {
-      _usuariosDeReservasActivas = usuariosReserv;
-    });
-  }
-
   Future<void> _loadReservasActivas() async {
     List<Reserva> reservas = await getReservas();
     List<Reserva> reservasActivas = reservas
@@ -87,10 +79,19 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
 
   Future<void> _loadUsuariosReservas() async {
     List<UsuarioConsumidor?> usuariosConsum =
-        await getUsuariosDeReservas(_reservasFuture) ?? [];
+        await getUsuariosDeReservas(_reservasFuture);
 
     setState(() {
       _usuariosDeReserva = usuariosConsum;
+    });
+  }
+
+  Future<void> _loadUsuariosReservasActivas() async {
+    await _loadReservasActivas();
+    List<UsuarioConsumidor?> usuariosReserv =
+        await getUsuariosDeReservas(_reservasActivas);
+    setState(() {
+      _usuariosDeReservasActivas = usuariosReserv;
     });
   }
 
@@ -99,9 +100,6 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     final List<UsuarioConsumidor?> consumidoresDeReserva = [];
 
     for (int i = 0; i < listaReservas.length; i++) {
-      final UsuarioConsumidor? consumidor =
-          await databaseService.buscarUsuario(listaReservas[i].usuarioEmail);
-
       consumidoresDeReserva.add(
           await databaseService.buscarUsuario(listaReservas[i].usuarioEmail));
     }
@@ -149,7 +147,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               UserAccountsDrawerHeader(
                 accountName: const Text('Bienvenido'),
                 accountEmail: user != null ? Text(user!.email!) : null,
-                currentAccountPicture: !kIsWeb? const CircleAvatar():null,
+                currentAccountPicture: !kIsWeb ? const CircleAvatar() : null,
                 decoration: const BoxDecoration(
                   color: Colors.pinkAccent,
                 ),
@@ -269,6 +267,8 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   }
 
   Widget listaReservasActivas() {
+    print(
+        "cantidad de usuarios: ${_usuariosDeReservasActivas.length} y cant de reservas activas ${_reservasActivas.length}");
     return Expanded(
       child: ListView.builder(
         itemCount: _usuariosDeReservasActivas.length,
@@ -463,7 +463,8 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               children: [
                 Text(
                   titulo,
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
