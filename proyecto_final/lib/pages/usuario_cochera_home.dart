@@ -100,8 +100,11 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     final List<UsuarioConsumidor?> consumidoresDeReserva = [];
 
     for (int i = 0; i < listaReservas.length; i++) {
-      consumidoresDeReserva.add(
-          await databaseService.buscarUsuario(listaReservas[i].usuarioEmail));
+      UsuarioConsumidor? u =
+          await databaseService.buscarUsuario(listaReservas[i].usuarioEmail);
+      if (u != null) {
+        consumidoresDeReserva.add(u);
+      }
     }
 
     return consumidoresDeReserva;
@@ -268,7 +271,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
 
   Widget listaReservasActivas() {
     print(
-        "cantidad de usuarios: ${_usuariosDeReservasActivas.length} y cant de reservas activas ${_reservasActivas.length}");
+        "cantidad de usuarios: ${_usuariosDeReservasActivas} y cant de reservas activas ${_reservasActivas.length}");
     return Expanded(
       child: ListView.builder(
         itemCount: _usuariosDeReservasActivas.length,
