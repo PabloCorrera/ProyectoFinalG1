@@ -32,6 +32,9 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   late List<UsuarioConsumidor?> _usuariosDeReserva = [];
   OpcionesRecaudacion opcionSeleccionada = OpcionesRecaudacion.total;
   String titulo = 'Total Recaudado:';
+    int botonActivoIndex = 0;
+    String tituloReservas = "Reservas activas :";
+    List<String> titulosReservas = ["Reservas activas :", "Reservas expiradas :", "Reservas totales :"];
 
   late List<Reserva> _reservasExpiradas = [];
   late List<UsuarioConsumidor?> _usuariosDeReservaAnteriores = [];
@@ -61,10 +64,6 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
       await _loadUsuariosReservas();
       await _loadReservasActivas();
       await _loadUsuariosReservasActivas();
-      print("Historial de reservas");
-      print(_reservasFuture.length);
-      print(_reservasFuture[0].usuarioEmail);
-      print(_reservasFuture[1].usuarioEmail);
     } catch (e) {
       print(e);
     }
@@ -72,27 +71,16 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
 
   Future<void> _loadReservasActivas() async {
     List<Reserva> reservas = await getReservas();
-    print("ESTAMOS EN RESERVAS TOTALES ");
-    print(_reservasFuture.length);
-    print(_reservasFuture[0].usuarioEmail);
-    print(_reservasFuture[1].usuarioEmail);
-  
     List<Reserva> reservasActivas = reservas
         .where(
             (reserva) => reserva.fechaSalida.toDate().isAfter(DateTime.now()))
         .toList();
-        print("Primero entra por aca");
     setState(() {
       _reservasActivas = reservasActivas;
     });
-    print("ESTAMOS EN RESERVAS ACTIVAS");
-    print(_reservasActivas.length);
-    print(_reservasActivas[0].usuarioEmail);
-    print(_reservasActivas[1].usuarioEmail);
   }
 
   Future<void> _loadUsuariosReservas() async {
-    print("Primero entra por aca !! 1erooo");
     List<UsuarioConsumidor?> usuariosConsum =
         await getUsuariosDeReservas(_reservasFuture);
 
@@ -102,7 +90,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   }
 
   Future<void> _loadUsuariosReservasActivas() async {
- print("2do entra por acaaaa");
+    await _loadReservasActivas();
     List<UsuarioConsumidor?> usuariosReserv =
         await getUsuariosDeReservas(_reservasActivas);
     setState(() {
@@ -115,8 +103,11 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     final List<UsuarioConsumidor?> consumidoresDeReserva = [];
 
     for (int i = 0; i < listaReservas.length; i++) {
-      consumidoresDeReserva.add(
-          await databaseService.buscarUsuario(listaReservas[i].usuarioEmail));
+      UsuarioConsumidor? u =
+          await databaseService.buscarUsuario(listaReservas[i].usuarioEmail);
+      if (u != null) {
+        consumidoresDeReserva.add(u);
+      }
     }
 
     return consumidoresDeReserva;
@@ -167,22 +158,13 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                   color: Colors.pinkAccent,
                 ),
               ),
+              
               ListTile(
                 leading: const Icon(Icons.card_travel),
-                title: const Text('Reservas activas'),
+                title: const Text('Reservas'),
                 onTap: () => {
                   setState(() {
                     aMostrar = vistaReservas();
-                    Navigator.pop(context);
-                  })
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.card_travel),
-                title: const Text('Historial reservas'),
-                onTap: () => {
-                  setState(() {
-                    aMostrar = vistaHistorialDeReservas();
                     Navigator.pop(context);
                   })
                 },
@@ -206,12 +188,11 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                     context.pushNamed(MapsPage.name);
                     Navigator.pop(context);
                   })
-
                 },
               ), */
               ListTile(
                 leading: const Icon(Icons.bar_chart),
-                title: const Text('Recaudado'),
+                title: const Text('Estadísticas'),
                 onTap: () => {
                   setState(() {
                     aMostrar = VistaIncome();
@@ -250,121 +231,153 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   }
 
   Widget vistaReservas() {
-    String titulo = 'Reservas Activas: ';
+    String titulo = tituloReservas;
     String opcionSeleccionada =
-        'Reservas actuales'; // Inicialmente seleccionamos "Reservas actuales"
+        'Reservas actualess'; // Inicialmente seleccionamos "Reservas actuales"
 
-    return Column(
+ return Column(
       children: [
         const SizedBox(height: 12.0),
-        Text(
-          titulo + _usuariosDeReservasActivas.length.toString(),
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+Text(
+  titulo + _usuariosDeReservasActivas.length.toString(),
+  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold), // Cambiar el tamaño de la fuente a 24
+),
+        const SizedBox(height: 12.0), // Agregar un espacio entre el Text y el Row
+        // Envuelve los botones en un Row para centrarlos horizontalmente
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Botón "Reservas activas"
+            botonReservas("Activas", 0),
+            // Espacio entre botones
+            SizedBox(width: 12.0),
+            // Botón "Reservas expiradas"
+            botonReservas("Expiradas", 1),
+            // Espacio entre botones
+            SizedBox(width: 12.0),
+            // Botón "Reservas Totales"
+            botonReservas("Totales", 2),
+          ],
         ),
-        listaReservasActivas()
-      ],
-    );
-  }
-
-  Widget vistaHistorialDeReservas() {
-    String titulo = 'Historial de Reservas: ';
-    String opcionSeleccionada =
-        'Reservas actuales'; // Inicialmente seleccionamos "Reservas actuales"
-    return Column(
-      children: [
-        const SizedBox(height: 12.0),
-        Text(
-          titulo + _usuariosDeReserva.length.toString(),
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        historialDeReservas()
-      ],
-    );
-  }
-
-Widget listaReservasActivas() {
-  print(
-      "cantidad de usuarios: ${_usuariosDeReservasActivas.length} y cant de reservas activas ${_reservasActivas.length}");
+ 
+        if (botonActivoIndex == 0)
+          listaReservasActivas(),
+        if (botonActivoIndex == 1)
+          historialDeReservas(),
+        if (botonActivoIndex ==2)
+          historialDeReservas(),
   
-  return Expanded(
-    child: ListView.builder(
-      itemCount: _usuariosDeReservasActivas.length,
-      itemBuilder: (context, index) {
-        var usuario = _usuariosDeReservasActivas[index];
+      ],
+    );
+  }
 
-        // Verificar si el usuario es nulo
-        if (usuario == null) {
+
+  Widget botonReservas(String texto, int index) {
+    return ElevatedButton(
+      onPressed: () {
+
+        setState(() {
+          botonActivoIndex = index;
+          tituloReservas = titulosReservas[index];
+        });
+      },
+
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all<Color>(
+          index == botonActivoIndex ? Colors.green : Colors.blue,
+        ),
+      ),
+      child: Text(texto),
+    );
+  }
+
+
+  Widget listaReservasActivas() {
+    print(
+        "cantidad de usuarios: ${_usuariosDeReservasActivas} y cant de reservas activas ${_reservasActivas.length}");
+    return Expanded(
+      child: ListView.builder(
+        itemCount: _usuariosDeReservasActivas.length,
+        itemBuilder: (context, index) {
+          var usuario = _usuariosDeReservasActivas[index]!;
           return ListTile(
             leading: const Icon(Icons.account_circle, size: 40),
-            title: const Text('Usuario no disponible'),
-            subtitle: const Text('Información no disponible'),
-            contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-          );
-        } else {
-          return ListTile(
-            leading: const Icon(Icons.account_circle, size: 40),
-            title: Text('${usuario.nombre} ${usuario.apellido}'),
-            subtitle: Text(usuario.email ?? 'Email no disponible'),
+            title: Text(usuario.nombre + " " + usuario.apellido),
+            subtitle: Text(usuario.email!),
             trailing: ElevatedButton(
               onPressed: () {
                 _mostrarDialogo(context, _reservasActivas[index], usuario);
               },
               child: const Text('Detalle'),
             ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-          );
-        }
-      },
-    ),
-  );
-}
-
-Widget historialDeReservas() {
-  DateTime fechaHoy = DateTime.now();
-
-  return Expanded(
-    child: ListView.builder(
-      itemCount: _usuariosDeReserva.length,
-      itemBuilder: (context, index) {
-        DateTime fechaSalida = _reservasFuture[index].fechaSalida.toDate();
-
-        // Determinar el color del texto basado en la fecha de salida
-        Color colorTexto =
-            fechaSalida.isBefore(fechaHoy) ? Colors.red : Colors.green;
-
-        var usuario = _usuariosDeReserva[index];
-
-        // Verificar si el usuario es nulo
-        if (usuario == null) {
-          return ListTile(
-            leading: const Icon(Icons.account_circle, size: 40),
-            title: const Text('Usuario no disponible'),
-            subtitle: const Text('Información no disponible'),
             contentPadding:
                 const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
           );
-        } else {
+        },
+      ),
+    );
+  }
+
+
+    Widget listaReservasExpiradas() {
+    return Expanded(
+      child: ListView.builder(
+        itemCount: _usuariosDeReservasActivas.length,
+        itemBuilder: (context, index) {
+          var usuario = _usuariosDeReservasActivas[index]!;
           return ListTile(
             leading: const Icon(Icons.account_circle, size: 40),
-            title: Text(
-              '${usuario.nombre} ${usuario.apellido}',
-              style: TextStyle(color: colorTexto), // Establecer el color del texto
-            ),
-            subtitle: Text(usuario.email ?? 'Email no disponible'),
+            title: Text(usuario.nombre + " " + usuario.apellido),
+            subtitle: Text(usuario.email!),
             trailing: ElevatedButton(
               onPressed: () {
-                _mostrarDialogo(context, _reservasFuture[index], usuario);
+                _mostrarDialogo(context, _reservasActivas[index], usuario);
               },
               child: const Text('Detalle'),
             ),
             contentPadding:
                 const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
           );
-        }
-      },
-    ),
-  );
-}
+        },
+      ),
+    );
+  }
+
+  Widget historialDeReservas() {
+    DateTime fechaHoy = DateTime.now();
+
+    return Expanded(
+      child: ListView.builder(
+        itemCount: _usuariosDeReserva.length,
+        itemBuilder: (context, index) {
+          DateTime fechaSalida = _reservasFuture[index].fechaSalida.toDate();
+
+          // Determinar el color del texto basado en la fecha de salida
+          Color colorTexto =
+              fechaSalida.isBefore(fechaHoy) ? Colors.red : Colors.green;
+
+          return ListTile(
+            leading: const Icon(Icons.account_circle, size: 40),
+            title: Text(
+              '${_usuariosDeReserva[index]!.nombre} ${_usuariosDeReserva[index]!.apellido}',
+              style:
+                  TextStyle(color: colorTexto), // Establecer el color del texto
+            ),
+            subtitle: Text(_usuariosDeReserva[index]!.email ?? ''),
+            trailing: ElevatedButton(
+              onPressed: () {
+                _mostrarDialogo(context, _reservasFuture[index],
+                    _usuariosDeReserva[index]!);
+              },
+              child: const Text('Detalle'),
+            ),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          );
+        },
+      ),
+    );
+  }
 
   Widget vistaEditar() {
     final TextEditingController nombreCocheraController =
