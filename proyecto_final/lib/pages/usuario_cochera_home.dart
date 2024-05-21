@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -13,8 +14,7 @@ import 'package:proyecto_final/services/database_sevice.dart';
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-enum OpcionesRecaudacion { total , estemes, ultimasemana, personalizado }
-
+enum OpcionesRecaudacion { total, estemes, ultimasemana, personalizado }
 
 class UsuarioCocheraHome extends StatefulWidget {
   const UsuarioCocheraHome({super.key});
@@ -31,9 +31,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   late List<UsuarioConsumidor?> _usuariosDeReservasActivas = [];
   late List<UsuarioConsumidor?> _usuariosDeReserva = [];
   OpcionesRecaudacion opcionSeleccionada = OpcionesRecaudacion.total;
-   String titulo = 'Total Recaudado:';
- 
-
+  String titulo = 'Total Recaudado:';
 
   late List<Reserva> _reservasExpiradas = [];
   late List<UsuarioConsumidor?> _usuariosDeReservaAnteriores = [];
@@ -63,40 +61,53 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
       await _loadUsuariosReservas();
       await _loadReservasActivas();
       await _loadUsuariosReservasActivas();
+      print("Historial de reservas");
+      print(_reservasFuture.length);
+      print(_reservasFuture[0].usuarioEmail);
+      print(_reservasFuture[1].usuarioEmail);
     } catch (e) {
       print(e);
     }
   }
 
-    Future<void> _loadUsuariosReservasActivas() async {
-    List<UsuarioConsumidor?> usuariosReserv = await getUsuariosDeReservas(_reservasActivas);
-    setState(() {
-      _usuariosDeReservasActivas = usuariosReserv;
-    });
-  }
-
- 
   Future<void> _loadReservasActivas() async {
     List<Reserva> reservas = await getReservas();
+    print("ESTAMOS EN RESERVAS TOTALES ");
+    print(_reservasFuture.length);
+    print(_reservasFuture[0].usuarioEmail);
+    print(_reservasFuture[1].usuarioEmail);
+  
     List<Reserva> reservasActivas = reservas
         .where(
             (reserva) => reserva.fechaSalida.toDate().isAfter(DateTime.now()))
         .toList();
+        print("Primero entra por aca");
     setState(() {
       _reservasActivas = reservasActivas;
     });
+    print("ESTAMOS EN RESERVAS ACTIVAS");
+    print(_reservasActivas.length);
+    print(_reservasActivas[0].usuarioEmail);
+    print(_reservasActivas[1].usuarioEmail);
   }
 
- 
-
   Future<void> _loadUsuariosReservas() async {
+    print("Primero entra por aca !! 1erooo");
     List<UsuarioConsumidor?> usuariosConsum =
-        await getUsuariosDeReservas(_reservasFuture) ?? [];
+        await getUsuariosDeReservas(_reservasFuture);
 
     setState(() {
       _usuariosDeReserva = usuariosConsum;
     });
+  }
 
+  Future<void> _loadUsuariosReservasActivas() async {
+ print("2do entra por acaaaa");
+    List<UsuarioConsumidor?> usuariosReserv =
+        await getUsuariosDeReservas(_reservasActivas);
+    setState(() {
+      _usuariosDeReservasActivas = usuariosReserv;
+    });
   }
 
   Future<List<UsuarioConsumidor?>> getUsuariosDeReservas(
@@ -104,9 +115,6 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     final List<UsuarioConsumidor?> consumidoresDeReserva = [];
 
     for (int i = 0; i < listaReservas.length; i++) {
-      final UsuarioConsumidor? consumidor =
-          await databaseService.buscarUsuario(listaReservas[i].usuarioEmail);
-
       consumidoresDeReserva.add(
           await databaseService.buscarUsuario(listaReservas[i].usuarioEmail));
     }
@@ -154,17 +162,27 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               UserAccountsDrawerHeader(
                 accountName: const Text('Bienvenido'),
                 accountEmail: user != null ? Text(user!.email!) : null,
-                currentAccountPicture: const CircleAvatar(),
+                currentAccountPicture: !kIsWeb ? const CircleAvatar() : null,
                 decoration: const BoxDecoration(
                   color: Colors.pinkAccent,
                 ),
               ),
               ListTile(
                 leading: const Icon(Icons.card_travel),
-                title: const Text('Mis reservas'),
+                title: const Text('Reservas activas'),
                 onTap: () => {
                   setState(() {
                     aMostrar = vistaReservas();
+                    Navigator.pop(context);
+                  })
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.card_travel),
+                title: const Text('Historial reservas'),
+                onTap: () => {
+                  setState(() {
+                    aMostrar = vistaHistorialDeReservas();
                     Navigator.pop(context);
                   })
                 },
@@ -179,9 +197,21 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                   })
                 },
               ),
+              /*
+              ListTile(
+                leading: const Icon(Icons.map),
+                title: const Text('Ver mapa'),
+                onTap: () => {
+                  setState(() {
+                    context.pushNamed(MapsPage.name);
+                    Navigator.pop(context);
+                  })
+
+                },
+              ), */
               ListTile(
                 leading: const Icon(Icons.bar_chart),
-                title: const Text('Estadísticas'),
+                title: const Text('Recaudado'),
                 onTap: () => {
                   setState(() {
                     aMostrar = VistaIncome();
@@ -218,103 +248,77 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
       return usuarioCochera as UsuarioCochera;
     }
   }
-Widget vistaReservas() {
-  String titulo = 'Reservas Activas: ';
-  String opcionSeleccionada = 'Reservas actuales'; // Inicialmente seleccionamos "Reservas actuales"
-  bool _reservasActivasChecked = false;
-  bool _reservasExpiradasChecked = false;
-  bool _totalReservasChecked = false;
 
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      SizedBox(height: 12.0),
-      Text(
-        titulo + _usuariosDeReservasActivas.length.toString(),
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-      CheckboxListTile(
-        title: Text('Reservas Activas'),
-        value: _reservasActivasChecked,
-        onChanged: (bool? value) {
-          setState(() {
-            _reservasActivasChecked = value ?? false;
-            // Aquí puedes realizar alguna acción en función del valor seleccionado, si es necesario
-          });
-        },
-      ),
-      CheckboxListTile(
-        title: Text('Reservas Expiradas'),
-        value: _reservasExpiradasChecked,
-        onChanged: (bool? value) {
-          setState(() {
-            _reservasExpiradasChecked = value ?? false;
-            // Aquí puedes realizar alguna acción en función del valor seleccionado, si es necesario
-          });
-        },
-      ),
-      CheckboxListTile(
-        title: Text('Total Reservas'),
-        value: _totalReservasChecked,
-        onChanged: (bool? value) {
-          setState(() {
-            _totalReservasChecked = value ?? false;
-            print("Holasaaaaaa");
-            // Aquí puedes realizar alguna acción en función del valor seleccionado, si es necesario
-          });
-        },
-      ),
-      listaReservasActivas(),
-    ],
-  );
-}
+  Widget vistaReservas() {
+    String titulo = 'Reservas Activas: ';
+    String opcionSeleccionada =
+        'Reservas actuales'; // Inicialmente seleccionamos "Reservas actuales"
 
-Widget vistaHistorialDeReservas() {
-  String titulo = 'Historial de Reservas: ';
-  String opcionSeleccionada = 'Reservas actuales'; // Inicialmente seleccionamos "Reservas actuales"
-return Column(
-  children: [
+    return Column(
+      children: [
+        const SizedBox(height: 12.0),
+        Text(
+          titulo + _usuariosDeReservasActivas.length.toString(),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        listaReservasActivas()
+      ],
+    );
+  }
 
-    
-    SizedBox(height: 12.0),
-    Text(
-      titulo + _usuariosDeReserva.length.toString(),
-      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-    ),
-      historialDeReservas()
-  ],
-);
-
-}
-
+  Widget vistaHistorialDeReservas() {
+    String titulo = 'Historial de Reservas: ';
+    String opcionSeleccionada =
+        'Reservas actuales'; // Inicialmente seleccionamos "Reservas actuales"
+    return Column(
+      children: [
+        const SizedBox(height: 12.0),
+        Text(
+          titulo + _usuariosDeReserva.length.toString(),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        historialDeReservas()
+      ],
+    );
+  }
 
 Widget listaReservasActivas() {
- 
-
-
+  print(
+      "cantidad de usuarios: ${_usuariosDeReservasActivas.length} y cant de reservas activas ${_reservasActivas.length}");
+  
   return Expanded(
     child: ListView.builder(
       itemCount: _usuariosDeReservasActivas.length,
       itemBuilder: (context, index) {
-        var usuario = _usuariosDeReservasActivas[index]!;
-        return ListTile(
-          leading: Icon(Icons.account_circle, size: 40),
-          title: Text(usuario.nombre + " " + usuario.apellido),
-          subtitle: Text(usuario.email!),
-          trailing: ElevatedButton(
-            onPressed: () {
-            _mostrarDialogo(context, _reservasActivas[index], usuario);
-            },
-            child: Text('Detalle'),
-          ),
-          contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        );
+        var usuario = _usuariosDeReservasActivas[index];
+
+        // Verificar si el usuario es nulo
+        if (usuario == null) {
+          return ListTile(
+            leading: const Icon(Icons.account_circle, size: 40),
+            title: const Text('Usuario no disponible'),
+            subtitle: const Text('Información no disponible'),
+            contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          );
+        } else {
+          return ListTile(
+            leading: const Icon(Icons.account_circle, size: 40),
+            title: Text('${usuario.nombre} ${usuario.apellido}'),
+            subtitle: Text(usuario.email ?? 'Email no disponible'),
+            trailing: ElevatedButton(
+              onPressed: () {
+                _mostrarDialogo(context, _reservasActivas[index], usuario);
+              },
+              child: const Text('Detalle'),
+            ),
+            contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          );
+        }
       },
     ),
   );
 }
- 
- 
+
 Widget historialDeReservas() {
   DateTime fechaHoy = DateTime.now();
 
@@ -325,149 +329,168 @@ Widget historialDeReservas() {
         DateTime fechaSalida = _reservasFuture[index].fechaSalida.toDate();
 
         // Determinar el color del texto basado en la fecha de salida
-        Color colorTexto = fechaSalida.isBefore(fechaHoy) ? Colors.red : Colors.green;
+        Color colorTexto =
+            fechaSalida.isBefore(fechaHoy) ? Colors.red : Colors.green;
 
-        return ListTile(
-          leading: Icon(Icons.account_circle, size: 40),
-          title: Text(
-           
-            '${_usuariosDeReserva[index]!.nombre} ${_usuariosDeReserva[index]!.apellido}',
-            style: TextStyle(color: colorTexto), // Establecer el color del texto
-          ),
-          subtitle: Text(_usuariosDeReserva[index]!.email ?? ''),
-          trailing: ElevatedButton(
-            onPressed: () {
-              _mostrarDialogo(context, _reservasFuture[index], _usuariosDeReserva[index]!);
-            },
-            child: Text('Detalle'),
-          ),
-          contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        );
+        var usuario = _usuariosDeReserva[index];
+
+        // Verificar si el usuario es nulo
+        if (usuario == null) {
+          return ListTile(
+            leading: const Icon(Icons.account_circle, size: 40),
+            title: const Text('Usuario no disponible'),
+            subtitle: const Text('Información no disponible'),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          );
+        } else {
+          return ListTile(
+            leading: const Icon(Icons.account_circle, size: 40),
+            title: Text(
+              '${usuario.nombre} ${usuario.apellido}',
+              style: TextStyle(color: colorTexto), // Establecer el color del texto
+            ),
+            subtitle: Text(usuario.email ?? 'Email no disponible'),
+            trailing: ElevatedButton(
+              onPressed: () {
+                _mostrarDialogo(context, _reservasFuture[index], usuario);
+              },
+              child: const Text('Detalle'),
+            ),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          );
+        }
       },
     ),
   );
 }
-Widget vistaEditar() {
-  final TextEditingController nombreCocheraController = TextEditingController();
-  final TextEditingController descripcionController = TextEditingController();
-  final TextEditingController precioController = TextEditingController();
-  final TextEditingController cbuController = TextEditingController();
 
-  return FutureBuilder<UsuarioCochera>(
-    future: getUsuarioCochera(databaseService, user!.email!),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return Center(child: CircularProgressIndicator());
-      } else if (snapshot.hasError) {
-        return Text('Error: ${snapshot.error}');
-      } else {
-        UsuarioCochera usuarioCochera = snapshot.data!;
-       
-        nombreCocheraController.text = usuarioCochera.nombreCochera;
-        descripcionController.text = usuarioCochera.descripcion;
-        precioController.text = usuarioCochera.price.toString();
-        cbuController.text = usuarioCochera.cbu;
+  Widget vistaEditar() {
+    final TextEditingController nombreCocheraController =
+        TextEditingController();
+    final TextEditingController descripcionController = TextEditingController();
+    final TextEditingController precioController = TextEditingController();
+    final TextEditingController cbuController = TextEditingController();
 
-        return Scaffold(
-          body: SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Text(
-                    'EDITAR COCHERA',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+    return FutureBuilder<UsuarioCochera>(
+      future: getUsuarioCochera(databaseService, user!.email!),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          UsuarioCochera usuarioCochera = snapshot.data!;
+
+          nombreCocheraController.text = usuarioCochera.nombreCochera;
+          descripcionController.text = usuarioCochera.descripcion;
+          precioController.text = usuarioCochera.price.toString();
+          cbuController.text = usuarioCochera.cbu;
+
+          return Scaffold(
+            body: SingleChildScrollView(
+              child: Container(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    const Text(
+                      'EDITAR COCHERA',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  _entryField('Nombre Cochera', nombreCocheraController),
-                  const SizedBox(height: 20),
-                  _entryField('Descripción', descripcionController),
-                  const SizedBox(height: 20),
-                  _entryFieldNumber('Precio', precioController),
-                  const SizedBox(height: 20),
-                  _entryFieldNumber('CBU', cbuController),
-                  const SizedBox(height: 20),
-                  _submitButton(
-                    nombreCocheraController,
-                    descripcionController,
-                    precioController,
-                    cbuController,
-                  ),
-                ],
+                    const SizedBox(height: 20),
+                    _entryField('Nombre Cochera', nombreCocheraController),
+                    const SizedBox(height: 20),
+                    _entryField('Descripción', descripcionController),
+                    const SizedBox(height: 20),
+                    _entryFieldNumber('Precio', precioController),
+                    const SizedBox(height: 20),
+                    _entryFieldNumber('CBU', cbuController),
+                    const SizedBox(height: 20),
+                    _submitButton(
+                      nombreCocheraController,
+                      descripcionController,
+                      precioController,
+                      cbuController,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      }
-    },
-  );
-}
+          );
+        }
+      },
+    );
+  }
 
-
-
-
-Widget _submitButton(TextEditingController nombreCocheraController, TextEditingController descripcionController, TextEditingController precioController, TextEditingController cbuController) {
-  return ElevatedButton(
-    onPressed: () async {
-      if(isNotBlank(nombreCocheraController.text) && isNotBlank(descripcionController.text) && isNotBlank(precioController.text) && isNotBlank(cbuController.text)){
-       if (cbuController.text.length == 22) {
-      String nombreCochera = nombreCocheraController.text;
-      String descripcion = descripcionController.text;
-      double precio = double.parse(precioController.text);
-      String cbu = cbuController.text;
-      print(precioController);
-      Map<String, dynamic> updatedAttributes = {
-        'nombreCochera': nombreCochera,
-        'descripcion': descripcion,
-        'price': precio,
-        'cbu': cbu
-      };
-      ScaffoldMessenger.of(context).showSnackBar(
-       const SnackBar(
-          content: Text('Los datos del usuario fueron editados correctamente'),
-          duration: Duration(seconds: 3),
-          backgroundColor: Colors.green,
-        ),
-      );
-       setState(() {
-        aMostrar = vistaReservas();
-      });
-      await databaseService.updateUsuarioCochera(user!.email!, updatedAttributes);
-      } else {
+  Widget _submitButton(
+      TextEditingController nombreCocheraController,
+      TextEditingController descripcionController,
+      TextEditingController precioController,
+      TextEditingController cbuController) {
+    return ElevatedButton(
+      onPressed: () async {
+        if (isNotBlank(nombreCocheraController.text) &&
+            isNotBlank(descripcionController.text) &&
+            isNotBlank(precioController.text) &&
+            isNotBlank(cbuController.text)) {
+          if (cbuController.text.length == 22) {
+            String nombreCochera = nombreCocheraController.text;
+            String descripcion = descripcionController.text;
+            double precio = double.parse(precioController.text);
+            String cbu = cbuController.text;
+            print(precioController);
+            Map<String, dynamic> updatedAttributes = {
+              'nombreCochera': nombreCochera,
+              'descripcion': descripcion,
+              'price': precio,
+              'cbu': cbu
+            };
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content:
+                    Text('Los datos del usuario fueron editados correctamente'),
+                duration: Duration(seconds: 3),
+                backgroundColor: Colors.green,
+              ),
+            );
+            setState(() {
+              aMostrar = vistaReservas();
+            });
+            await databaseService.updateUsuarioCochera(
+                user!.email!, updatedAttributes);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('El CBU debe tener 22 números'),
+                duration: Duration(seconds: 3),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('El CBU debe tener 22 números'),
+              content: Text('Complete los datos correctamente por favor'),
               duration: Duration(seconds: 3),
               backgroundColor: Colors.red,
             ),
           );
         }
-      } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-       const SnackBar(
-          content: Text('Complete los datos correctamente por favor'),
-          duration: Duration(seconds: 3),
-          backgroundColor: Colors.red,
-        ),
-      );
-        }
       },
-      child: Text('Submit'),
+      child: const Text('Submit'),
     );
   }
 
- 
- 
   @override
   Widget VistaIncome() {
     String titulo = "Total recaudado";
 
-   
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -478,69 +501,69 @@ Widget _submitButton(TextEditingController nombreCocheraController, TextEditingC
               children: [
                 Text(
                   titulo,
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.money,
                       color: Colors.green,
                       size: 24,
                     ),
-                    SizedBox(width: 5),
+                    const SizedBox(width: 5),
                     Text(
                       '\$${_recaudacionTotal.toStringAsFixed(2)}',
-                      style: TextStyle(fontSize: 24),
+                      style: const TextStyle(fontSize: 24),
                     ),
                   ],
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-                ExpansionTile(
-                  title: Text('Opciones'),
-                  children: [
-                    RadioListTile(
-                        value: OpcionesRecaudacion.total,
-                        groupValue: opcionSeleccionada,
-                        onChanged: (value) {
-                          opcionSeleccionada = value as OpcionesRecaudacion;
+                // ExpansionTile(
+                //   title: Text('Opciones'),
+                //   children: [
+                //     RadioListTile(
+                //         value: OpcionesRecaudacion.total,
+                //         groupValue: opcionSeleccionada,
+                //         onChanged: (value) {
+                //            setState(() {
+                //             opcionSeleccionada = value as OpcionesRecaudacion;
+                //            });
 
-                          setState(() {});
-                        },
-                        title: Text("Total")),
-                    RadioListTile(
-                        value: OpcionesRecaudacion.ultimasemana,
-                        groupValue: opcionSeleccionada,
-                        onChanged: (value) {
-                          opcionSeleccionada = value as OpcionesRecaudacion;
+                //         },
+                //         title: Text("Total")),
+                //     RadioListTile(
+                //         value: OpcionesRecaudacion.ultimasemana,
+                //         groupValue: opcionSeleccionada,
+                //         onChanged: (value) {
+                //           opcionSeleccionada = value as OpcionesRecaudacion;
 
-                          setState(() {});
-                        },
-                        title: Text("Ultima semana")),
-                    RadioListTile(
-                        value: OpcionesRecaudacion.estemes,
-                        groupValue: opcionSeleccionada,
-                        onChanged: (value) {
-                          opcionSeleccionada = value as OpcionesRecaudacion;
+                //           setState(() {});
+                //         },
+                //         title: Text("Ultima semana")),
+                //     RadioListTile(
+                //         value: OpcionesRecaudacion.estemes,
+                //         groupValue: opcionSeleccionada,
+                //         onChanged: (value) {
+                //           opcionSeleccionada = value as OpcionesRecaudacion;
 
-                          setState(() {});
-                        },
-                        title: Text("Este mes")),
-                    RadioListTile(
-                        value: OpcionesRecaudacion.personalizado,
-                        groupValue: opcionSeleccionada,
-                        onChanged: (value) {
-                          setState(() {
-                            opcionSeleccionada = value as OpcionesRecaudacion;
-                       
-                          });
-                        },
-                        title: Text("Personalziado"))
-                  ],
-                ),
-               
-             
+                //           setState(() {});
+                //         },
+                //         title: Text("Este mes")),
+                //     RadioListTile(
+                //         value: OpcionesRecaudacion.personalizado,
+                //         groupValue: opcionSeleccionada,
+                //         onChanged: (value) {
+                //           setState(() {
+                //             opcionSeleccionada = value as OpcionesRecaudacion;
+
+                //           });
+                //         },
+                //         title: Text("Personalziado"))
+                //   ],
+                // ),
               ],
             ),
           ),
@@ -594,30 +617,30 @@ Widget _submitButton(TextEditingController nombreCocheraController, TextEditingC
                     borderRadius: BorderRadius.circular(16.0),
                   ),
                   child: Container(
-                    padding: EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(16.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           "Reserva de $nombreCompletoUsuario",
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
-                        SizedBox(height: 16.0),
-                        Text(
+                        const SizedBox(height: 16.0),
+                        const Text(
                           "Fechas :",
                           style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
-                        SizedBox(height: 8.0),
+                        const SizedBox(height: 8.0),
                         Row(
                           children: [
-                            Icon(Icons.calendar_today,
+                            const Icon(Icons.calendar_today,
                                 size: 16,
                                 color: Colors.blue), // Icono de calendario
-                            SizedBox(width: 8.0),
-                            Text(
+                            const SizedBox(width: 8.0),
+                            const Text(
                               "Creación: ",
                               style: TextStyle(
                                   fontSize: 16,
@@ -626,18 +649,17 @@ Widget _submitButton(TextEditingController nombreCocheraController, TextEditingC
                             ),
                             Text(
                               "${formatter.format(reserva.fechaCreacion.toDate())}", // Mostrar la fecha de creación
-                              style: TextStyle(fontSize: 16),
+                              style: const TextStyle(fontSize: 16),
                             ),
                           ],
                         ),
-                        SizedBox(height: 8.0),
+                        const SizedBox(height: 8.0),
                         Row(
                           children: [
-                            
-                            Icon(Icons.arrow_downward,
+                            const Icon(Icons.arrow_downward,
                                 size: 16, color: Colors.green),
-                            SizedBox(width: 8.0),
-                            Text(
+                            const SizedBox(width: 8.0),
+                            const Text(
                               "Entrada: ",
                               style: TextStyle(
                                   fontSize: 16,
@@ -646,17 +668,17 @@ Widget _submitButton(TextEditingController nombreCocheraController, TextEditingC
                             ),
                             Text(
                               "${formatter.format(fechaEntrada)}",
-                              style: TextStyle(fontSize: 16),
+                              style: const TextStyle(fontSize: 16),
                             ),
                           ],
                         ),
-                        SizedBox(height: 8.0),
+                        const SizedBox(height: 8.0),
                         Row(
                           children: [
-                            Icon(Icons.arrow_upward,
+                            const Icon(Icons.arrow_upward,
                                 size: 16, color: Colors.red),
-                            SizedBox(width: 8.0),
-                            Text(
+                            const SizedBox(width: 8.0),
+                            const Text(
                               "Salida: ",
                               style: TextStyle(
                                   fontSize: 16,
@@ -665,17 +687,17 @@ Widget _submitButton(TextEditingController nombreCocheraController, TextEditingC
                             ),
                             Text(
                               "${formatter.format(fechaSalida)}",
-                              style: TextStyle(fontSize: 16),
+                              style: const TextStyle(fontSize: 16),
                             ),
                           ],
                         ),
-                        SizedBox(height: 8.0),
+                        const SizedBox(height: 8.0),
                         Row(
                           children: [
-                            Icon(FontAwesomeIcons.moneyBillAlt,
+                            const Icon(FontAwesomeIcons.moneyBillAlt,
                                 size: 16, color: Colors.green),
-                            SizedBox(width: 8.0),
-                            Text(
+                            const SizedBox(width: 8.0),
+                            const Text(
                               "Precio total: ",
                               style: TextStyle(
                                   fontSize: 16,
@@ -684,18 +706,18 @@ Widget _submitButton(TextEditingController nombreCocheraController, TextEditingC
                             ),
                             Text(
                               "\$${reserva.precioTotal}",
-                              style: TextStyle(fontSize: 16),
+                              style: const TextStyle(fontSize: 16),
                             ),
                           ],
                         ),
-                        SizedBox(height: 30.0),
+                        const SizedBox(height: 30.0),
                         Align(
                           alignment: Alignment.center,
                           child: TextButton(
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
-                            child: Text("Cerrar"),
+                            child: const Text("Cerrar"),
                           ),
                         ),
                       ],
@@ -709,33 +731,29 @@ Widget _submitButton(TextEditingController nombreCocheraController, TextEditingC
       },
     );
   }
- 
 
-
-Widget _entryField(String title, TextEditingController controller) {
-  return TextFormField(
-    controller: controller,
-    decoration: InputDecoration(
-      labelText: title,
-    ),
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
-    ],
-  );
-}
+  Widget _entryField(String title, TextEditingController controller) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: title,
+      ),
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
+      ],
+    );
+  }
 
 // Función para construir un campo de entrada de número
-Widget _entryFieldNumber(String title, TextEditingController controller) {
-  return TextFormField(
-    controller: controller,
-    keyboardType: TextInputType.number,
-    decoration: InputDecoration(
-      labelText: title,
-    ),
-    inputFormatters: <TextInputFormatter>[
-    FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-    ]);
-
-}
-
+  Widget _entryFieldNumber(String title, TextEditingController controller) {
+    return TextFormField(
+        controller: controller,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          labelText: title,
+        ),
+        inputFormatters: <TextInputFormatter>[
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+        ]);
+  }
 }

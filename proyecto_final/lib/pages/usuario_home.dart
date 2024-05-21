@@ -85,10 +85,14 @@ class _UsuarioHomeState extends State<UsuarioHome> {
       padding: EdgeInsets.zero,
       children: [
         UserAccountsDrawerHeader(
-          accountName:  Text('Bienvenido ${consumidor!.nombre}'),
+          accountName: Text('Bienvenido ${consumidor!.nombre}'),
           accountEmail: user != null ? Text(user!.email!) : null,
           currentAccountPicture: CircleAvatar(
-              backgroundImage: consumidor!.imageUrl!=""? NetworkImage(consumidor!.imageUrl!):null),
+              backgroundImage: consumidor != null &&
+                      consumidor?.imageUrl != null &&
+                      consumidor!.imageUrl!.isNotEmpty
+                  ? NetworkImage(consumidor!.imageUrl!)
+                  : null),
           decoration: const BoxDecoration(
             color: Colors.pinkAccent,
           ),
@@ -155,6 +159,7 @@ class _UsuarioHomeState extends State<UsuarioHome> {
   }
 
   Widget vistaReservas() {
+    print("cantidad de reservas ${_reservasFuture.length}");
     return ListView.builder(
       itemCount: _reservasFuture.length,
       itemBuilder: (context, index) {

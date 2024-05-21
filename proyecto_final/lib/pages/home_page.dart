@@ -172,10 +172,6 @@ class _HomePageState extends State<HomePage> {
             ),
             _registerGarageButton(),
             const SizedBox(
-              height: 5,
-            ),
-            _verMapa(),
-            const SizedBox(
               height: 50,
             ),
             _signOutButton(),

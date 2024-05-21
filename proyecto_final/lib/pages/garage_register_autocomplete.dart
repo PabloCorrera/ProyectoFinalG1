@@ -218,7 +218,7 @@ Widget _submitButton() {
               const SizedBox(height: 20),
               _entryField('Apellido', _controllerSurname),
               const SizedBox(height: 20),
-              _entryField('Nombre Estacionamiento', _controllerGarageName),
+              _entryField('Nombre cochera', _controllerGarageName),
               const SizedBox(height: 20),
               _entryField('Descripcion', _description),
               const SizedBox(height: 20),
