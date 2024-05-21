@@ -35,6 +35,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     int botonActivoIndex = 0;
     String tituloReservas = "Reservas activas :";
     List<String> titulosReservas = ["Reservas activas :", "Reservas expiradas :", "Reservas totales :"];
+    int cantidadReservas = 0;
 
   late List<Reserva> _reservasExpiradas = [];
   late List<UsuarioConsumidor?> _usuariosDeReservaAnteriores = [];
@@ -77,6 +78,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
         .toList();
     setState(() {
       _reservasActivas = reservasActivas;
+      cantidadReservas = _reservasActivas.length;
     });
   }
 
@@ -239,7 +241,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
       children: [
         const SizedBox(height: 12.0),
 Text(
-  titulo + _usuariosDeReservasActivas.length.toString(),
+  titulo + cantidadReservas.toString(),
   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold), // Cambiar el tamaño de la fuente a 24
 ),
         const SizedBox(height: 12.0), // Agregar un espacio entre el Text y el Row
@@ -248,15 +250,15 @@ Text(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Botón "Reservas activas"
-            botonReservas("Activas", 0),
+            botonReservas("Activas", 0, _reservasActivas.length),
             // Espacio entre botones
             SizedBox(width: 12.0),
             // Botón "Reservas expiradas"
-            botonReservas("Expiradas", 1),
+            botonReservas("Expiradas", 1, _reservasActivas.length),
             // Espacio entre botones
             SizedBox(width: 12.0),
             // Botón "Reservas Totales"
-            botonReservas("Totales", 2),
+            botonReservas("Totales", 2, _reservasFuture.length),
           ],
         ),
  
@@ -272,13 +274,15 @@ Text(
   }
 
 
-  Widget botonReservas(String texto, int index) {
+  Widget botonReservas(String texto, int index, int cantidad) {
     return ElevatedButton(
       onPressed: () {
 
         setState(() {
           botonActivoIndex = index;
           tituloReservas = titulosReservas[index];
+          cantidadReservas = cantidad;
+        
         });
       },
 
