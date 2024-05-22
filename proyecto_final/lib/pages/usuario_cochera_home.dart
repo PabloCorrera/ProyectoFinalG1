@@ -550,7 +550,12 @@ Widget historialDeReservas() {
               Reference imagenASubir = referenceDirImages.child(uniqueName);
               try {
                 await imagenASubir.putFile(File(fileImagen!.path));
-                await imagenASubir.getDownloadURL().then((value) => urlImagen = value);
+                await imagenASubir.getDownloadURL().then((value) => {
+                  urlImagen = value,
+                  setState(() {
+                    usuarioCochera!.imageUrl = value;
+                  })
+                  });
               } catch (error) {
                 print(error);
                 urlImagen = "";
@@ -870,6 +875,7 @@ double obtenerRecaudacionUltimos30Dias() {
             setState(() {
               imagen = foto;
               fileImagen = img;
+              aMostrar = vistaEditar();
             })
           });
     }
@@ -881,6 +887,7 @@ double obtenerRecaudacionUltimos30Dias() {
             setState(() {
               imagen = foto;
               fileImagen = img;
+              aMostrar = vistaEditar();
             })
           });
     }
