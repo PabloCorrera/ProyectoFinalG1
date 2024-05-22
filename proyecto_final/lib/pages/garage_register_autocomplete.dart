@@ -1,10 +1,15 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:proyecto_final/core/utils.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
 import 'package:proyecto_final/models/autocomplete_prediction.dart';
 import 'package:proyecto_final/pages/usuario_cochera_home.dart';
@@ -27,8 +32,7 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
   final TextEditingController _description = TextEditingController();
   final TextEditingController _controllerGarageName = TextEditingController();
   final TextEditingController _controllerGarageAdress = TextEditingController();
-  final TextEditingController _controllerQuantitySpaces =
-      TextEditingController();
+  final TextEditingController _controllerQuantitySpaces = TextEditingController();
   final TextEditingController _controllerPrice = TextEditingController();
   final TextEditingController _controllerName = TextEditingController();
   final TextEditingController _controllerSurname = TextEditingController();
@@ -41,6 +45,9 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
   String? emailUsuario = FirebaseAuth.instance.currentUser?.email;
 
   String? errorMessage = '';
+
+  Uint8List? imagen;
+  XFile? fileImagen;
 
   //funcion AUTO complete de google
   Future<String> showGoogleAutoComplete() async {
@@ -111,10 +118,28 @@ Widget _submitButton() {
             cantLugares: int.parse(_controllerQuantitySpaces.text),
             lat: latitud,
             lng: lngitud,
-            cbu: _controllerCbu.text
+            cbu: _controllerCbu.text,
+            imageUrl: ""
           );
-          _databaseService.addUsuarioCochera(usuarioCochera);
-          context.pushNamed(UsuarioCocheraHome.name);
+          String urlImagen = "";
+          if (fileImagen != null) {
+        String uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
+
+        Reference referenceRoot = FirebaseStorage.instance.ref();
+        Reference referenceDirImages = referenceRoot.child('images');
+        Reference imagenASubir = referenceDirImages.child(uniqueName);
+        try {
+          await imagenASubir.putFile(File(fileImagen!.path));
+          await imagenASubir.getDownloadURL().then((value) => urlImagen = value);
+        } catch (error) {
+          print(error);
+          urlImagen = "";
+        }
+      }
+        usuarioCochera.imageUrl = urlImagen;
+        _databaseService.addUsuarioCochera(usuarioCochera);
+        await Future.delayed(const Duration(seconds: 3));
+        context.pushNamed(UsuarioCocheraHome.name);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -222,7 +247,6 @@ Widget _submitButton() {
               const SizedBox(height: 20),
               _entryField('Descripcion', _description),
               const SizedBox(height: 20),
-              //_entryField('Direccion', _controllerGarageAdress, ),
               Padding(
                 padding: const EdgeInsets.all(defaultPadding),
                 child: TextFormField(
@@ -263,6 +287,11 @@ Widget _submitButton() {
               _entryFieldNumber('Cantidad de lugares', _controllerQuantitySpaces),
               const SizedBox(height: 20),
               _entryFieldNumber('CBU', _controllerCbu),
+              const SizedBox(height: 20),
+              imagePicker(),
+              const SizedBox(height: 20),
+              _errorMessage(),
+              const SizedBox(height: 20),
               _errorMessage(),
               _submitButton(),
             ],
@@ -270,5 +299,62 @@ Widget _submitButton() {
         ),
       ),
     );
+  }
+
+
+  Widget imagePicker() {
+  return Column(
+    children: [
+      imagen != null
+          ? CircleAvatar(
+              radius: 64,
+              backgroundImage: MemoryImage(imagen!),
+            )
+          : const CircleAvatar(
+              radius: 64,
+              backgroundImage: NetworkImage(
+                  'https://cdn-icons-png.flaticon.com/512/9131/9131529.png'),
+            ),
+      const SizedBox(height: 10), // Espacio entre la imagen y los botones
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ElevatedButton(
+            onPressed: () => selectImage(),
+            child: const Text('Elegir imagen'),
+          ),
+          const SizedBox(width: 10), // Espacio entre los botones
+          ElevatedButton(
+            onPressed: () => takeImage(),
+            child: const Text('Tomar imagen'),
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
+
+takeImage()async{
+ XFile? img = await pickImage(ImageSource.camera);
+    if (img != null) {
+      img.readAsBytes().then((foto) => {
+            setState(() {
+              imagen = foto;
+              fileImagen = img;
+            })
+          });
+    }
+  }
+  selectImage() async {
+    XFile? img = await pickImage(ImageSource.gallery);
+    if (img != null) {
+      img.readAsBytes().then((foto) => {
+            setState(() {
+              imagen = foto;
+              fileImagen = img;
+            })
+          });
+    }
   }
 }

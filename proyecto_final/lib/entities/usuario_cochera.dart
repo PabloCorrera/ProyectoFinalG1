@@ -14,6 +14,8 @@ class UsuarioCochera {
   late String descripcion;
   late int cantLugares;
   late String cbu;
+  late String? imageUrl;
+
 
   UsuarioCochera({
     this.nombre = "",
@@ -25,8 +27,9 @@ class UsuarioCochera {
     this.lng = 0.0,
     this.price = 0.0,
     this.cbu = "",
-    required this.descripcion,
-    required this.cantLugares});
+    this.imageUrl = "",
+    this.descripcion = "",
+    this.cantLugares = 0});
 
 
 UsuarioCochera.fromJson(Map<String, Object?> json)
@@ -42,6 +45,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
           cbu: json['cbu'] != null ? json['cbu']! as String : "",
           descripcion: json['descripcion']! as String,
           cantLugares: json['cantLugares']! as int,
+          imageUrl: json['imageUrl'] as String?,
         );
 
    UsuarioCochera copyWith({
@@ -56,6 +60,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
   String? cbu,
   String? descripcion,
   int? cantLugares,
+  String? imageUrl,
 }) {
   return UsuarioCochera(
     nombre: nombre ?? this.nombre,
@@ -69,6 +74,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
     cbu: cbu ?? this.cbu,
     descripcion: descripcion ?? this.descripcion,
     cantLugares: cantLugares ?? this.cantLugares,
+    imageUrl: imageUrl ?? this.imageUrl,
   );
 }
 
@@ -85,6 +91,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
       'cbu': cbu,
       'descripcion': descripcion,
       'cantLugares': cantLugares,
+      'imageUrl': imageUrl,
     };
   }
   factory UsuarioCochera.fromFirestore(
@@ -104,6 +111,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
       cbu: data?['cbu'] != null ? data!['cbu']! as String : "",
       descripcion: data?['descripcion'],
       cantLugares: data?['cantLugares'],
+      imageUrl: data?['imageUrl'],
     );
   }
 
@@ -121,6 +129,7 @@ UsuarioCochera.fromJson(Map<String, Object?> json)
       if (cbu != null) 'cbu': cbu,
       if (descripcion != null) 'descripcion': descripcion,
       if (cantLugares != null) 'cantLugares': cantLugares,
+      if (imageUrl != null) 'imageUrl': imageUrl
     };
   }
 

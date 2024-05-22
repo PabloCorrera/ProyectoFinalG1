@@ -1,15 +1,19 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_final/auth.dart';
+import 'package:proyecto_final/core/utils.dart';
 import 'package:proyecto_final/entities/reserva.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
 import 'package:proyecto_final/entities/usuario_consumidor.dart';
 import 'package:proyecto_final/pages/login_register_page.dart';
-import 'package:proyecto_final/pages/maps_page.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -37,17 +41,20 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   late List<UsuarioConsumidor?> _usuariosDeReservaAnteriores = [];
   late double _recaudacionTotal = 0;
   final User? user = Auth().currentUser;
+  late UsuarioCochera? usuarioCochera = UsuarioCochera();
   final String nombreUsuario = "";
   final String apellidoPersona = "";
 
   Widget? aMostrar;
   Widget? reservasAMostrar;
   String dropdownValue = 'Total';
-
+  Uint8List? imagen;
+  XFile? fileImagen;
   @override
   void initState() {
     super.initState();
     _loadReservas();
+    _loadUsuarioCochera();
   }
 
   Future<void> _loadReservas() async {
@@ -131,6 +138,14 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     });
   }
 
+  Future<void> _loadUsuarioCochera() async {
+    UsuarioCochera uc =
+        await databaseService.getCocheraByEmail(user!.email!);
+    setState(() {
+      usuarioCochera = uc;
+    });
+  }
+
   Future<List<Reserva>> getReservas() async {
     return databaseService.getReservasPorCochera(user!.email!);
   }
@@ -150,7 +165,13 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               UserAccountsDrawerHeader(
                 accountName: const Text('Bienvenido'),
                 accountEmail: user != null ? Text(user!.email!) : null,
-                currentAccountPicture: !kIsWeb ? const CircleAvatar() : null,
+                currentAccountPicture: !kIsWeb ? CircleAvatar(
+                    backgroundImage: usuarioCochera != null &&
+                            usuarioCochera?.imageUrl != null &&
+                            usuarioCochera!.imageUrl!.isNotEmpty
+                        ? NetworkImage(usuarioCochera!.imageUrl!)
+                        : null,
+                ) : null,
                 decoration: const BoxDecoration(
                   color: Colors.pinkAccent,
                 ),
@@ -332,11 +353,11 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   }
 
   Widget vistaEditar() {
-    final TextEditingController nombreCocheraController =
-        TextEditingController();
+    final TextEditingController nombreCocheraController =  TextEditingController();
     final TextEditingController descripcionController = TextEditingController();
     final TextEditingController precioController = TextEditingController();
     final TextEditingController cbuController = TextEditingController();
+    final TextEditingController lugaresController = TextEditingController();
 
     return FutureBuilder<UsuarioCochera>(
       future: getUsuarioCochera(databaseService, user!.email!),
@@ -352,6 +373,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
           descripcionController.text = usuarioCochera.descripcion;
           precioController.text = usuarioCochera.price.toString();
           cbuController.text = usuarioCochera.cbu;
+          lugaresController.text = usuarioCochera.cantLugares.toString();
 
           return Scaffold(
             body: SingleChildScrollView(
@@ -377,11 +399,16 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                     const SizedBox(height: 20),
                     _entryFieldNumber('CBU', cbuController),
                     const SizedBox(height: 20),
+                    _entryFieldNumber('Cantidad de lugares', lugaresController),
+                    const SizedBox(height: 20),
+                    imagePicker(),
+                    const SizedBox(height: 20),
                     _submitButton(
                       nombreCocheraController,
                       descripcionController,
                       precioController,
                       cbuController,
+                      lugaresController
                     ),
                   ],
                 ),
@@ -397,25 +424,47 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
       TextEditingController nombreCocheraController,
       TextEditingController descripcionController,
       TextEditingController precioController,
-      TextEditingController cbuController) {
+      TextEditingController cbuController,
+      TextEditingController lugaresController,) {
     return ElevatedButton(
       onPressed: () async {
         if (isNotBlank(nombreCocheraController.text) &&
             isNotBlank(descripcionController.text) &&
             isNotBlank(precioController.text) &&
-            isNotBlank(cbuController.text)) {
+            isNotBlank(cbuController.text) &&
+            isNotBlank(lugaresController.text)) {
           if (cbuController.text.length == 22) {
             String nombreCochera = nombreCocheraController.text;
             String descripcion = descripcionController.text;
             double precio = double.parse(precioController.text);
             String cbu = cbuController.text;
-            print(precioController);
-            Map<String, dynamic> updatedAttributes = {
+            int cantLugares= int.parse(lugaresController.text);
+           
+            String urlImagen = "";
+            if (fileImagen != null) {
+              String uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
+
+              Reference referenceRoot = FirebaseStorage.instance.ref();
+              Reference referenceDirImages = referenceRoot.child('images');
+              Reference imagenASubir = referenceDirImages.child(uniqueName);
+              try {
+                await imagenASubir.putFile(File(fileImagen!.path));
+                await imagenASubir.getDownloadURL().then((value) => urlImagen = value);
+              } catch (error) {
+                print(error);
+                urlImagen = "";
+              }
+            }
+             Map<String, dynamic> updatedAttributes = {
               'nombreCochera': nombreCochera,
               'descripcion': descripcion,
               'price': precio,
-              'cbu': cbu
+              'cbu': cbu,
+              'cantLugares' : cantLugares,
+              'imageUrl' : urlImagen
             };
+            await databaseService.updateUsuarioCochera(user!.email!, updatedAttributes);
+            await Future.delayed(const Duration(seconds: 3));
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content:
@@ -427,8 +476,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
             setState(() {
               aMostrar = vistaReservas();
             });
-            await databaseService.updateUsuarioCochera(
-                user!.email!, updatedAttributes);
+           
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -720,5 +768,60 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
         inputFormatters: <TextInputFormatter>[
           FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
         ]);
+  }
+  
+  Widget imagePicker() {
+  return Column(
+    children: [
+      imagen != null
+          ? CircleAvatar(
+              radius: 64,
+              backgroundImage: MemoryImage(imagen!),
+            )
+          : const CircleAvatar(
+              radius: 64,
+              backgroundImage: NetworkImage(
+                  'https://cdn-icons-png.flaticon.com/512/9131/9131529.png'),
+            ),
+      const SizedBox(height: 10), // Espacio entre la imagen y los botones
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ElevatedButton(
+            onPressed: () => selectImage(),
+            child: const Text('Elegir imagen'),
+          ),
+          const SizedBox(width: 10), // Espacio entre los botones
+          ElevatedButton(
+            onPressed: () => takeImage(),
+            child: const Text('Tomar imagen'),
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
+   takeImage()async{
+ XFile? img = await pickImage(ImageSource.camera);
+    if (img != null) {
+      img.readAsBytes().then((foto) => {
+            setState(() {
+              imagen = foto;
+              fileImagen = img;
+            })
+          });
+    }
+  }
+  selectImage() async {
+    XFile? img = await pickImage(ImageSource.gallery);
+    if (img != null) {
+      img.readAsBytes().then((foto) => {
+            setState(() {
+              imagen = foto;
+              fileImagen = img;
+            })
+          });
+    }
   }
 }

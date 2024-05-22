@@ -249,6 +249,18 @@ Future<UsuarioConsumidor> getConsumidorByEmail(String mailUsuario) async {
     return uc;
 }
 
+Future<UsuarioCochera> getCocheraByEmail(String mailCochera) async {
+  final ref = _firestore.collection(USUARIO_COCHERA)
+  .where("email",isEqualTo: mailCochera)
+  .withConverter(fromFirestore: UsuarioCochera.fromFirestore, toFirestore: (UsuarioCochera user,_)=>user.toFirestore());
+  final docSnap = await ref.get();
+  UsuarioCochera uc = UsuarioCochera();
+    docSnap.docs.forEach((element){ 
+      uc = element.data();
+    });
+    return uc;
+}
+
   Future<UsuarioConsumidor?> buscarUsuario(String usuarioEmail) async {
     try {
       print("DATABASEEEEEEE");
