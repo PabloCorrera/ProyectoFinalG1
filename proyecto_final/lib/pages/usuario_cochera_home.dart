@@ -847,7 +847,8 @@ double obtenerRecaudacionUltimos30Dias() {
           : const CircleAvatar(
               radius: 64,
               backgroundImage: NetworkImage(
-                  'https://cdn-icons-png.flaticon.com/512/9131/9131529.png'),
+                  'https://cdn-icons-png.flaticon.com/512/9131/9131529.png'
+                  ),
             ),
       const SizedBox(height: 10), // Espacio entre la imagen y los botones
       Row(
