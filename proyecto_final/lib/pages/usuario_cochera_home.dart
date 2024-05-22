@@ -324,6 +324,7 @@ Text(
           botonActivoIndex = index;
           tituloReservas = titulosReservas[index];
           cantidadReservas = cantidad;
+          aMostrar = vistaReservas();
         
         });
       },
