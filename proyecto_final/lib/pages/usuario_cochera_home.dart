@@ -50,10 +50,12 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   String dropdownValue = 'Total';
   Uint8List? imagen;
   XFile? fileImagen;
+  late Future<void> _initialLoadFuture;
+
   @override
   void initState() {
     super.initState();
-    _loadReservas();
+    _initialLoadFuture = _loadReservas();
     _loadUsuarioCochera();
   }
 
@@ -65,9 +67,9 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
       });
 
       _loadReservasAnteriores();
-      await _loadUsuariosReservas();
-      await _loadReservasActivas();
-      await _loadUsuariosReservasActivas();
+      return _loadUsuariosReservas()
+          .then((_) => _loadReservasActivas())
+          .then((_) => _loadUsuariosReservasActivas());
     } catch (e) {
       print(e);
     }
@@ -95,6 +97,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
 
   Future<void> _loadUsuariosReservasActivas() async {
     await _loadReservasActivas();
+
     List<UsuarioConsumidor?> usuariosReserv =
         await getUsuariosDeReservas(_reservasActivas);
     setState(() {
@@ -139,8 +142,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   }
 
   Future<void> _loadUsuarioCochera() async {
-    UsuarioCochera uc =
-        await databaseService.getCocheraByEmail(user!.email!);
+    UsuarioCochera uc = await databaseService.getCocheraByEmail(user!.email!);
     setState(() {
       usuarioCochera = uc;
     });
@@ -153,94 +155,94 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Home Usuario Cochera'),
-          backgroundColor: Colors.pink,
-        ),
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              UserAccountsDrawerHeader(
-                accountName: const Text('Bienvenido'),
-                accountEmail: user != null ? Text(user!.email!) : null,
-                currentAccountPicture: !kIsWeb ? CircleAvatar(
-                    backgroundImage: usuarioCochera != null &&
-                            usuarioCochera?.imageUrl != null &&
-                            usuarioCochera!.imageUrl!.isNotEmpty
-                        ? NetworkImage(usuarioCochera!.imageUrl!)
-                        : null,
-                ) : null,
-                decoration: const BoxDecoration(
-                  color: Colors.pinkAccent,
-                ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.card_travel),
-                title: const Text('Reservas activas'),
-                onTap: () => {
-                  setState(() {
-                    aMostrar = vistaReservas();
-                    Navigator.pop(context);
-                  })
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.card_travel),
-                title: const Text('Historial reservas'),
-                onTap: () => {
-                  setState(() {
-                    aMostrar = vistaHistorialDeReservas();
-                    Navigator.pop(context);
-                  })
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.edit),
-                title: const Text('Editar mis datos'),
-                onTap: () => {
-                  setState(() {
-                    aMostrar = vistaEditar();
-                    Navigator.pop(context);
-                  })
-                },
-              ),
-              /*
-              ListTile(
-                leading: const Icon(Icons.map),
-                title: const Text('Ver mapa'),
-                onTap: () => {
-                  setState(() {
-                    context.pushNamed(MapsPage.name);
-                    Navigator.pop(context);
-                  })
-                },
-              ), */
-              ListTile(
-                leading: const Icon(Icons.bar_chart),
-                title: const Text('Recaudado'),
-                onTap: () => {
-                  setState(() {
-                    aMostrar = VistaIncome();
-                    Navigator.pop(context);
-                  })
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.logout),
-                title: const Text('Salir'),
-                onTap: () => {
-                  context.pushNamed(LoginPage.name),
-                  Auth().signOut(),
-                },
-              )
-            ],
-          ),
-        ),
-        body: aMostrar ?? vistaReservas(),
+        child: Scaffold(
+      appBar: AppBar(
+        title: const Text('Home Usuario Cochera'),
+        backgroundColor: Colors.pink,
       ),
-    );
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            UserAccountsDrawerHeader(
+              accountName: const Text('Bienvenido'),
+              accountEmail: user != null ? Text(user!.email!) : null,
+              currentAccountPicture: !kIsWeb
+                  ? CircleAvatar(
+                      backgroundImage: usuarioCochera != null &&
+                              usuarioCochera?.imageUrl != null &&
+                              usuarioCochera!.imageUrl!.isNotEmpty
+                          ? NetworkImage(usuarioCochera!.imageUrl!)
+                          : null,
+                    )
+                  : null,
+              decoration: const BoxDecoration(
+                color: Colors.pinkAccent,
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.card_travel),
+              title: const Text('Reservas activas'),
+              onTap: () => {
+                setState(() {
+                  aMostrar = vistaReservas();
+                  Navigator.pop(context);
+                })
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.card_travel),
+              title: const Text('Historial reservas'),
+              onTap: () => {
+                setState(() {
+                  aMostrar = vistaHistorialDeReservas();
+                  Navigator.pop(context);
+                })
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.edit),
+              title: const Text('Editar mis datos'),
+              onTap: () => {
+                setState(() {
+                  aMostrar = vistaEditar();
+                  Navigator.pop(context);
+                })
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.bar_chart),
+              title: const Text('Recaudado'),
+              onTap: () => {
+                setState(() {
+                  aMostrar = VistaIncome();
+                  Navigator.pop(context);
+                })
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Salir'),
+              onTap: () => {
+                context.pushNamed(LoginPage.name),
+                Auth().signOut(),
+              },
+            )
+          ],
+        ),
+      ),
+      body: FutureBuilder(
+          future: _initialLoadFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else {
+              return aMostrar ?? vistaReservas();
+            }
+          }),
+    ));
   }
 
   Future<UsuarioCochera> getUsuarioCochera(
@@ -291,8 +293,6 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   }
 
   Widget listaReservasActivas() {
-    print(
-        "cantidad de usuarios: ${_usuariosDeReservasActivas} y cant de reservas activas ${_reservasActivas.length}");
     return Expanded(
       child: ListView.builder(
         itemCount: _usuariosDeReservasActivas.length,
@@ -353,7 +353,8 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   }
 
   Widget vistaEditar() {
-    final TextEditingController nombreCocheraController =  TextEditingController();
+    final TextEditingController nombreCocheraController =
+        TextEditingController();
     final TextEditingController descripcionController = TextEditingController();
     final TextEditingController precioController = TextEditingController();
     final TextEditingController cbuController = TextEditingController();
@@ -404,12 +405,11 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                     imagePicker(),
                     const SizedBox(height: 20),
                     _submitButton(
-                      nombreCocheraController,
-                      descripcionController,
-                      precioController,
-                      cbuController,
-                      lugaresController
-                    ),
+                        nombreCocheraController,
+                        descripcionController,
+                        precioController,
+                        cbuController,
+                        lugaresController),
                   ],
                 ),
               ),
@@ -421,11 +421,12 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   }
 
   Widget _submitButton(
-      TextEditingController nombreCocheraController,
-      TextEditingController descripcionController,
-      TextEditingController precioController,
-      TextEditingController cbuController,
-      TextEditingController lugaresController,) {
+    TextEditingController nombreCocheraController,
+    TextEditingController descripcionController,
+    TextEditingController precioController,
+    TextEditingController cbuController,
+    TextEditingController lugaresController,
+  ) {
     return ElevatedButton(
       onPressed: () async {
         if (isNotBlank(nombreCocheraController.text) &&
@@ -438,32 +439,36 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
             String descripcion = descripcionController.text;
             double precio = double.parse(precioController.text);
             String cbu = cbuController.text;
-            int cantLugares= int.parse(lugaresController.text);
-           
+            int cantLugares = int.parse(lugaresController.text);
+
             String urlImagen = "";
             if (fileImagen != null) {
-              String uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
+              String uniqueName =
+                  DateTime.now().millisecondsSinceEpoch.toString();
 
               Reference referenceRoot = FirebaseStorage.instance.ref();
               Reference referenceDirImages = referenceRoot.child('images');
               Reference imagenASubir = referenceDirImages.child(uniqueName);
               try {
                 await imagenASubir.putFile(File(fileImagen!.path));
-                await imagenASubir.getDownloadURL().then((value) => urlImagen = value);
+                await imagenASubir
+                    .getDownloadURL()
+                    .then((value) => urlImagen = value);
               } catch (error) {
                 print(error);
                 urlImagen = "";
               }
             }
-             Map<String, dynamic> updatedAttributes = {
+            Map<String, dynamic> updatedAttributes = {
               'nombreCochera': nombreCochera,
               'descripcion': descripcion,
               'price': precio,
               'cbu': cbu,
-              'cantLugares' : cantLugares,
-              'imageUrl' : urlImagen
+              'cantLugares': cantLugares,
+              'imageUrl': urlImagen
             };
-            await databaseService.updateUsuarioCochera(user!.email!, updatedAttributes);
+            await databaseService.updateUsuarioCochera(
+                user!.email!, updatedAttributes);
             await Future.delayed(const Duration(seconds: 3));
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -476,7 +481,6 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
             setState(() {
               aMostrar = vistaReservas();
             });
-           
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -769,41 +773,41 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
           FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
         ]);
   }
-  
-  Widget imagePicker() {
-  return Column(
-    children: [
-      imagen != null
-          ? CircleAvatar(
-              radius: 64,
-              backgroundImage: MemoryImage(imagen!),
-            )
-          : const CircleAvatar(
-              radius: 64,
-              backgroundImage: NetworkImage(
-                  'https://cdn-icons-png.flaticon.com/512/9131/9131529.png'),
-            ),
-      const SizedBox(height: 10), // Espacio entre la imagen y los botones
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton(
-            onPressed: () => selectImage(),
-            child: const Text('Elegir imagen'),
-          ),
-          const SizedBox(width: 10), // Espacio entre los botones
-          ElevatedButton(
-            onPressed: () => takeImage(),
-            child: const Text('Tomar imagen'),
-          ),
-        ],
-      ),
-    ],
-  );
-}
 
-   takeImage()async{
- XFile? img = await pickImage(ImageSource.camera);
+  Widget imagePicker() {
+    return Column(
+      children: [
+        imagen != null
+            ? CircleAvatar(
+                radius: 64,
+                backgroundImage: MemoryImage(imagen!),
+              )
+            : const CircleAvatar(
+                radius: 64,
+                backgroundImage: NetworkImage(
+                    'https://cdn-icons-png.flaticon.com/512/9131/9131529.png'),
+              ),
+        const SizedBox(height: 10), // Espacio entre la imagen y los botones
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () => selectImage(),
+              child: const Text('Elegir imagen'),
+            ),
+            const SizedBox(width: 10), // Espacio entre los botones
+            ElevatedButton(
+              onPressed: () => takeImage(),
+              child: const Text('Tomar imagen'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  takeImage() async {
+    XFile? img = await pickImage(ImageSource.camera);
     if (img != null) {
       img.readAsBytes().then((foto) => {
             setState(() {
@@ -813,6 +817,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
           });
     }
   }
+
   selectImage() async {
     XFile? img = await pickImage(ImageSource.gallery);
     if (img != null) {
