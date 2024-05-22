@@ -449,7 +449,12 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               Reference imagenASubir = referenceDirImages.child(uniqueName);
               try {
                 await imagenASubir.putFile(File(fileImagen!.path));
-                await imagenASubir.getDownloadURL().then((value) => urlImagen = value);
+                await imagenASubir.getDownloadURL().then((value) => {
+                  urlImagen = value,
+                  setState(() {
+                    usuarioCochera!.imageUrl = value;
+                  })
+                  });
               } catch (error) {
                 print(error);
                 urlImagen = "";
@@ -809,6 +814,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
             setState(() {
               imagen = foto;
               fileImagen = img;
+              aMostrar = vistaEditar();
             })
           });
     }
@@ -820,6 +826,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
             setState(() {
               imagen = foto;
               fileImagen = img;
+              aMostrar = vistaEditar();
             })
           });
     }
