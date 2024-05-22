@@ -469,7 +469,6 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               'imageUrl' : urlImagen
             };
             await databaseService.updateUsuarioCochera(user!.email!, updatedAttributes);
-            await Future.delayed(const Duration(seconds: 3));
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content:
@@ -479,7 +478,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               ),
             );
             setState(() {
-              aMostrar = vistaReservas();
+              //aMostrar = vistaReservas();
             });
            
           } else {
@@ -783,10 +782,11 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               radius: 64,
               backgroundImage: MemoryImage(imagen!),
             )
-          : const CircleAvatar(
+          : CircleAvatar(
               radius: 64,
-              backgroundImage: NetworkImage(
-                  'https://cdn-icons-png.flaticon.com/512/9131/9131529.png'),
+              backgroundImage:usuarioCochera!.imageUrl == null? const NetworkImage(
+                  'https://cdn-icons-png.flaticon.com/512/9131/9131529.png'):NetworkImage(
+                  usuarioCochera!.imageUrl!),
             ),
       const SizedBox(height: 10), // Espacio entre la imagen y los botones
       Row(
