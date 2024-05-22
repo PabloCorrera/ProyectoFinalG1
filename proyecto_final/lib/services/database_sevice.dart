@@ -263,7 +263,6 @@ Future<UsuarioCochera> getCocheraByEmail(String mailCochera) async {
 
   Future<UsuarioConsumidor?> buscarUsuario(String usuarioEmail) async {
     try {
-      print("DATABASEEEEEEE");
       // Realiza una consulta para buscar al usuario por su correo electrónico
       var query = await _usuariosConsumidorRef
           .where('email', isEqualTo: usuarioEmail)
