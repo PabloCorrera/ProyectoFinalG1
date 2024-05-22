@@ -13,6 +13,7 @@ import 'package:proyecto_final/pages/maps_page.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 enum OpcionesRecaudacion { total, estemes, ultimasemana, personalizado }
 
@@ -222,7 +223,7 @@ Future<void> _loadReservasExpiradas() async {
                 title: const Text('Estadísticas'),
                 onTap: () => {
                   setState(() {
-                    aMostrar = VistaIncome();
+                    aMostrar = VistaEstadisticas();
                     Navigator.pop(context);
                   })
                 },
@@ -276,7 +277,7 @@ Text(
 
             botonReservas("Activas", 0, _reservasActivas.length),
             SizedBox(width: 12.0),
-            botonReservas("Expiradas", 1, _reservasActivas.length),
+            botonReservas("Expiradas", 1, _reservasExpiradas.length),
             SizedBox(width: 12.0),
             botonReservas("Totales", 2, _reservasFuture.length),
           ],
@@ -551,108 +552,68 @@ Widget historialDeReservas() {
       child: const Text('Submit'),
     );
   }
+@override
+Widget VistaEstadisticas() {
+  String titulo = "Mis estadísticas";
+  int reservasUltimos30Dias = obtenerReservasUltimos30Dias(); // Método que obtendrá el número de reservas en los últimos 30 días
+  int reservasTotales = _reservasFuture.length; // Suponiendo que _reservasExpiradas y _reservasActivas contienen todas las reservas
+  double recaudacionUltimos30Dias = obtenerRecaudacionUltimos30Dias(); // Método que obtendrá la recaudación de los últimos 30 días
+  double recaudacionTotal = _recaudacionTotal; // Suponiendo que esta variable contiene la recaudación total
 
-  @override
-  Widget VistaIncome() {
-    String titulo = "Total recaudado";
-
-    return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+  return Scaffold(
+    body: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: Column(
-              children: [
-                Text(
-                  titulo,
-                  style: const TextStyle(
-                      fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.money,
-                      color: Colors.green,
-                      size: 24,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      '\$${_recaudacionTotal.toStringAsFixed(2)}',
-                      style: const TextStyle(fontSize: 24),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // ExpansionTile(
-                //   title: Text('Opciones'),
-                //   children: [
-                //     RadioListTile(
-                //         value: OpcionesRecaudacion.total,
-                //         groupValue: opcionSeleccionada,
-                //         onChanged: (value) {
-                //            setState(() {
-                //             opcionSeleccionada = value as OpcionesRecaudacion;
-                //            });
-
-                //         },
-                //         title: Text("Total")),
-                //     RadioListTile(
-                //         value: OpcionesRecaudacion.ultimasemana,
-                //         groupValue: opcionSeleccionada,
-                //         onChanged: (value) {
-                //           opcionSeleccionada = value as OpcionesRecaudacion;
-
-                //           setState(() {});
-                //         },
-                //         title: Text("Ultima semana")),
-                //     RadioListTile(
-                //         value: OpcionesRecaudacion.estemes,
-                //         groupValue: opcionSeleccionada,
-                //         onChanged: (value) {
-                //           opcionSeleccionada = value as OpcionesRecaudacion;
-
-                //           setState(() {});
-                //         },
-                //         title: Text("Este mes")),
-                //     RadioListTile(
-                //         value: OpcionesRecaudacion.personalizado,
-                //         groupValue: opcionSeleccionada,
-                //         onChanged: (value) {
-                //           setState(() {
-                //             opcionSeleccionada = value as OpcionesRecaudacion;
-
-                //           });
-                //         },
-                //         title: Text("Personalziado"))
-                //   ],
-                // ),
-              ],
+          Center(
+            child: Text(
+              titulo,
+              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _reservasExpiradas.length,
-              itemBuilder: (context, index) {
-                final reserva = _reservasExpiradas[index];
-                return ListTile(
-                  leading: const Icon(Icons.event),
-                  title: Text("Reserva de " +
-                      _usuariosDeReservaAnteriores[index]!.nombre +
-                      " " +
-                      _usuariosDeReservaAnteriores[index]!.apellido),
-                  subtitle:
-                      Text(_reservasExpiradas[index].precioTotal.toString()),
-                );
-              },
-            ),
+          const SizedBox(height: 24),
+          Text(
+            'Reservas de los últimos 30 días: $reservasUltimos30Dias',
+            style: const TextStyle(fontSize: 18),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Reservas Totales: $reservasTotales',
+            style: const TextStyle(fontSize: 18),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Recaudación de los últimos 30 días: \$${recaudacionUltimos30Dias.toStringAsFixed(2)}',
+            style: const TextStyle(fontSize: 18),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Recaudación Total: \$${recaudacionTotal.toStringAsFixed(2)}',
+            style: const TextStyle(fontSize: 18),
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
+
+// Ejemplo de métodos para obtener los datos requeridos
+int obtenerReservasUltimos30Dias() {
+  DateTime fechaHoy = DateTime.now();
+  DateTime hace30Dias = fechaHoy.subtract(Duration(days: 30));
+  return _reservasFuture
+      .where((reserva) => reserva.fechaSalida.toDate().isAfter(hace30Dias))
+      .length;
+}
+
+double obtenerRecaudacionUltimos30Dias() {
+  DateTime fechaHoy = DateTime.now();
+  DateTime hace30Dias = fechaHoy.subtract(Duration(days: 30));
+  return _reservasExpiradas
+      .where((reserva) => reserva.fechaSalida.toDate().isAfter(hace30Dias))
+      .fold(0.0, (sum, reserva) => sum + reserva.precioTotal);
+}
 
   bool isNotBlank(String value) {
     return value.trim().isNotEmpty;
