@@ -17,6 +17,7 @@ import 'package:proyecto_final/pages/login_register_page.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 enum OpcionesRecaudacion { total, estemes, ultimasemana, personalizado }
 
@@ -32,12 +33,20 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   DatabaseService databaseService = DatabaseService();
   late List<Reserva> _reservasFuture = [];
   late List<Reserva> _reservasActivas = [];
+  late List<Reserva> _reservasExpiradas = [];
   late List<UsuarioConsumidor?> _usuariosDeReservasActivas = [];
+  late List<UsuarioConsumidor?> _usuariosDeReservasExpiradas = [];
   late List<UsuarioConsumidor?> _usuariosDeReserva = [];
   OpcionesRecaudacion opcionSeleccionada = OpcionesRecaudacion.total;
   String titulo = 'Total Recaudado:';
-
-  late List<Reserva> _reservasExpiradas = [];
+  int botonActivoIndex = 0;
+  String tituloReservas = "Reservas activas :";
+  List<String> titulosReservas = [
+    "Reservas activas :",
+    "Reservas expiradas :",
+    "Reservas totales :"
+  ];
+  int cantidadReservas = 0;
   late List<UsuarioConsumidor?> _usuariosDeReservaAnteriores = [];
   late double _recaudacionTotal = 0;
   final User? user = Auth().currentUser;
@@ -69,7 +78,9 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
       _loadReservasAnteriores();
       return _loadUsuariosReservas()
           .then((_) => _loadReservasActivas())
-          .then((_) => _loadUsuariosReservasActivas());
+          .then((_) => _loadReservasExpiradas())
+          .then((_) => _loadUsuariosReservasActivas())
+          .then((_) => _loadUsuariosDeReservasExpiradas());
     } catch (e) {
       print(e);
     }
@@ -83,6 +94,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
         .toList();
     setState(() {
       _reservasActivas = reservasActivas;
+      cantidadReservas = _reservasActivas.length;
     });
   }
 
@@ -105,6 +117,15 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     });
   }
 
+  Future<void> _loadUsuariosDeReservasExpiradas() async {
+    await _loadReservasExpiradas();
+    List<UsuarioConsumidor?> usuariosReserv =
+        await getUsuariosDeReservas(_reservasExpiradas);
+    setState(() {
+      _usuariosDeReservasExpiradas = usuariosReserv;
+    });
+  }
+
   Future<List<UsuarioConsumidor?>> getUsuariosDeReservas(
       List<Reserva> listaReservas) async {
     final List<UsuarioConsumidor?> consumidoresDeReserva = [];
@@ -118,6 +139,17 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     }
 
     return consumidoresDeReserva;
+  }
+
+  Future<void> _loadReservasExpiradas() async {
+    List<Reserva> reservas = await getReservas();
+    List<Reserva> reservasExpiradas = reservas
+        .where(
+            (reserva) => reserva.fechaSalida.toDate().isBefore(DateTime.now()))
+        .toList();
+    setState(() {
+      _reservasExpiradas = reservasExpiradas;
+    });
   }
 
   Future<void> _loadReservasAnteriores() async {
@@ -191,16 +223,6 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.card_travel),
-              title: const Text('Historial reservas'),
-              onTap: () => {
-                setState(() {
-                  aMostrar = vistaHistorialDeReservas();
-                  Navigator.pop(context);
-                })
-              },
-            ),
-            ListTile(
               leading: const Icon(Icons.edit),
               title: const Text('Editar mis datos'),
               onTap: () => {
@@ -215,7 +237,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               title: const Text('Recaudado'),
               onTap: () => {
                 setState(() {
-                  aMostrar = VistaIncome();
+                  aMostrar = VistaEstadisticas();
                   Navigator.pop(context);
                 })
               },
@@ -260,60 +282,118 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   }
 
   Widget vistaReservas() {
-    String titulo = 'Reservas Activas: ';
-    String opcionSeleccionada =
-        'Reservas actuales'; // Inicialmente seleccionamos "Reservas actuales"
+    String titulo = tituloReservas;
+    String opcionSeleccionada = 'Reservas actualess';
 
     return Column(
       children: [
         const SizedBox(height: 12.0),
         Text(
-          titulo + _usuariosDeReservasActivas.length.toString(),
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          titulo + cantidadReservas.toString(),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
-        listaReservasActivas()
+        const SizedBox(height: 12.0),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            botonReservas("Activas", 0, _reservasActivas.length),
+            SizedBox(width: 12.0),
+            botonReservas("Expiradas", 1, _reservasExpiradas.length),
+            SizedBox(width: 12.0),
+            botonReservas("Totales", 2, _reservasFuture.length),
+          ],
+        ),
+        if (botonActivoIndex == 0) listaReservasActivas(),
+        if (botonActivoIndex == 1) listaReservasExpiradas(),
+        if (botonActivoIndex == 2) historialDeReservas(),
       ],
     );
   }
 
-  Widget vistaHistorialDeReservas() {
-    String titulo = 'Historial de Reservas: ';
-    String opcionSeleccionada =
-        'Reservas actuales'; // Inicialmente seleccionamos "Reservas actuales"
-    return Column(
-      children: [
-        const SizedBox(height: 12.0),
-        Text(
-          titulo + _usuariosDeReserva.length.toString(),
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  Widget botonReservas(String texto, int index, int cantidad) {
+    return ElevatedButton(
+      onPressed: () {
+        setState(() {
+          botonActivoIndex = index;
+          tituloReservas = titulosReservas[index];
+          cantidadReservas = cantidad;
+          aMostrar = vistaReservas();
+        });
+      },
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all<Color>(
+          index == botonActivoIndex ? Colors.green : Colors.blue,
         ),
-        historialDeReservas()
-      ],
+      ),
+      child: Text(texto),
     );
   }
 
   Widget listaReservasActivas() {
+    print(
+        "cantidad de usuarios: ${_usuariosDeReservasActivas} y cant de reservas activas ${_reservasActivas.length}");
     return Expanded(
-      child: ListView.builder(
-        itemCount: _usuariosDeReservasActivas.length,
-        itemBuilder: (context, index) {
-          var usuario = _usuariosDeReservasActivas[index]!;
-          return ListTile(
-            leading: const Icon(Icons.account_circle, size: 40),
-            title: Text(usuario.nombre + " " + usuario.apellido),
-            subtitle: Text(usuario.email!),
-            trailing: ElevatedButton(
-              onPressed: () {
-                _mostrarDialogo(context, _reservasActivas[index], usuario);
+      child: _usuariosDeReservasActivas.isEmpty
+          ? Center(
+              child: Text(
+                'No hay reservas activas',
+                style: TextStyle(fontSize: 18.0),
+              ),
+            )
+          : ListView.builder(
+              itemCount: _usuariosDeReservasActivas.length,
+              itemBuilder: (context, index) {
+                var usuario = _usuariosDeReservasActivas[index]!;
+                return ListTile(
+                  leading: const Icon(Icons.account_circle, size: 40),
+                  title: Text(usuario.nombre + " " + usuario.apellido),
+                  subtitle: Text(usuario.email!),
+                  trailing: ElevatedButton(
+                    onPressed: () {
+                      _mostrarDialogo(
+                          context, _reservasActivas[index], usuario);
+                    },
+                    child: const Text('Detalle'),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 8.0, horizontal: 16.0),
+                );
               },
-              child: const Text('Detalle'),
             ),
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-          );
-        },
-      ),
     );
+  }
+
+  Widget listaReservasExpiradas() {
+    if (_usuariosDeReservasExpiradas.isEmpty) {
+      return Center(
+        child: Text(
+          'No hay reservas expiradas',
+          style: TextStyle(fontSize: 18.0),
+        ),
+      );
+    } else {
+      return Expanded(
+        child: ListView.builder(
+          itemCount: _usuariosDeReservasExpiradas.length,
+          itemBuilder: (context, index) {
+            var usuario = _usuariosDeReservasExpiradas[index]!;
+            return ListTile(
+              leading: const Icon(Icons.account_circle, size: 40),
+              title: Text(usuario.nombre + " " + usuario.apellido),
+              subtitle: Text(usuario.email!),
+              trailing: ElevatedButton(
+                onPressed: () {
+                  _mostrarDialogo(context, _reservasExpiradas[index], usuario);
+                },
+                child: const Text('Detalle'),
+              ),
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            );
+          },
+        ),
+      );
+    }
   }
 
   Widget historialDeReservas() {
@@ -324,19 +404,33 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
         itemCount: _usuariosDeReserva.length,
         itemBuilder: (context, index) {
           DateTime fechaSalida = _reservasFuture[index].fechaSalida.toDate();
+          DateTime fechaEntrada = _reservasFuture[index].fechaEntrada.toDate();
 
-          // Determinar el color del texto basado en la fecha de salida
-          Color colorTexto =
-              fechaSalida.isBefore(fechaHoy) ? Colors.red : Colors.green;
+          String estadoReserva;
+          Color colorTexto;
+          if (fechaSalida.isBefore(fechaHoy)) {
+            estadoReserva = 'Expirada';
+            colorTexto = Colors.red;
+          } else if (fechaSalida.isAfter(fechaHoy)) {
+            estadoReserva = 'Activa';
+            colorTexto = Colors.green;
+          } else if (fechaEntrada.isAfter(fechaHoy)) {
+            estadoReserva = 'No iniciada';
+            colorTexto = Colors.blue;
+          } else {
+            estadoReserva = 'En curso';
+            colorTexto = Colors.black;
+          }
 
           return ListTile(
             leading: const Icon(Icons.account_circle, size: 40),
             title: Text(
               '${_usuariosDeReserva[index]!.nombre} ${_usuariosDeReserva[index]!.apellido}',
-              style:
-                  TextStyle(color: colorTexto), // Establecer el color del texto
             ),
-            subtitle: Text(_usuariosDeReserva[index]!.email ?? ''),
+            subtitle: Text(
+              estadoReserva,
+              style: TextStyle(color: colorTexto),
+            ),
             trailing: ElevatedButton(
               onPressed: () {
                 _mostrarDialogo(context, _reservasFuture[index],
@@ -469,7 +563,6 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
             };
             await databaseService.updateUsuarioCochera(
                 user!.email!, updatedAttributes);
-            await Future.delayed(const Duration(seconds: 3));
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content:
@@ -479,7 +572,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               ),
             );
             setState(() {
-              aMostrar = vistaReservas();
+              //aMostrar = vistaReservas();
             });
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -505,105 +598,71 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   }
 
   @override
-  Widget VistaIncome() {
-    String titulo = "Total recaudado";
+  Widget VistaEstadisticas() {
+    String titulo = "Mis estadísticas";
+    int reservasUltimos30Dias =
+        obtenerReservasUltimos30Dias(); // Método que obtendrá el número de reservas en los últimos 30 días
+    int reservasTotales = _reservasFuture
+        .length; // Suponiendo que _reservasExpiradas y _reservasActivas contienen todas las reservas
+    double recaudacionUltimos30Dias =
+        obtenerRecaudacionUltimos30Dias(); // Método que obtendrá la recaudación de los últimos 30 días
+    double recaudacionTotal =
+        _recaudacionTotal; // Suponiendo que esta variable contiene la recaudación total
 
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: Column(
-              children: [
-                Text(
-                  titulo,
-                  style: const TextStyle(
-                      fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.money,
-                      color: Colors.green,
-                      size: 24,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      '\$${_recaudacionTotal.toStringAsFixed(2)}',
-                      style: const TextStyle(fontSize: 24),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // ExpansionTile(
-                //   title: Text('Opciones'),
-                //   children: [
-                //     RadioListTile(
-                //         value: OpcionesRecaudacion.total,
-                //         groupValue: opcionSeleccionada,
-                //         onChanged: (value) {
-                //            setState(() {
-                //             opcionSeleccionada = value as OpcionesRecaudacion;
-                //            });
-
-                //         },
-                //         title: Text("Total")),
-                //     RadioListTile(
-                //         value: OpcionesRecaudacion.ultimasemana,
-                //         groupValue: opcionSeleccionada,
-                //         onChanged: (value) {
-                //           opcionSeleccionada = value as OpcionesRecaudacion;
-
-                //           setState(() {});
-                //         },
-                //         title: Text("Ultima semana")),
-                //     RadioListTile(
-                //         value: OpcionesRecaudacion.estemes,
-                //         groupValue: opcionSeleccionada,
-                //         onChanged: (value) {
-                //           opcionSeleccionada = value as OpcionesRecaudacion;
-
-                //           setState(() {});
-                //         },
-                //         title: Text("Este mes")),
-                //     RadioListTile(
-                //         value: OpcionesRecaudacion.personalizado,
-                //         groupValue: opcionSeleccionada,
-                //         onChanged: (value) {
-                //           setState(() {
-                //             opcionSeleccionada = value as OpcionesRecaudacion;
-
-                //           });
-                //         },
-                //         title: Text("Personalziado"))
-                //   ],
-                // ),
-              ],
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Text(
+                titulo,
+                style:
+                    const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+              ),
             ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _reservasExpiradas.length,
-              itemBuilder: (context, index) {
-                final reserva = _reservasExpiradas[index];
-                return ListTile(
-                  leading: const Icon(Icons.event),
-                  title: Text("Reserva de " +
-                      _usuariosDeReservaAnteriores[index]!.nombre +
-                      " " +
-                      _usuariosDeReservaAnteriores[index]!.apellido),
-                  subtitle:
-                      Text(_reservasExpiradas[index].precioTotal.toString()),
-                );
-              },
+            const SizedBox(height: 24),
+            Text(
+              'Reservas de los últimos 30 días: $reservasUltimos30Dias',
+              style: const TextStyle(fontSize: 18),
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            Text(
+              'Reservas Totales: $reservasTotales',
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Recaudación de los últimos 30 días: \$${recaudacionUltimos30Dias.toStringAsFixed(2)}',
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Recaudación Total: \$${recaudacionTotal.toStringAsFixed(2)}',
+              style: const TextStyle(fontSize: 18),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+// Ejemplo de métodos para obtener los datos requeridos
+  int obtenerReservasUltimos30Dias() {
+    DateTime fechaHoy = DateTime.now();
+    DateTime hace30Dias = fechaHoy.subtract(Duration(days: 30));
+    return _reservasFuture
+        .where((reserva) => reserva.fechaSalida.toDate().isAfter(hace30Dias))
+        .length;
+  }
+
+  double obtenerRecaudacionUltimos30Dias() {
+    DateTime fechaHoy = DateTime.now();
+    DateTime hace30Dias = fechaHoy.subtract(Duration(days: 30));
+    return _reservasExpiradas
+        .where((reserva) => reserva.fechaSalida.toDate().isAfter(hace30Dias))
+        .fold(0.0, (sum, reserva) => sum + reserva.precioTotal);
   }
 
   bool isNotBlank(String value) {
@@ -782,10 +841,12 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                 radius: 64,
                 backgroundImage: MemoryImage(imagen!),
               )
-            : const CircleAvatar(
+            : CircleAvatar(
                 radius: 64,
-                backgroundImage: NetworkImage(
-                    'https://cdn-icons-png.flaticon.com/512/9131/9131529.png'),
+                backgroundImage: usuarioCochera!.imageUrl == null
+                    ? const NetworkImage(
+                        'https://cdn-icons-png.flaticon.com/512/9131/9131529.png')
+                    : NetworkImage(usuarioCochera!.imageUrl!),
               ),
         const SizedBox(height: 10), // Espacio entre la imagen y los botones
         Row(
@@ -813,6 +874,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
             setState(() {
               imagen = foto;
               fileImagen = img;
+              aMostrar = vistaEditar();
             })
           });
     }
@@ -825,6 +887,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
             setState(() {
               imagen = foto;
               fileImagen = img;
+              aMostrar = vistaEditar();
             })
           });
     }
