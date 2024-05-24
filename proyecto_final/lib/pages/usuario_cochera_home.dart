@@ -537,7 +537,6 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               return Center(child: CircularProgressIndicator());
             },
           );
-
           try {
             String nombreCochera = nombreCocheraController.text;
             String descripcion = descripcionController.text;
@@ -573,6 +572,10 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
             };
             await databaseService.updateUsuarioCochera(
                 user!.email!, updatedAttributes);
+                setState(() {
+                  usuarioCochera!.imageUrl = urlImagen; 
+                });
+            
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content:
