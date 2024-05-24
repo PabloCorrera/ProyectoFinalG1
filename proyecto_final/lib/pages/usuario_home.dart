@@ -159,7 +159,7 @@ class _UsuarioHomeState extends State<UsuarioHome> {
   }
 
   Widget vistaReservas() {
-    print("cantidad de reservas ${_reservasFuture.length}");
+    _loadReservas();
     return ListView.builder(
       itemCount: _reservasFuture.length,
       itemBuilder: (context, index) {
