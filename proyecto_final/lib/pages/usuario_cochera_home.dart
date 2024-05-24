@@ -580,6 +580,7 @@ Widget historialDeReservas() {
               ),
             );
             setState(() {
+              usuarioCochera!.imageUrl = urlImagen;
               aMostrar = vistaReservas();
             });
            
