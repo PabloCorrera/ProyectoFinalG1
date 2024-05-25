@@ -8,11 +8,17 @@ import 'package:proyecto_final/pages/maps_page.dart';
 import 'package:proyecto_final/pages/user_register.dart';
 import 'package:proyecto_final/pages/usuario_cochera_home.dart';
 import 'package:proyecto_final/pages/usuario_home.dart';
+import 'package:proyecto_final/wrapper.dart';
 
 final appRouter = GoRouter(routes: [
   GoRoute(
-    name: LoginPage.name,
+    name: Wrapper.name,
     path: '/',
+    builder: (context, state) => const Wrapper(),
+  ),
+  GoRoute(
+    name: LoginPage.name,
+    path: '/login',
     builder: (context, state) => const LoginPage(),
   ),
   GoRoute(
@@ -28,23 +34,23 @@ final appRouter = GoRouter(routes: [
   GoRoute(
     name: GarageRegisterAutoPlete.name,
     path: '/garageRegisterAutoPlete',
-    builder: (context, state) => GarageRegisterAutoPlete(),
+    builder: (context, state) => const GarageRegisterAutoPlete(),
   ),
   GoRoute(
     name: MapsPage.name,
     path: '/mapsPage',
-    builder: (context, state) => MapsPage(),
+    builder: (context, state) => const MapsPage(),
   ),
 GoRoute(
     name: UsuarioHome.name,
     path: '/usuarioHome',
-    builder: (context, state) => UsuarioHome(),
+    builder: (context, state) => const UsuarioHome(),
   ),
 
   GoRoute(
     name: UsuarioCocheraHome.name,
     path: '/usuarioCochera',
-    builder: (context, state) => UsuarioCocheraHome(),
+    builder: (context, state) => const UsuarioCocheraHome(),
   ),
 
 

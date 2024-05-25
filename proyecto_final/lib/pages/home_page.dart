@@ -150,32 +150,35 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: _title(),
-      ),
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            _userUid(),
-            const SizedBox(
-              height: 20,
-            ),
-            _registerConsumerButton(),
-            const SizedBox(
-              height: 5,
-            ),
-            _registerGarageButton(),
-            const SizedBox(
-              height: 50,
-            ),
-            _signOutButton(),
-          ],
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: _title(),
+          automaticallyImplyLeading: false
+        ),
+        body: Container(
+          height: double.infinity,
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              _userUid(),
+              const SizedBox(
+                height: 20,
+              ),
+              _registerConsumerButton(),
+              const SizedBox(
+                height: 5,
+              ),
+              _registerGarageButton(),
+              const SizedBox(
+                height: 50,
+              ),
+              _signOutButton(),
+            ],
+          ),
         ),
       ),
     );

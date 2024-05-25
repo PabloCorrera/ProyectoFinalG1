@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
@@ -22,10 +24,10 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  late StreamSubscription<User?> user;
   String? errorMessage = '';
   bool isLogin = true;
   String? userMail = FirebaseAuth.instance.currentUser?.email;
-  
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
@@ -35,6 +37,8 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     obtenerCredenciales();
+    
+   
   }
 
   AndroidOptions _getAndroidOptions() => const AndroidOptions(
@@ -52,8 +56,10 @@ class _LoginPageState extends State<LoginPage> {
           String? contrasena = await storage.read(key: 'contrasena');
           if (usuario != null && contrasena != null) {
             try {
-              await Auth().signInWithEmailAndPassword(
-                  email: usuario, password: contrasena).then((value) =>  redirigirUsuario(usuario));
+              await Auth()
+                  .signInWithEmailAndPassword(
+                      email: usuario, password: contrasena)
+                  .then((value) => redirigirUsuario(usuario));
             } on FirebaseAuthException catch (e) {
               setState(() {
                 errorMessage = e.message;
@@ -71,61 +77,54 @@ class _LoginPageState extends State<LoginPage> {
     try {
       await Auth().signInWithEmailAndPassword(
           email: _controllerEmail.text, password: _controllerPassword.text);
-          if(!kIsWeb){
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-      if (prefs.getBool('usarAutenticacionBiometrica') == null) {
-        bool? usarAutenticacionBiometrica = await _mostrarDialogo(context);
-        if (usarAutenticacionBiometrica != null) {
-          _guardarPreferencia(usarAutenticacionBiometrica);
-          if (usarAutenticacionBiometrica) {
-            guardarCredenciales(
-                _controllerEmail.text, _controllerPassword.text);
+      if (!kIsWeb) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        if (prefs.getBool('usarAutenticacionBiometrica') == null) {
+          bool? usarAutenticacionBiometrica = await _mostrarDialogo(context);
+          if (usarAutenticacionBiometrica != null) {
+            _guardarPreferencia(usarAutenticacionBiometrica);
+            if (usarAutenticacionBiometrica) {
+              guardarCredenciales(
+                  _controllerEmail.text, _controllerPassword.text);
+            }
           }
         }
       }
-          }
       await redirigirUsuario(_controllerEmail.text);
-
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
       });
     }
   }
-  
-  Future<void> redirigirUsuario(String email) async{
-      bool isConsumer =
-          await databaseService.getTipoUsuario(email) ==
-              "consumidor";
-      bool isOwner =
-          await databaseService.getTipoUsuario(email) ==
-              "cochera";
-      if(!kIsWeb){
-        if (isConsumer) {
+
+  Future<void> redirigirUsuario(String email) async {
+    bool isConsumer =
+        await databaseService.getTipoUsuario(email) == "consumidor";
+    bool isOwner = await databaseService.getTipoUsuario(email) == "cochera";
+    if (!kIsWeb) {
+      if (isConsumer) {
         context.pushNamed(UsuarioHome.name);
-      }
-      else if (isOwner) {
+      } else if (isOwner) {
         context.pushNamed(UsuarioCocheraHome.name);
-      } else{
+      } else {
         context.pushNamed(HomePage.name);
       }
-      } else
-      {
-        if (isConsumer) {
-       setState(() {
-        errorMessage = "Utilice la version mobile de la aplicación";
-      });
-      } else if(isOwner){
-        context.pushNamed(UsuarioCocheraHome.name);
-      }
-      else{
+    } else {
+      if (isConsumer) {
         setState(() {
-        errorMessage = "Por favor, complete el proceso de registro desde la aplicación";
-      });
+          errorMessage = "Utilice la version mobile de la aplicación";
+        });
+      } else if (isOwner) {
+        context.pushNamed(UsuarioCocheraHome.name);
+      } else {
+        setState(() {
+          errorMessage =
+              "Por favor, complete el proceso de registro desde la aplicación";
+        });
       }
-      }
-      
-  } 
+    }
+  }
 
   Future<bool?> _mostrarDialogo(BuildContext context) async {
     return showDialog<bool>(
@@ -286,29 +285,31 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: _title(),
-      ),
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            _entryField('Email', _controllerEmail),
-            _entryField('Contraseña', _controllerPassword),
-            _errorMessage(),
-            _submitButton(),
-            const SizedBox(
-              height: 5,
-            ),
-            _signInWithGoogle(),
-            !kIsWeb?_loginOrRegisterButton():const SizedBox(),
-          ],
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: _title(),
+        ),
+        body: Container(
+          height: double.infinity,
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              _entryField('Email', _controllerEmail),
+              _entryField('Contraseña', _controllerPassword),
+              _errorMessage(),
+              _submitButton(),
+              const SizedBox(
+                height: 5,
+              ),
+              _signInWithGoogle(),
+              !kIsWeb ? _loginOrRegisterButton() : const SizedBox(),
+            ],
+          ),
         ),
       ),
     );

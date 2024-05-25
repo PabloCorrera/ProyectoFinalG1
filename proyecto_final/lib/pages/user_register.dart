@@ -165,6 +165,7 @@ Widget imagePicker() {
     return Scaffold(
       appBar: AppBar(
         title: _title(),
+        automaticallyImplyLeading: false,
       ),
       body: Container(
         decoration: const BoxDecoration(
