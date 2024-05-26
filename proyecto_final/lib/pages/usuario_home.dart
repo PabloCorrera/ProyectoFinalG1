@@ -8,6 +8,7 @@ import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/entities/reserva.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
 import 'package:proyecto_final/entities/usuario_consumidor.dart';
+import 'package:proyecto_final/models/constant.dart';
 import 'package:proyecto_final/pages/maps_page.dart';
 import 'package:proyecto_final/pages/login_register_page.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
@@ -69,12 +70,23 @@ class _UsuarioHomeState extends State<UsuarioHome> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Home Usuario'),
-          backgroundColor: Colors.pink,
-        ),
         drawer: buildDrawer(),
-        body: aMostrar ?? vistaCocheras(),
+        body: Column(
+          children: [
+            AppBar(
+              title: const Text('Home Usuario'),
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black, // Color del texto de la AppBar
+            ),
+            const Divider(
+              color: Colors.grey,
+              thickness: 1,
+            ),
+            Expanded(
+              child: aMostrar ?? vistaCocheras(),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -85,8 +97,20 @@ class _UsuarioHomeState extends State<UsuarioHome> {
       padding: EdgeInsets.zero,
       children: [
         UserAccountsDrawerHeader(
-          accountName: Text('Bienvenido ${consumidor!.nombre}'),
-          accountEmail: user != null ? Text(user!.email!) : null,
+          accountName: Text(
+            'Bienvenido ${consumidor!.nombre}',
+            style: const TextStyle(
+              fontSize: 18, // Tamaño del texto
+              color: logoTitulos, // Color del texto
+            ),
+          ),
+          accountEmail: user != null
+              ? Text(user!.email!,
+                  style: TextStyle(
+                    fontSize: 14, // Tamaño del texto
+                    color: logoTitulos,
+                  ))
+              : null,
           currentAccountPicture: CircleAvatar(
               backgroundImage: consumidor != null &&
                       consumidor?.imageUrl != null &&
@@ -94,11 +118,11 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                   ? NetworkImage(consumidor!.imageUrl!)
                   : null),
           decoration: const BoxDecoration(
-            color: Colors.pinkAccent,
+            color: botonReservaCancel,
           ),
         ),
         ListTile(
-          leading: const Icon(Icons.car_rental),
+          leading: const Icon(Icons.car_rental, color: botonReservaCancel),
           title: const Text('Reservar cochera'),
           onTap: () => {
             setState(() {
@@ -108,7 +132,7 @@ class _UsuarioHomeState extends State<UsuarioHome> {
           },
         ),
         ListTile(
-          leading: const Icon(Icons.card_travel),
+          leading: const Icon(Icons.card_travel, color: botonReservaCancel),
           title: const Text('Mis reservas'),
           onTap: () => {
             setState(() {
@@ -118,7 +142,7 @@ class _UsuarioHomeState extends State<UsuarioHome> {
           },
         ),
         ListTile(
-          leading: const Icon(Icons.map),
+          leading: const Icon(Icons.map, color: botonReservaCancel),
           title: const Text('Ver mapa'),
           onTap: () => {
             setState(() {
@@ -128,7 +152,7 @@ class _UsuarioHomeState extends State<UsuarioHome> {
           },
         ),
         ListTile(
-          leading: const Icon(Icons.logout),
+          leading: const Icon(Icons.logout, color: botonReservaCancel),
           title: const Text('Salir'),
           onTap: () => {
             context.pushNamed(LoginPage.name),
@@ -144,15 +168,41 @@ class _UsuarioHomeState extends State<UsuarioHome> {
       itemCount: _cocherasFuture.length,
       itemBuilder: (context, index) {
         final cochera = _cocherasFuture[index];
-        return ListTile(
-          title: Text(cochera.direccion),
-          subtitle: Text("Precio por hora: ${cochera.price}"),
-          trailing: ElevatedButton(
-            onPressed: () {
-              _showReservarDialog(context, cochera);
-            },
-            child: const Text('Reservar'),
-          ),
+        return Column(
+          children: [
+            ListTile(
+              title: Text(cochera.direccion),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Estacionamiento: ${cochera.nombreCochera}"),
+                  Text("Por hora: ${cochera.price}"),
+                ],
+              ),
+              trailing: ElevatedButton(
+                style: ButtonStyle(
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.white),
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(botonReservaCancel),
+                  padding: MaterialStateProperty.all<EdgeInsets>(
+                      EdgeInsets.symmetric(horizontal: 16.0)),
+                  textStyle: MaterialStateProperty.all<TextStyle>(
+                      TextStyle(fontSize: 16)),
+                ),
+                onPressed: () {
+                  _showReservarDialog(context, cochera);
+                },
+                child: const Text('Reservar'),
+              ),
+            ),
+            Divider(
+              color: Colors.grey,
+              thickness: 1,
+              indent: 16,
+              endIndent: 16,
+            ),
+          ],
         );
       },
     );
@@ -167,40 +217,54 @@ class _UsuarioHomeState extends State<UsuarioHome> {
         bool puedeCancelar =
             faltanMasDeCuarentaYcincoMinutos(reserva.fechaEntrada);
         String estado = estadoReserva(reserva.fechaEntrada);
-        return ListTile(
-          title: Text(reserva.direccion),
-          trailing: puedeCancelar
-              ? ElevatedButton(
-                  onPressed: puedeCancelar
-                      ? () {
-                          showDialogCancelarReserva(context, reserva);
-                        }
-                      : () {
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(const SnackBar(
-                            content: Text('Ya no puede cancelar reserva'),
-                            backgroundColor: Colors.red,
-                          ));
-                        },
-                  child: const Text('Cancelar'),
-                )
-              : null,
-          contentPadding:
-              const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Fecha entrada: ${reserva.fechaEntrada.toDate()}"),
-              Text("Fecha salida: ${reserva.fechaSalida.toDate()}"),
-              Text(
-                estado,
-                style: TextStyle(
-                    color:
-                        estado == "Reserva activa" ? Colors.green : Colors.red),
-              )
-            ],
-          ),
-          onTap: () {},
+
+        return Column(
+          children: [
+            ListTile(
+              title: Text(reserva.direccion),
+              trailing: puedeCancelar
+                  ? ElevatedButton(
+                      onPressed: () {
+                        showDialogCancelarReserva(context, reserva);
+                      },
+                      child: const Text('Cancelar'),
+                      style: ButtonStyle(
+                        foregroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white),
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            botonReservaCancel),
+                        padding: MaterialStateProperty.all<EdgeInsets>(
+                            EdgeInsets.symmetric(horizontal: 16.0)),
+                        textStyle: MaterialStateProperty.all<TextStyle>(
+                            TextStyle(fontSize: 16)),
+                      ),
+                    )
+                  : null,
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Fecha entrada: ${reserva.fechaEntrada.toDate()}"),
+                  Text("Fecha salida: ${reserva.fechaSalida.toDate()}"),
+                  Text(
+                    estado,
+                    style: TextStyle(
+                        color: estado == "Reserva activa"
+                            ? Colors.green
+                            : Colors.red),
+                  )
+                ],
+              ),
+              onTap: () {},
+            ),
+            Divider(
+              color: Colors.grey,
+              thickness: 1,
+              indent: 16,
+              endIndent: 16,
+            ), // Divisor entre elementos de la lista
+          ],
         );
       },
     );

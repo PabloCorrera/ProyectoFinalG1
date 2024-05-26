@@ -7,12 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/core/utils.dart';
 import 'package:proyecto_final/entities/reserva.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
 import 'package:proyecto_final/entities/usuario_consumidor.dart';
+import 'package:proyecto_final/models/constant.dart';
 import 'package:proyecto_final/pages/login_register_page.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 import 'package:intl/intl.dart';
@@ -189,8 +191,10 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     return SafeArea(
         child: Scaffold(
       appBar: AppBar(
-        title: const Text('Home Usuario Cochera'),
-        backgroundColor: Colors.pink,
+        title: Text('wePark',
+            style: GoogleFonts.rowdies(
+                textStyle: Theme.of(context).textTheme.titleLarge)),
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       drawer: Drawer(
         child: ListView(
@@ -209,7 +213,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                     )
                   : null,
               decoration: const BoxDecoration(
-                color: Colors.pinkAccent,
+                color: botonReservaCancel,
               ),
             ),
             ListTile(
@@ -572,7 +576,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               ),
             );
             setState(() {
-              //aMostrar = vistaReservas();
+              aMostrar = vistaReservas();
             });
           } else {
             ScaffoldMessenger.of(context).showSnackBar(

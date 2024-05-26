@@ -3,7 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:proyecto_final/auth.dart';
+import 'package:proyecto_final/models/constant.dart';
 import 'package:proyecto_final/pages/home_page.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:proyecto_final/pages/usuario_cochera_home.dart';
@@ -25,7 +27,6 @@ class _LoginPageState extends State<LoginPage> {
   String? errorMessage = '';
   bool isLogin = true;
   String? userMail = FirebaseAuth.instance.currentUser?.email;
-  
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
@@ -52,8 +53,10 @@ class _LoginPageState extends State<LoginPage> {
           String? contrasena = await storage.read(key: 'contrasena');
           if (usuario != null && contrasena != null) {
             try {
-              await Auth().signInWithEmailAndPassword(
-                  email: usuario, password: contrasena).then((value) =>  redirigirUsuario(usuario));
+              await Auth()
+                  .signInWithEmailAndPassword(
+                      email: usuario, password: contrasena)
+                  .then((value) => redirigirUsuario(usuario, context));
             } on FirebaseAuthException catch (e) {
               setState(() {
                 errorMessage = e.message;
@@ -71,61 +74,54 @@ class _LoginPageState extends State<LoginPage> {
     try {
       await Auth().signInWithEmailAndPassword(
           email: _controllerEmail.text, password: _controllerPassword.text);
-          if(!kIsWeb){
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-      if (prefs.getBool('usarAutenticacionBiometrica') == null) {
-        bool? usarAutenticacionBiometrica = await _mostrarDialogo(context);
-        if (usarAutenticacionBiometrica != null) {
-          _guardarPreferencia(usarAutenticacionBiometrica);
-          if (usarAutenticacionBiometrica) {
-            guardarCredenciales(
-                _controllerEmail.text, _controllerPassword.text);
+      if (!kIsWeb) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        if (prefs.getBool('usarAutenticacionBiometrica') == null) {
+          bool? usarAutenticacionBiometrica = await _mostrarDialogo(context);
+          if (usarAutenticacionBiometrica != null) {
+            _guardarPreferencia(usarAutenticacionBiometrica);
+            if (usarAutenticacionBiometrica) {
+              guardarCredenciales(
+                  _controllerEmail.text, _controllerPassword.text);
+            }
           }
         }
       }
-          }
-      await redirigirUsuario(_controllerEmail.text);
-
+      await redirigirUsuario(_controllerEmail.text, context);
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
       });
     }
   }
-  
-  Future<void> redirigirUsuario(String email) async{
-      bool isConsumer =
-          await databaseService.getTipoUsuario(email) ==
-              "consumidor";
-      bool isOwner =
-          await databaseService.getTipoUsuario(email) ==
-              "cochera";
-      if(!kIsWeb){
-        if (isConsumer) {
+
+  Future<void> redirigirUsuario(String email, BuildContext context) async {
+    bool isConsumer =
+        await databaseService.getTipoUsuario(email) == "consumidor";
+    bool isOwner = await databaseService.getTipoUsuario(email) == "cochera";
+    if (!kIsWeb) {
+      if (isConsumer) {
         context.pushNamed(UsuarioHome.name);
-      }
-      else if (isOwner) {
+      } else if (isOwner) {
         context.pushNamed(UsuarioCocheraHome.name);
-      } else{
+      } else {
         context.pushNamed(HomePage.name);
       }
-      } else
-      {
-        if (isConsumer) {
-       setState(() {
-        errorMessage = "Utilice la version mobile de la aplicación";
-      });
-      } else if(isOwner){
-        context.pushNamed(UsuarioCocheraHome.name);
-      }
-      else{
+    } else {
+      if (isConsumer) {
         setState(() {
-        errorMessage = "Por favor, complete el proceso de registro desde la aplicación";
-      });
+          errorMessage = "Utilice la version mobile de la aplicación";
+        });
+      } else if (isOwner) {
+        context.pushNamed(UsuarioCocheraHome.name);
+      } else {
+        setState(() {
+          errorMessage =
+              "Por favor, complete el proceso de registro desde la aplicación";
+        });
       }
-      }
-      
-  } 
+    }
+  }
 
   Future<bool?> _mostrarDialogo(BuildContext context) async {
     return showDialog<bool>(
@@ -157,7 +153,6 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _guardarPreferencia(bool usarAutenticacionBiometrica) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('usarAutenticacionBiometrica', usarAutenticacionBiometrica);
-    print("GUARDO PREFERENCIAS");
   }
 
   void guardarCredenciales(String usuario, String contrasena) async {
@@ -170,7 +165,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       await Auth().signInWithGoogle();
       if (context.mounted) {
-        redirigirUsuario(Auth().currentUser!.email!);
+        redirigirUsuario(Auth().currentUser!.email!, context);
       }
     } catch (e) {
       setState(() {
@@ -194,7 +189,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _title() {
-    return const Text('Bienvenido a We Park');
+    return Text('Bienvenido a wePark',
+        // selectionColor: Theme.of(context).primaryColor,
+        style: GoogleFonts.rowdies(
+            textStyle: Theme.of(context).textTheme.titleLarge));
   }
 
   Widget _entryField(
@@ -219,7 +217,8 @@ class _LoginPageState extends State<LoginPage> {
       width: double.infinity,
       height: 45,
       decoration: BoxDecoration(
-          color: Colors.blue, borderRadius: BorderRadius.circular(10)),
+          color: Theme.of(context).indicatorColor,
+          borderRadius: BorderRadius.circular(10)),
       child: TextButton(
           onPressed: isLogin
               ? signInWithEmailAndPassword
@@ -229,7 +228,7 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               Text(
                 isLogin ? 'Login' : 'Register',
-                style: const TextStyle(color: Colors.white),
+                selectionColor: Theme.of(context).primaryColor,
               ),
               const SizedBox(
                 width: 5,
@@ -250,7 +249,7 @@ class _LoginPageState extends State<LoginPage> {
             isLogin = !isLogin;
           });
         },
-        child: Text(isLogin ? 'Register instead' : 'Login instead'));
+        child: Text(isLogin ? 'Registrate en wePark' : 'Login instead'));
   }
 
   Widget _signInWithGoogle() {
@@ -267,7 +266,7 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 Text(
                   'Sign in with Google',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: magnolia),
                 ),
                 SizedBox(
                   width: 5,
@@ -286,28 +285,31 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: _title(),
-      ),
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
+    return MaterialApp(
+      home: Scaffold(
+        body: Stack(
           children: <Widget>[
-            _entryField('Email', _controllerEmail),
-            _entryField('Contraseña', _controllerPassword),
-            _errorMessage(),
-            _submitButton(),
-            const SizedBox(
-              height: 5,
+            Container(
+              height: double.infinity,
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  _title(),
+                  _entryField('Email', _controllerEmail),
+                  _entryField('Contraseña', _controllerPassword),
+                  _errorMessage(),
+                  _submitButton(),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  _signInWithGoogle(),
+                  !kIsWeb ? _loginOrRegisterButton() : const SizedBox(),
+                ],
+              ),
             ),
-            _signInWithGoogle(),
-            !kIsWeb?_loginOrRegisterButton():const SizedBox(),
           ],
         ),
       ),

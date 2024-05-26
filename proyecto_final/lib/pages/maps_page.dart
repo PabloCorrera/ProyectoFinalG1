@@ -111,7 +111,7 @@ Future<void> _showReservarDialog(
         builder: (context, setState) {
           return AlertDialog(
             title: Text("Reservar en ${cochera.nombreCochera}"),
-            titleTextStyle: TextStyle(color: primaryColor, fontSize: 20),
+            titleTextStyle: TextStyle(color: logoTitulos, fontSize: 20),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
