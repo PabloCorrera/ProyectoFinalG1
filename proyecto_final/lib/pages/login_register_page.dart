@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  late StreamSubscription<User?> user;
   String? errorMessage = '';
   bool isLogin = true;
   String? userMail = FirebaseAuth.instance.currentUser?.email;
@@ -56,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
               await Auth()
                   .signInWithEmailAndPassword(
                       email: usuario, password: contrasena)
-                  .then((value) => redirigirUsuario(usuario, context));
+                  .then((value) => redirigirUsuario(usuario));
             } on FirebaseAuthException catch (e) {
               setState(() {
                 errorMessage = e.message;
@@ -87,7 +89,7 @@ class _LoginPageState extends State<LoginPage> {
           }
         }
       }
-      await redirigirUsuario(_controllerEmail.text, context);
+      await redirigirUsuario(_controllerEmail.text);
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
@@ -95,7 +97,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<void> redirigirUsuario(String email, BuildContext context) async {
+  Future<void> redirigirUsuario(String email) async {
     bool isConsumer =
         await databaseService.getTipoUsuario(email) == "consumidor";
     bool isOwner = await databaseService.getTipoUsuario(email) == "cochera";
@@ -165,7 +167,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       await Auth().signInWithGoogle();
       if (context.mounted) {
-        redirigirUsuario(Auth().currentUser!.email!, context);
+        redirigirUsuario(Auth().currentUser!.email!);
       }
     } catch (e) {
       setState(() {
@@ -249,7 +251,7 @@ class _LoginPageState extends State<LoginPage> {
             isLogin = !isLogin;
           });
         },
-        child: Text(isLogin ? 'Registrate en wePark' : 'Login instead'));
+        child: Text(isLogin ? 'Registrate en wePark' : 'Iniciar sesión'));
   }
 
   Widget _signInWithGoogle() {

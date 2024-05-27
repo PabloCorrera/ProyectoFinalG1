@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_final/models/constant.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   ThemeData getTheme() {
@@ -10,7 +11,6 @@ class AppTheme {
         secondaryHeaderColor: logoTitulos,
         indicatorColor: botonfunc,
         bottomAppBarColor: paynesGray,
-        fontFamily: "Rowdies",
         textTheme: const TextTheme(
           titleLarge: primaryTextStyle,
           bodyMedium: secondaryTextStyle,

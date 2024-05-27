@@ -1,14 +1,20 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:pay/pay.dart';
 import 'package:proyecto_final/assets/payment_config.dart';
 import 'package:proyecto_final/auth.dart';
+import 'package:proyecto_final/core/utils.dart';
 import 'package:proyecto_final/entities/reserva.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
 import 'package:proyecto_final/entities/usuario_consumidor.dart';
-import 'package:proyecto_final/models/constant.dart';
 import 'package:proyecto_final/pages/maps_page.dart';
 import 'package:proyecto_final/pages/login_register_page.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
@@ -25,6 +31,8 @@ class _UsuarioHomeState extends State<UsuarioHome> {
   late List<UsuarioCochera> _cocherasFuture = [];
   late List<Reserva> _reservasFuture = [];
   final User? user = Auth().currentUser;
+  Uint8List? imagen;
+  XFile? fileImagen;
   late UsuarioConsumidor? consumidor = UsuarioConsumidor();
   Widget? aMostrar;
   @override
@@ -70,23 +78,12 @@ class _UsuarioHomeState extends State<UsuarioHome> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        drawer: buildDrawer(),
-        body: Column(
-          children: [
-            AppBar(
-              title: const Text('Home Usuario'),
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black, // Color del texto de la AppBar
-            ),
-            const Divider(
-              color: Colors.grey,
-              thickness: 1,
-            ),
-            Expanded(
-              child: aMostrar ?? vistaCocheras(),
-            ),
-          ],
+        appBar: AppBar(
+          title: const Text('Home Usuario'),
+          backgroundColor: Colors.pink,
         ),
+        drawer: buildDrawer(),
+        body: aMostrar ?? vistaCocheras(),
       ),
     );
   }
@@ -97,20 +94,8 @@ class _UsuarioHomeState extends State<UsuarioHome> {
       padding: EdgeInsets.zero,
       children: [
         UserAccountsDrawerHeader(
-          accountName: Text(
-            'Bienvenido ${consumidor!.nombre}',
-            style: const TextStyle(
-              fontSize: 18, // Tamaño del texto
-              color: logoTitulos, // Color del texto
-            ),
-          ),
-          accountEmail: user != null
-              ? Text(user!.email!,
-                  style: TextStyle(
-                    fontSize: 14, // Tamaño del texto
-                    color: logoTitulos,
-                  ))
-              : null,
+          accountName: Text('Bienvenido ${consumidor!.nombre}'),
+          accountEmail: user != null ? Text(user!.email!) : null,
           currentAccountPicture: CircleAvatar(
               backgroundImage: consumidor != null &&
                       consumidor?.imageUrl != null &&
@@ -118,11 +103,11 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                   ? NetworkImage(consumidor!.imageUrl!)
                   : null),
           decoration: const BoxDecoration(
-            color: botonReservaCancel,
+            color: Colors.pinkAccent,
           ),
         ),
         ListTile(
-          leading: const Icon(Icons.car_rental, color: botonReservaCancel),
+          leading: const Icon(Icons.car_rental),
           title: const Text('Reservar cochera'),
           onTap: () => {
             setState(() {
@@ -132,7 +117,7 @@ class _UsuarioHomeState extends State<UsuarioHome> {
           },
         ),
         ListTile(
-          leading: const Icon(Icons.card_travel, color: botonReservaCancel),
+          leading: const Icon(Icons.card_travel),
           title: const Text('Mis reservas'),
           onTap: () => {
             setState(() {
@@ -142,7 +127,17 @@ class _UsuarioHomeState extends State<UsuarioHome> {
           },
         ),
         ListTile(
-          leading: const Icon(Icons.map, color: botonReservaCancel),
+          leading: const Icon(Icons.edit),
+          title: const Text('Editar mis datos'),
+          onTap: () => {
+            setState(() {
+              aMostrar = vistaEditar();
+              Navigator.pop(context);
+            })
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.map),
           title: const Text('Ver mapa'),
           onTap: () => {
             setState(() {
@@ -152,7 +147,7 @@ class _UsuarioHomeState extends State<UsuarioHome> {
           },
         ),
         ListTile(
-          leading: const Icon(Icons.logout, color: botonReservaCancel),
+          leading: const Icon(Icons.logout),
           title: const Text('Salir'),
           onTap: () => {
             context.pushNamed(LoginPage.name),
@@ -168,41 +163,15 @@ class _UsuarioHomeState extends State<UsuarioHome> {
       itemCount: _cocherasFuture.length,
       itemBuilder: (context, index) {
         final cochera = _cocherasFuture[index];
-        return Column(
-          children: [
-            ListTile(
-              title: Text(cochera.direccion),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Estacionamiento: ${cochera.nombreCochera}"),
-                  Text("Por hora: ${cochera.price}"),
-                ],
-              ),
-              trailing: ElevatedButton(
-                style: ButtonStyle(
-                  foregroundColor:
-                      MaterialStateProperty.all<Color>(Colors.white),
-                  backgroundColor:
-                      MaterialStateProperty.all<Color>(botonReservaCancel),
-                  padding: MaterialStateProperty.all<EdgeInsets>(
-                      EdgeInsets.symmetric(horizontal: 16.0)),
-                  textStyle: MaterialStateProperty.all<TextStyle>(
-                      TextStyle(fontSize: 16)),
-                ),
-                onPressed: () {
-                  _showReservarDialog(context, cochera);
-                },
-                child: const Text('Reservar'),
-              ),
-            ),
-            Divider(
-              color: Colors.grey,
-              thickness: 1,
-              indent: 16,
-              endIndent: 16,
-            ),
-          ],
+        return ListTile(
+          title: Text(cochera.direccion),
+          subtitle: Text("Precio por hora: ${cochera.price}"),
+          trailing: ElevatedButton(
+            onPressed: () {
+              _showReservarDialog(context, cochera);
+            },
+            child: const Text('Reservar'),
+          ),
         );
       },
     );
@@ -217,57 +186,172 @@ class _UsuarioHomeState extends State<UsuarioHome> {
         bool puedeCancelar =
             faltanMasDeCuarentaYcincoMinutos(reserva.fechaEntrada);
         String estado = estadoReserva(reserva.fechaEntrada);
-
-        return Column(
-          children: [
-            ListTile(
-              title: Text(reserva.direccion),
-              trailing: puedeCancelar
-                  ? ElevatedButton(
-                      onPressed: () {
-                        showDialogCancelarReserva(context, reserva);
-                      },
-                      child: const Text('Cancelar'),
-                      style: ButtonStyle(
-                        foregroundColor:
-                            MaterialStateProperty.all<Color>(Colors.white),
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            botonReservaCancel),
-                        padding: MaterialStateProperty.all<EdgeInsets>(
-                            EdgeInsets.symmetric(horizontal: 16.0)),
-                        textStyle: MaterialStateProperty.all<TextStyle>(
-                            TextStyle(fontSize: 16)),
-                      ),
-                    )
-                  : null,
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Fecha entrada: ${reserva.fechaEntrada.toDate()}"),
-                  Text("Fecha salida: ${reserva.fechaSalida.toDate()}"),
-                  Text(
-                    estado,
-                    style: TextStyle(
-                        color: estado == "Reserva activa"
-                            ? Colors.green
-                            : Colors.red),
-                  )
-                ],
-              ),
-              onTap: () {},
-            ),
-            Divider(
-              color: Colors.grey,
-              thickness: 1,
-              indent: 16,
-              endIndent: 16,
-            ), // Divisor entre elementos de la lista
-          ],
+        String fechaEntrada = DateFormat('yyyy-MM-dd kk:mm')
+            .format(reserva.fechaEntrada.toDate());
+        String fechaSalida =
+            DateFormat('yyyy-MM-dd kk:mm').format(reserva.fechaSalida.toDate());
+        return ListTile(
+          title: Text(reserva.direccion),
+          trailing: puedeCancelar
+              ? ElevatedButton(
+                  onPressed: puedeCancelar
+                      ? () {
+                          showDialogCancelarReserva(context, reserva);
+                        }
+                      : () {
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(const SnackBar(
+                            content: Text('Ya no puede cancelar reserva'),
+                            backgroundColor: Colors.red,
+                          ));
+                        },
+                  child: const Text('Cancelar'),
+                )
+              : null,
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Fecha entrada: $fechaEntrada"),
+              Text("Fecha salida: $fechaSalida"),
+              Text(
+                estado,
+                style: TextStyle(
+                    color:
+                        estado == "Reserva activa" ? Colors.green : Colors.red),
+              )
+            ],
+          ),
+          onTap: () {},
         );
       },
     );
+  }
+
+  Widget vistaEditar() {
+    final TextEditingController nombreController = TextEditingController();
+    final TextEditingController apellidoController = TextEditingController();
+
+    return FutureBuilder<UsuarioConsumidor>(
+      future: databaseService.getConsumidorByEmail(user!.email!),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          UsuarioConsumidor usuarioConsumidor = snapshot.data!;
+
+          nombreController.text = usuarioConsumidor.nombre;
+          apellidoController.text = usuarioConsumidor.apellido;
+
+          return Scaffold(
+            body: SingleChildScrollView(
+              child: Container(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    const Text(
+                      'EDITAR USUARIO',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    _entryField('Nombre', nombreController),
+                    const SizedBox(height: 20),
+                    _entryField('Apellido', apellidoController),
+                    const SizedBox(height: 20),
+                    imagePicker(),
+                    const SizedBox(height: 20),
+                    _submitButton(
+                      nombreController,
+                      apellidoController,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Widget _entryField(String title, TextEditingController controller) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: title,
+      ),
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
+      ],
+    );
+  }
+
+  Widget imagePicker() {
+    return Column(
+      children: [
+        imagen != null
+            ? CircleAvatar(
+                radius: 64,
+                backgroundImage: MemoryImage(imagen!),
+              )
+            : CircleAvatar(
+                radius: 64,
+                backgroundImage: consumidor!.imageUrl == null
+                    ? const NetworkImage(
+                        'https://cdn-icons-png.flaticon.com/512/9131/9131529.png')
+                    : NetworkImage(consumidor!.imageUrl!),
+              ),
+        const SizedBox(height: 10), // Espacio entre la imagen y los botones
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () => selectImage(),
+              child: const Text('Elegir imagen'),
+            ),
+            const SizedBox(width: 10), // Espacio entre los botones
+            ElevatedButton(
+              onPressed: () => takeImage(),
+              child: const Text('Tomar imagen'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  takeImage() async {
+    XFile? img = await pickImage(ImageSource.camera);
+    if (img != null) {
+      img.readAsBytes().then((foto) => {
+            setState(() {
+              imagen = foto;
+              fileImagen = img;
+              aMostrar = vistaEditar();
+            })
+          });
+    }
+  }
+
+  selectImage() async {
+    XFile? img = await pickImage(ImageSource.gallery);
+    if (img != null) {
+      img.readAsBytes().then((foto) => {
+            setState(() {
+              imagen = foto;
+              fileImagen = img;
+              aMostrar = vistaEditar();
+            })
+          });
+    }
   }
 
   void showDialogCancelarReserva(BuildContext context, Reserva reserva) {
@@ -627,5 +711,90 @@ class _UsuarioHomeState extends State<UsuarioHome> {
           if (value.imageUrl != null) {url = value.imageUrl!} else {url = ""}
         });
     return url;
+  }
+
+  Widget _submitButton(
+    TextEditingController nombreController,
+    TextEditingController apellidoController,
+  ) {
+    return ElevatedButton(
+      onPressed: () async {
+        if (isNotBlank(nombreController.text) &&
+            isNotBlank(apellidoController.text)) {
+          {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return const Center(child: CircularProgressIndicator());
+              },
+            );
+            try {
+              String nombre = nombreController.text;
+              String apellido = apellidoController.text;
+
+              String urlImagen = "";
+              if (fileImagen != null) {
+                String uniqueName =
+                    DateTime.now().millisecondsSinceEpoch.toString();
+
+                Reference referenceRoot = FirebaseStorage.instance.ref();
+                Reference referenceDirImages = referenceRoot.child('images');
+                Reference imagenASubir = referenceDirImages.child(uniqueName);
+                try {
+                  await imagenASubir.putFile(File(fileImagen!.path));
+                  await imagenASubir
+                      .getDownloadURL()
+                      .then((value) => urlImagen = value);
+                } catch (error) {
+                  print(error);
+                  urlImagen = "";
+                }
+              }
+
+              await databaseService.updateUsuarioConsumidor(
+                  consumidor!.userId, nombre, apellido, urlImagen);
+              setState(() {
+                consumidor!.imageUrl = urlImagen;
+                consumidor!.nombre = nombre;
+                consumidor!.apellido = apellido;
+              });
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                      'Los datos del usuario fueron editados correctamente'),
+                  duration: Duration(seconds: 3),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            } catch (error) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Hubo un error al editar los datos'),
+                  duration: Duration(seconds: 3),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            } finally {
+              Navigator.pop(context);
+            }
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Complete los datos correctamente por favor'),
+              duration: Duration(seconds: 3),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
+      child: const Text('Editar'),
+    );
+  }
+
+  bool isNotBlank(String value) {
+    return value.trim().isNotEmpty;
   }
 }

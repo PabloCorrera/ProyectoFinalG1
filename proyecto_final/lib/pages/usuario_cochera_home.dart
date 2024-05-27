@@ -62,6 +62,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   Uint8List? imagen;
   XFile? fileImagen;
   late Future<void> _initialLoadFuture;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -334,8 +335,6 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   }
 
   Widget listaReservasActivas() {
-    print(
-        "cantidad de usuarios: ${_usuariosDeReservasActivas} y cant de reservas activas ${_reservasActivas.length}");
     return Expanded(
       child: _usuariosDeReservasActivas.isEmpty
           ? Center(
@@ -533,51 +532,71 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
             isNotBlank(cbuController.text) &&
             isNotBlank(lugaresController.text)) {
           if (cbuController.text.length == 22) {
-            String nombreCochera = nombreCocheraController.text;
-            String descripcion = descripcionController.text;
-            double precio = double.parse(precioController.text);
-            String cbu = cbuController.text;
-            int cantLugares = int.parse(lugaresController.text);
-
-            String urlImagen = "";
-            if (fileImagen != null) {
-              String uniqueName =
-                  DateTime.now().millisecondsSinceEpoch.toString();
-
-              Reference referenceRoot = FirebaseStorage.instance.ref();
-              Reference referenceDirImages = referenceRoot.child('images');
-              Reference imagenASubir = referenceDirImages.child(uniqueName);
-              try {
-                await imagenASubir.putFile(File(fileImagen!.path));
-                await imagenASubir
-                    .getDownloadURL()
-                    .then((value) => urlImagen = value);
-              } catch (error) {
-                print(error);
-                urlImagen = "";
-              }
-            }
-            Map<String, dynamic> updatedAttributes = {
-              'nombreCochera': nombreCochera,
-              'descripcion': descripcion,
-              'price': precio,
-              'cbu': cbu,
-              'cantLugares': cantLugares,
-              'imageUrl': urlImagen
-            };
-            await databaseService.updateUsuarioCochera(
-                user!.email!, updatedAttributes);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content:
-                    Text('Los datos del usuario fueron editados correctamente'),
-                duration: Duration(seconds: 3),
-                backgroundColor: Colors.green,
-              ),
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return Center(child: CircularProgressIndicator());
+              },
             );
-            setState(() {
-              aMostrar = vistaReservas();
-            });
+            try {
+              String nombreCochera = nombreCocheraController.text;
+              String descripcion = descripcionController.text;
+              double precio = double.parse(precioController.text);
+              String cbu = cbuController.text;
+              int cantLugares = int.parse(lugaresController.text);
+
+              String urlImagen = "";
+              if (fileImagen != null) {
+                String uniqueName =
+                    DateTime.now().millisecondsSinceEpoch.toString();
+
+                Reference referenceRoot = FirebaseStorage.instance.ref();
+                Reference referenceDirImages = referenceRoot.child('images');
+                Reference imagenASubir = referenceDirImages.child(uniqueName);
+                try {
+                  await imagenASubir.putFile(File(fileImagen!.path));
+                  await imagenASubir
+                      .getDownloadURL()
+                      .then((value) => urlImagen = value);
+                } catch (error) {
+                  print(error);
+                  urlImagen = "";
+                }
+              }
+              Map<String, dynamic> updatedAttributes = {
+                'nombreCochera': nombreCochera,
+                'descripcion': descripcion,
+                'price': precio,
+                'cbu': cbu,
+                'cantLugares': cantLugares,
+                'imageUrl': urlImagen
+              };
+              await databaseService.updateUsuarioCochera(
+                  user!.email!, updatedAttributes);
+              setState(() {
+                usuarioCochera!.imageUrl = urlImagen;
+              });
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                      'Los datos del usuario fueron editados correctamente'),
+                  duration: Duration(seconds: 3),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            } catch (error) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Hubo un error al editar los datos'),
+                  duration: Duration(seconds: 3),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            } finally {
+              Navigator.pop(context);
+            }
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -597,7 +616,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
           );
         }
       },
-      child: const Text('Submit'),
+      child: const Text('Editar'),
     );
   }
 
