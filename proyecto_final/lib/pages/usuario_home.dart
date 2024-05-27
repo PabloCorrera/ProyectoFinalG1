@@ -181,126 +181,149 @@ class _UsuarioHomeState extends State<UsuarioHome> {
   }
 
   Widget vistaCocheras() {
-    return ListView.builder(
-      itemCount: _cocherasFuture.length,
-      itemBuilder: (context, index) {
-        final cochera = _cocherasFuture[index];
-        return Column(
-          children: [
-            ListTile(
-              title: Text(
-                cochera.nombreCochera,
-                style: GoogleFonts.rubik(),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(cochera.direccion,
-                      style: GoogleFonts.rubik(textStyle: terTextStyle)),
-                  Text("precio por hora: ${cochera.price}",
-                      style: GoogleFonts.rubik(textStyle: terTextStyle)),
-                ],
-              ),
-              trailing: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: botonfunc,
-                ),
-                onPressed: () {
-                  _showReservarDialog(context, cochera);
-                },
-                child: Text(
-                  'Reservar',
-                  style: GoogleFonts.rubik(),
-                ),
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 16.0),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: Colors.grey.shade400,
-                    width: 1.0,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
+    return FutureBuilder<List<UsuarioCochera>>(
+      future:
+          Future.delayed(Duration(milliseconds: 200), () => _cocherasFuture),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text('Error al cargar las cocheras.'),
+          );
+        } else {
+          if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+            return ListView.builder(
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                final cochera = snapshot.data![index];
+                return Column(
+                  children: [
+                    ListTile(
+                      title: Text(
+                        cochera.nombreCochera,
+                        style: GoogleFonts.rubik(),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(cochera.direccion,
+                              style:
+                                  GoogleFonts.rubik(textStyle: terTextStyle)),
+                          Text("precio por hora: ${cochera.price}",
+                              style:
+                                  GoogleFonts.rubik(textStyle: terTextStyle)),
+                        ],
+                      ),
+                      trailing: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: botonfunc,
+                        ),
+                        onPressed: () {
+                          _showReservarDialog(context, cochera);
+                        },
+                        child: Text(
+                          'Reservar',
+                          style: GoogleFonts.rubik(),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Colors.grey.shade400,
+                            width: 1.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+          } else {
+            return Center(
+              child: Text('No hay cocheras disponibles.'),
+            );
+          }
+        }
       },
     );
   }
 
   Widget vistaReservas() {
-    _loadReservas();
-    return ListView.builder(
-      itemCount: _reservasFuture.length,
-      itemBuilder: (context, index) {
-        final reserva = _reservasFuture[index];
-        bool puedeCancelar =
-            faltanMasDeCuarentaYcincoMinutos(reserva.fechaEntrada);
-        String estado = estadoReserva(reserva.fechaEntrada);
-        String fechaEntrada = DateFormat('yyyy-MM-dd kk:mm')
-            .format(reserva.fechaEntrada.toDate());
-        String fechaSalida =
-            DateFormat('yyyy-MM-dd kk:mm').format(reserva.fechaSalida.toDate());
-        return Column(
-          children: [
-            ListTile(
-              title: Text(reserva.direccion,
-                  style: GoogleFonts.rubik(
-                      textStyle: secondaryTextStyle,
-                      fontWeight: FontWeight.w400)),
-              trailing: puedeCancelar
-                  ? ElevatedButton(
-                      onPressed: puedeCancelar
-                          ? () {
+    return FutureBuilder<List<Reserva>>(
+      future: Future.delayed(Duration(milliseconds: 200),
+          () => _reservasFuture), // Llama a la función que carga las reservas
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Muestra el CircularProgressIdicator mientras los datos están siendo cargados.
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          if (snapshot.hasError) {
+            // Muestra un mensaje de error si hubo un error al cargar los datos.
+            return Center(
+              child: Text('Error al cargar las reservas.'),
+            );
+          } else {
+            if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+              // Si hay datos y no están vacíos, construye la ListView
+              return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  final reserva = snapshot.data![index];
+                  bool puedeCancelar =
+                      faltanMasDeCuarentaYcincoMinutos(reserva.fechaEntrada);
+                  String estado = estadoReserva(reserva.fechaEntrada);
+                  String fechaEntrada = DateFormat('yyyy-MM-dd kk:mm')
+                      .format(reserva.fechaEntrada.toDate());
+                  String fechaSalida = DateFormat('yyyy-MM-dd kk:mm')
+                      .format(reserva.fechaSalida.toDate());
+
+                  return ListTile(
+                    title: Text(reserva.direccion),
+                    trailing: puedeCancelar
+                        ? ElevatedButton(
+                            onPressed: () {
                               showDialogCancelarReserva(context, reserva);
-                            }
-                          : () {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(const SnackBar(
-                                content: Text('Ya no puede cancelar reserva'),
-                                backgroundColor: Colors.red,
-                              ));
                             },
-                      child: const Text('Cancelar'),
-                    )
-                  : null,
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Fecha entrada: $fechaEntrada",
-                      style: GoogleFonts.rubik(textStyle: terTextStyle)),
-                  Text("Fecha salida: $fechaSalida",
-                      style: GoogleFonts.rubik(textStyle: terTextStyle)),
-                  Text(
-                    estado,
-                    style: GoogleFonts.rubik(
-                        textStyle: TextStyle(
-                            color: estado == "Reserva activa"
-                                ? Colors.green
-                                : Colors.red,
-                            fontSize: 18)),
-                  )
-                ],
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 16.0),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: Colors.grey.shade400,
-                    width: 1.0,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
+                            child: const Text('Cancelar'),
+                          )
+                        : null,
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 16.0),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Fecha entrada: $fechaEntrada"),
+                        Text("Fecha salida: $fechaSalida"),
+                        Text(
+                          estado,
+                          style: TextStyle(
+                              color: estado == "Reserva activa"
+                                  ? Colors.green
+                                  : Colors.red),
+                        )
+                      ],
+                    ),
+                    onTap: () {},
+                  );
+                },
+              );
+            } else {
+              // Si no hay reservas en el historial
+              return Center(
+                child: Text('No hay reservas en el historial'),
+              );
+            }
+          }
+        }
       },
     );
   }
@@ -757,8 +780,9 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                   Navigator.of(context).pop(),
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Reserva exitosa.'),
-                      backgroundColor: Colors.green,
+                      content: Text('Reserva exitosa.',
+                          style: TextStyle(fontSize: 20)),
+                      backgroundColor: botonReservaCancel,
                     ),
                   )
                 }

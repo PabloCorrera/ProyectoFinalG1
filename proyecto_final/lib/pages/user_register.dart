@@ -61,6 +61,16 @@ class _UserRegisterState extends State<UserRegister> {
   void registrarUsuario() async {
     if (_controllerName.text.trim().isNotEmpty &&
         _controllerSurname.text.trim().isNotEmpty) {
+
+      // Mostrar el indicador de progreso
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(child: CircularProgressIndicator());
+        },
+      );
+
       UsuarioConsumidor user = UsuarioConsumidor(
           nombre: _controllerName.text,
           apellido: _controllerSurname.text,
@@ -86,7 +96,11 @@ class _UserRegisterState extends State<UserRegister> {
       user.imageUrl = urlImagen;
 
       _databaseService.addUsuarioConsumidor(user);
-      await Future.delayed(const Duration(seconds: 3));
+      await Future.delayed(const Duration(seconds: 3)); 
+      
+      // Ocultar el indicador de progreso
+      Navigator.pop(context);
+
       context.pushNamed(UsuarioHome.name);
     } else {
       setState(() {
@@ -94,6 +108,7 @@ class _UserRegisterState extends State<UserRegister> {
       });
     }
   }
+
 
   Widget _submitButton(BuildContext context) {
     return ElevatedButton(

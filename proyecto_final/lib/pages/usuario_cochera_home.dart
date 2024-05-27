@@ -674,56 +674,84 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     );
   }
 
-  @override
   Widget VistaEstadisticas() {
-    String titulo = "Mis estadísticas";
-    int reservasUltimos30Dias =
-        obtenerReservasUltimos30Dias(); // Método que obtendrá el número de reservas en los últimos 30 días
-    int reservasTotales = _reservasFuture
-        .length; // Suponiendo que _reservasExpiradas y _reservasActivas contienen todas las reservas
-    double recaudacionUltimos30Dias =
-        obtenerRecaudacionUltimos30Dias(); // Método que obtendrá la recaudación de los últimos 30 días
-    double recaudacionTotal =
-        _recaudacionTotal; // Suponiendo que esta variable contiene la recaudación total
+  String titulo = "Mis estadísticas";
 
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Text(
-                titulo,
-                style:
-                    const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-              ),
+  return FutureBuilder<Map<String, dynamic>>(
+    future: Future.delayed(Duration(milliseconds: 200), () {
+      int reservasUltimos30Dias = obtenerReservasUltimos30Dias(); // Método que obtendrá el número de reservas en los últimos 30 días
+      int reservasTotales = _reservasFuture.length; // Suponiendo que _reservasExpiradas y _reservasActivas contienen todas las reservas
+      double recaudacionUltimos30Dias = obtenerRecaudacionUltimos30Dias(); // Método que obtendrá la recaudación de los últimos 30 días
+      double recaudacionTotal = _recaudacionTotal; // Suponiendo que esta variable contiene la recaudación total
+
+      return {
+        'reservasUltimos30Dias': reservasUltimos30Dias,
+        'reservasTotales': reservasTotales,
+        'recaudacionUltimos30Dias': recaudacionUltimos30Dias,
+        'recaudacionTotal': recaudacionTotal,
+      };
+    }),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      } else if (snapshot.hasError) {
+        return Center(
+          child: Text('Error al cargar las estadísticas.'),
+        );
+      } else if (snapshot.hasData) {
+        var data = snapshot.data!;
+        int reservasUltimos30Dias = data['reservasUltimos30Dias'];
+        int reservasTotales = data['reservasTotales'];
+        double recaudacionUltimos30Dias = data['recaudacionUltimos30Dias'];
+        double recaudacionTotal = data['recaudacionTotal'];
+
+        return Scaffold(
+          body: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Text(
+                    titulo,
+                    style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Reservas de los últimos 30 días: $reservasUltimos30Dias',
+                  style: const TextStyle(fontSize: 18),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Reservas Totales: $reservasTotales',
+                  style: const TextStyle(fontSize: 18),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Recaudación de los últimos 30 días: \$${recaudacionUltimos30Dias.toStringAsFixed(2)}',
+                  style: const TextStyle(fontSize: 18),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Recaudación Total: \$${recaudacionTotal.toStringAsFixed(2)}',
+                  style: const TextStyle(fontSize: 18),
+                ),
+              ],
             ),
-            const SizedBox(height: 24),
-            Text(
-              'Reservas de los últimos 30 días: $reservasUltimos30Dias',
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Reservas Totales: $reservasTotales',
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Recaudación de los últimos 30 días: \$${recaudacionUltimos30Dias.toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Recaudación Total: \$${recaudacionTotal.toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 18),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+          ),
+        );
+      } else {
+        return Center(
+          child: Text('No hay estadísticas disponibles.'),
+        );
+      }
+    },
+  );
+}
+
 
 // Ejemplo de métodos para obtener los datos requeridos
   int obtenerReservasUltimos30Dias() {
