@@ -189,7 +189,7 @@ class _UsuarioHomeState extends State<UsuarioHome> {
           children: [
             ListTile(
               title: Text(
-                "Estacionamiento: ${cochera.nombreCochera}",
+                cochera.nombreCochera,
                 style: GoogleFonts.rubik(),
               ),
               subtitle: Column(
@@ -198,7 +198,7 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                   Text(cochera.direccion,
                       style: GoogleFonts.rubik(textStyle: terTextStyle)),
                   Text("precio por hora: ${cochera.price}",
-                      style: GoogleFonts.rubik()),
+                      style: GoogleFonts.rubik(textStyle: terTextStyle)),
                 ],
               ),
               trailing: ElevatedButton(
