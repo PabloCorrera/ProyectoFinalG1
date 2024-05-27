@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -202,8 +201,12 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
           padding: EdgeInsets.zero,
           children: [
             UserAccountsDrawerHeader(
-              accountName: const Text('Bienvenido'),
-              accountEmail: user != null ? Text(user!.email!) : null,
+              accountName: Text('Bienvenido',
+                  style: GoogleFonts.rubik(textStyle: terTextStyle)),
+              accountEmail: user != null
+                  ? Text(user!.email!,
+                      style: GoogleFonts.rubik(textStyle: terTextStyle))
+                  : null,
               currentAccountPicture: !kIsWeb
                   ? CircleAvatar(
                       backgroundImage: usuarioCochera != null &&
@@ -218,8 +221,8 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.card_travel),
-              title: const Text('Reservas activas'),
+              leading: const Icon(Icons.card_travel, color: botonReservaCancel),
+              title: Text('Reservas activas', style: GoogleFonts.rubik()),
               onTap: () => {
                 setState(() {
                   aMostrar = vistaReservas();
@@ -228,8 +231,8 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.edit),
-              title: const Text('Editar mis datos'),
+              leading: const Icon(Icons.edit, color: botonReservaCancel),
+              title: Text('Editar mis datos', style: GoogleFonts.rubik()),
               onTap: () => {
                 setState(() {
                   aMostrar = vistaEditar();
@@ -238,8 +241,8 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.bar_chart),
-              title: const Text('Recaudado'),
+              leading: const Icon(Icons.bar_chart, color: botonReservaCancel),
+              title: Text('Recaudado', style: GoogleFonts.rubik()),
               onTap: () => {
                 setState(() {
                   aMostrar = VistaEstadisticas();
@@ -248,8 +251,8 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Salir'),
+              leading: const Icon(Icons.logout, color: botonReservaCancel),
+              title: Text('Salir', style: GoogleFonts.rubik()),
               onTap: () => {
                 context.pushNamed(LoginPage.name),
                 Auth().signOut(),
@@ -293,15 +296,22 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     return Column(
       children: [
         const SizedBox(height: 12.0),
-        Text(
-          titulo + cantidadReservas.toString(),
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
+        Text(titulo + cantidadReservas.toString(),
+            style: GoogleFonts.rubik(
+              textStyle: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: logoTitulos),
+            )),
         const SizedBox(height: 12.0),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            botonReservas("Activas", 0, _reservasActivas.length),
+            botonReservas(
+              "Activas",
+              0,
+              _reservasActivas.length,
+            ),
             SizedBox(width: 12.0),
             botonReservas("Expiradas", 1, _reservasExpiradas.length),
             SizedBox(width: 12.0),
@@ -327,8 +337,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
       },
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all<Color>(
-          index == botonActivoIndex ? Colors.green : Colors.blue,
-        ),
+            index == botonActivoIndex ? Colors.green : botonfunc),
       ),
       child: Text(texto),
     );
@@ -347,19 +356,34 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               itemCount: _usuariosDeReservasActivas.length,
               itemBuilder: (context, index) {
                 var usuario = _usuariosDeReservasActivas[index]!;
-                return ListTile(
-                  leading: const Icon(Icons.account_circle, size: 40),
-                  title: Text(usuario.nombre + " " + usuario.apellido),
-                  subtitle: Text(usuario.email!),
-                  trailing: ElevatedButton(
-                    onPressed: () {
-                      _mostrarDialogo(
-                          context, _reservasActivas[index], usuario);
-                    },
-                    child: const Text('Detalle'),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                      vertical: 8.0, horizontal: 16.0),
+                return Column(
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.account_circle, size: 40),
+                      title: Text(usuario.nombre + " " + usuario.apellido),
+                      subtitle: Text(usuario.email!),
+                      trailing: ElevatedButton(
+                        onPressed: () {
+                          _mostrarDialogo(
+                              context, _reservasActivas[index], usuario);
+                        },
+                        child: const Text('Detalle'),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 16.0),
+                    ),
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 16.0),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Colors.grey.shade300,
+                            width: 1.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 );
               },
             ),
@@ -380,18 +404,34 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
           itemCount: _usuariosDeReservasExpiradas.length,
           itemBuilder: (context, index) {
             var usuario = _usuariosDeReservasExpiradas[index]!;
-            return ListTile(
-              leading: const Icon(Icons.account_circle, size: 40),
-              title: Text(usuario.nombre + " " + usuario.apellido),
-              subtitle: Text(usuario.email!),
-              trailing: ElevatedButton(
-                onPressed: () {
-                  _mostrarDialogo(context, _reservasExpiradas[index], usuario);
-                },
-                child: const Text('Detalle'),
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            return Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.account_circle, size: 40),
+                  title: Text(usuario.nombre + " " + usuario.apellido),
+                  subtitle: Text(usuario.email!),
+                  trailing: ElevatedButton(
+                    onPressed: () {
+                      _mostrarDialogo(
+                          context, _reservasExpiradas[index], usuario);
+                    },
+                    child: const Text('Detalle'),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 8.0, horizontal: 16.0),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 16.0),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.grey.shade300,
+                        width: 1.0,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             );
           },
         ),
@@ -425,24 +465,39 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
             colorTexto = Colors.black;
           }
 
-          return ListTile(
-            leading: const Icon(Icons.account_circle, size: 40),
-            title: Text(
-              '${_usuariosDeReserva[index]!.nombre} ${_usuariosDeReserva[index]!.apellido}',
-            ),
-            subtitle: Text(
-              estadoReserva,
-              style: TextStyle(color: colorTexto),
-            ),
-            trailing: ElevatedButton(
-              onPressed: () {
-                _mostrarDialogo(context, _reservasFuture[index],
-                    _usuariosDeReserva[index]!);
-              },
-              child: const Text('Detalle'),
-            ),
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          return Column(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.account_circle, size: 40),
+                title: Text(
+                  '${_usuariosDeReserva[index]!.nombre} ${_usuariosDeReserva[index]!.apellido}',
+                ),
+                subtitle: Text(
+                  estadoReserva,
+                  style: TextStyle(color: colorTexto),
+                ),
+                trailing: ElevatedButton(
+                  onPressed: () {
+                    _mostrarDialogo(context, _reservasFuture[index],
+                        _usuariosDeReserva[index]!);
+                  },
+                  child: const Text('Detalle'),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 16.0),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Colors.grey.shade300, // Color del separador
+                      width: 1.0, // Grosor del separador
+                    ),
+                  ),
+                ),
+              ),
+            ],
           );
         },
       ),
@@ -481,13 +536,9 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    const Text(
-                      'EDITAR COCHERA',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    Text('Editar cochera',
+                        style:
+                            GoogleFonts.rubik(textStyle: secondaryTextStyle)),
                     const SizedBox(height: 20),
                     _entryField('Nombre Cochera', nombreCocheraController),
                     const SizedBox(height: 20),
@@ -525,6 +576,9 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     TextEditingController lugaresController,
   ) {
     return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: botonfunc,
+      ),
       onPressed: () async {
         if (isNotBlank(nombreCocheraController.text) &&
             isNotBlank(descripcionController.text) &&
@@ -834,6 +888,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   Widget _entryField(String title, TextEditingController controller) {
     return TextFormField(
       controller: controller,
+      style: GoogleFonts.rubik(),
       decoration: InputDecoration(
         labelText: title,
       ),
@@ -876,13 +931,19 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: botonfunc,
+              ),
               onPressed: () => selectImage(),
-              child: const Text('Elegir imagen'),
+              child: Text('Elegir imagen', style: GoogleFonts.rubik()),
             ),
             const SizedBox(width: 10), // Espacio entre los botones
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: botonfunc,
+              ),
               onPressed: () => takeImage(),
-              child: const Text('Tomar imagen'),
+              child: Text('Tomar imagen', style: GoogleFonts.rubik()),
             ),
           ],
         ),

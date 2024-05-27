@@ -15,10 +15,13 @@ const TextStyle primaryTextStyle = TextStyle(
     color: logoTitulos // Puedes agregar más atributos de estilo aquí
     );
 
-const TextStyle secondaryTextStyle = TextStyle(
-  fontFamily: 'Rubik',
-  fontSize: 18,
-  // Puedes agregar más atributos de estilo aquí
-);
+const TextStyle secondaryTextStyle =
+    TextStyle(fontSize: 24, color: logoTitulos, fontWeight: FontWeight.w500
+        // Puedes agregar más atributos de estilo aquí
+        );
+const TextStyle terTextStyle =
+    TextStyle(fontSize: 18, color: logoTitulos, fontWeight: FontWeight.w300
+        // Puedes agregar más atributos de estilo aquí
+        );
 
 const defaultPadding = 16.0;
