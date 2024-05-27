@@ -158,76 +158,116 @@ class _UsuarioHomeState extends State<UsuarioHome> {
     ));
   }
 
-  Widget vistaCocheras() {
-    return ListView.builder(
-      itemCount: _cocherasFuture.length,
-      itemBuilder: (context, index) {
-        final cochera = _cocherasFuture[index];
-        return ListTile(
-          title: Text(cochera.direccion),
-          subtitle: Text("Precio por hora: ${cochera.price}"),
-          trailing: ElevatedButton(
-            onPressed: () {
-              _showReservarDialog(context, cochera);
-            },
-            child: const Text('Reservar'),
-          ),
+ Widget vistaCocheras() {
+  return FutureBuilder<List<UsuarioCochera>>(
+    future: Future.value(_cocherasFuture),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return Center(
+          child: CircularProgressIndicator(),
         );
-      },
-    );
-  }
+      } else if (snapshot.hasError) {
+        return Center(
+          child: Text('Error al cargar las cocheras.'),
+        );
+      } else {
+        if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+          return ListView.builder(
+            itemCount: snapshot.data!.length,
+            itemBuilder: (context, index) {
+              final cochera = snapshot.data![index];
+              return ListTile(
+                title: Text(cochera.direccion),
+                subtitle: Text("Precio por hora: ${cochera.price}"),
+                trailing: ElevatedButton(
+                  onPressed: () {
+                    _showReservarDialog(context, cochera);
+                  },
+                  child: const Text('Reservar'),
+                ),
+              );
+            },
+          );
+        } else {
+          return Center(
+            child: Text('No hay cocheras disponibles.'),
+          );
+        }
+      }
+    },
+  );
+}
+
+
+
 
   Widget vistaReservas() {
-    _loadReservas();
-    return ListView.builder(
-      itemCount: _reservasFuture.length,
-      itemBuilder: (context, index) {
-        final reserva = _reservasFuture[index];
-        bool puedeCancelar =
-            faltanMasDeCuarentaYcincoMinutos(reserva.fechaEntrada);
-        String estado = estadoReserva(reserva.fechaEntrada);
-        String fechaEntrada = DateFormat('yyyy-MM-dd kk:mm')
-            .format(reserva.fechaEntrada.toDate());
-        String fechaSalida =
-            DateFormat('yyyy-MM-dd kk:mm').format(reserva.fechaSalida.toDate());
-        return ListTile(
-          title: Text(reserva.direccion),
-          trailing: puedeCancelar
-              ? ElevatedButton(
-                  onPressed: puedeCancelar
-                      ? () {
-                          showDialogCancelarReserva(context, reserva);
-                        }
-                      : () {
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(const SnackBar(
-                            content: Text('Ya no puede cancelar reserva'),
-                            backgroundColor: Colors.red,
-                          ));
-                        },
-                  child: const Text('Cancelar'),
-                )
-              : null,
-          contentPadding:
-              const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Fecha entrada: $fechaEntrada"),
-              Text("Fecha salida: $fechaSalida"),
-              Text(
-                estado,
-                style: TextStyle(
-                    color:
-                        estado == "Reserva activa" ? Colors.green : Colors.red),
-              )
-            ],
-          ),
-          onTap: () {},
+  return FutureBuilder<List<Reserva>>(
+    future: Future.value(_reservasFuture), // Llama a la función que carga las reservas
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        // Muestra el CircularProgressIdicator mientras los datos están siendo cargados.
+        return Center(
+          child: CircularProgressIndicator(),
         );
-      },
-    );
-  }
+      } else {
+        if (snapshot.hasError) {
+          // Muestra un mensaje de error si hubo un error al cargar los datos.
+          return Center(
+            child: Text('Error al cargar las reservas.'),
+          );
+        } else {
+          if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+            // Si hay datos y no están vacíos, construye la ListView
+            return ListView.builder(
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                final reserva = snapshot.data![index];
+                bool puedeCancelar = faltanMasDeCuarentaYcincoMinutos(reserva.fechaEntrada);
+                String estado = estadoReserva(reserva.fechaEntrada);
+                String fechaEntrada = DateFormat('yyyy-MM-dd kk:mm').format(reserva.fechaEntrada.toDate());
+                String fechaSalida = DateFormat('yyyy-MM-dd kk:mm').format(reserva.fechaSalida.toDate());
+                
+                return ListTile(
+                  title: Text(reserva.direccion),
+                  trailing: puedeCancelar
+                      ? ElevatedButton(
+                          onPressed: () {
+                            showDialogCancelarReserva(context, reserva);
+                          },
+                          child: const Text('Cancelar'),
+                        )
+                      : null,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Fecha entrada: $fechaEntrada"),
+                      Text("Fecha salida: $fechaSalida"),
+                      Text(
+                        estado,
+                        style: TextStyle(
+                            color: estado == "Reserva activa" ? Colors.green : Colors.red),
+                      )
+                    ],
+                  ),
+                  onTap: () {},
+                );
+              },
+            );
+          } else {
+            // Si no hay reservas en el historial
+            return Center(
+              child: Text('No hay reservas en el historial'),
+            );
+          }
+        }
+      }
+    },
+  );
+}
+
+  
 
   Widget vistaEditar() {
     final TextEditingController nombreController = TextEditingController();

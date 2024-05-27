@@ -107,6 +107,14 @@ Widget _submitButton() {
           isNotBlank(_controllerCbu.text)) 
       {
         if (_controllerCbu.text.length == 22) {
+
+          showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return Center(child: CircularProgressIndicator());
+        },
+          );
           UsuarioCochera usuarioCochera = UsuarioCochera(
             nombre: _controllerName.text,
             apellido: _controllerSurname.text,
@@ -139,6 +147,7 @@ Widget _submitButton() {
         usuarioCochera.imageUrl = urlImagen;
         _databaseService.addUsuarioCochera(usuarioCochera);
         await Future.delayed(const Duration(seconds: 3));
+        Navigator.pop(context);
         context.pushNamed(UsuarioCocheraHome.name);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
