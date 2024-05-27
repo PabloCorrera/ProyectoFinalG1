@@ -286,33 +286,56 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                   String fechaSalida = DateFormat('yyyy-MM-dd kk:mm')
                       .format(reserva.fechaSalida.toDate());
 
-                  return ListTile(
-                    title: Text(reserva.direccion),
-                    trailing: puedeCancelar
-                        ? ElevatedButton(
-                            onPressed: () {
-                              showDialogCancelarReserva(context, reserva);
-                            },
-                            child: const Text('Cancelar'),
-                          )
-                        : null,
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 8.0, horizontal: 16.0),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Fecha entrada: $fechaEntrada"),
-                        Text("Fecha salida: $fechaSalida"),
-                        Text(
-                          estado,
-                          style: TextStyle(
-                              color: estado == "Reserva activa"
-                                  ? Colors.green
-                                  : Colors.red),
-                        )
-                      ],
-                    ),
-                    onTap: () {},
+                  return Column(
+                    children: [
+                      ListTile(
+                        title: Text(reserva.direccion,
+                            style: GoogleFonts.rubik(
+                                textStyle: terTextStyle,
+                                fontWeight: FontWeight.w400)),
+                        trailing: puedeCancelar
+                            ? ElevatedButton(
+                                onPressed: () {
+                                  showDialogCancelarReserva(context, reserva);
+                                },
+                                child: const Text('Cancelar'),
+                              )
+                            : null,
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 16.0),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Fecha entrada: $fechaEntrada",
+                                style:
+                                    GoogleFonts.rubik(textStyle: terTextStyle)),
+                            Text("Fecha salida: $fechaSalida",
+                                style:
+                                    GoogleFonts.rubik(textStyle: terTextStyle)),
+                            Text(
+                              estado,
+                              style: GoogleFonts.rubik(
+                                  textStyle: TextStyle(
+                                      color: estado == "Reserva activa"
+                                          ? Colors.green
+                                          : Colors.red,
+                                      fontSize: 18)),
+                            )
+                          ],
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.symmetric(horizontal: 16.0),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 1.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   );
                 },
               );
