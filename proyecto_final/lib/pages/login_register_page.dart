@@ -1,11 +1,12 @@
 import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:proyecto_final/auth.dart';
+import 'package:proyecto_final/models/constant.dart';
 import 'package:proyecto_final/pages/home_page.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:proyecto_final/pages/usuario_cochera_home.dart';
@@ -37,8 +38,6 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     obtenerCredenciales();
-    
-   
   }
 
   AndroidOptions _getAndroidOptions() => const AndroidOptions(
@@ -156,7 +155,6 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _guardarPreferencia(bool usarAutenticacionBiometrica) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('usarAutenticacionBiometrica', usarAutenticacionBiometrica);
-    print("GUARDO PREFERENCIAS");
   }
 
   void guardarCredenciales(String usuario, String contrasena) async {
@@ -193,7 +191,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _title() {
-    return const Text('Bienvenido a We Park');
+    return Text('Bienvenido a wePark',
+        // selectionColor: Theme.of(context).primaryColor,
+        style: GoogleFonts.rowdies(
+            textStyle: Theme.of(context).textTheme.titleLarge));
   }
 
   Widget _entryField(
@@ -213,44 +214,78 @@ class _LoginPageState extends State<LoginPage> {
     return Text(errorMessage == '' ? '' : 'Humm ? $errorMessage');
   }
 
-  Widget _submitButton() {
-    return Container(
-      width: double.infinity,
-      height: 45,
-      decoration: BoxDecoration(
-          color: Colors.blue, borderRadius: BorderRadius.circular(10)),
-      child: TextButton(
-          onPressed: isLogin
-              ? signInWithEmailAndPassword
-              : createUserWithEmailAndPassword,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                isLogin ? 'Login' : 'Register',
-                style: const TextStyle(color: Colors.white),
-              ),
-              const SizedBox(
-                width: 5,
-              ),
-              const Icon(
-                FontAwesomeIcons.car,
-                color: Colors.white,
-              )
-            ],
-          )),
-    );
-  }
+ Widget _submitButton() {
+  return Container(
+    width: double.infinity,
+    height: 45,
+    decoration: BoxDecoration(
+      color: Theme.of(context).indicatorColor,
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: TextButton(
+      onPressed: () async {
+        // Mostrar el diálogo con el indicador de carga
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return Center(child: CircularProgressIndicator());
+          },
+        );
+
+        try {
+          if (isLogin) {
+            await signInWithEmailAndPassword();
+          } else {
+            await createUserWithEmailAndPassword();
+          }
+        } catch (e) {
+          // Maneja el error si es necesario
+        } finally {
+          // Cerrar el diálogo después de completar la operación
+          Navigator.pop(context);
+        }
+      },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            isLogin ? 'Login' : 'Register',
+            selectionColor: Theme.of(context).primaryColor,
+          ),
+          const SizedBox(width: 5),
+          const Icon(
+            FontAwesomeIcons.car,
+            color: Colors.white,
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 
   Widget _loginOrRegisterButton() {
-    return TextButton(
-        onPressed: () {
-          setState(() {
-            isLogin = !isLogin;
-          });
+  return TextButton(
+    onPressed: () {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(child: CircularProgressIndicator());
         },
-        child: Text(isLogin ? 'Register instead' : 'Login instead'));
-  }
+      );
+
+      setState(() {
+        isLogin = !isLogin;
+      });
+
+      Navigator.pop(context);
+    },
+    child: Text(isLogin ? 'Registrate en wePark' : 'Iniciar sesión'),
+  );
+}
+
 
   Widget _signInWithGoogle() {
     if (isLogin) {
@@ -266,7 +301,7 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 Text(
                   'Sign in with Google',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: magnolia),
                 ),
                 SizedBox(
                   width: 5,
@@ -285,31 +320,32 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: _title(),
-        ),
-        body: Container(
-          height: double.infinity,
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              _entryField('Email', _controllerEmail),
-              _entryField('Contraseña', _controllerPassword),
-              _errorMessage(),
-              _submitButton(),
-              const SizedBox(
-                height: 5,
+    return MaterialApp(
+      home: Scaffold(
+        body: Stack(
+          children: <Widget>[
+            Container(
+              height: double.infinity,
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  _title(),
+                  _entryField('Email', _controllerEmail),
+                  _entryField('Contraseña', _controllerPassword),
+                  _errorMessage(),
+                  _submitButton(),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  _signInWithGoogle(),
+                  !kIsWeb ? _loginOrRegisterButton() : const SizedBox(),
+                ],
               ),
-              _signInWithGoogle(),
-              !kIsWeb ? _loginOrRegisterButton() : const SizedBox(),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

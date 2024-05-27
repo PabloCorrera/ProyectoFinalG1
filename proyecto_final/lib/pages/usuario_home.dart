@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:pay/pay.dart';
@@ -15,6 +16,7 @@ import 'package:proyecto_final/core/utils.dart';
 import 'package:proyecto_final/entities/reserva.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
 import 'package:proyecto_final/entities/usuario_consumidor.dart';
+import 'package:proyecto_final/models/constant.dart';
 import 'package:proyecto_final/pages/maps_page.dart';
 import 'package:proyecto_final/pages/login_register_page.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
@@ -79,8 +81,9 @@ class _UsuarioHomeState extends State<UsuarioHome> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Home Usuario'),
-          backgroundColor: Colors.pink,
+          title: Text('wePark',
+              style: GoogleFonts.rowdies(textStyle: primaryTextStyle)),
+          backgroundColor: botonReservaCancel,
         ),
         drawer: buildDrawer(),
         body: aMostrar ?? vistaCocheras(),
@@ -90,77 +93,96 @@ class _UsuarioHomeState extends State<UsuarioHome> {
 
   Widget buildDrawer() {
     return Drawer(
-        child: ListView(
-      padding: EdgeInsets.zero,
-      children: [
-        UserAccountsDrawerHeader(
-          accountName: Text('Bienvenido ${consumidor!.nombre}'),
-          accountEmail: user != null ? Text(user!.email!) : null,
-          currentAccountPicture: CircleAvatar(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          UserAccountsDrawerHeader(
+            accountName: Text(
+              'Bienvenido ${consumidor!.nombre}',
+              style: GoogleFonts.rubik(textStyle: secondaryTextStyle),
+            ),
+            accountEmail: user != null ? Text(user!.email!) : null,
+            currentAccountPicture: CircleAvatar(
               backgroundImage: consumidor != null &&
                       consumidor?.imageUrl != null &&
                       consumidor!.imageUrl!.isNotEmpty
                   ? NetworkImage(consumidor!.imageUrl!)
-                  : null),
-          decoration: const BoxDecoration(
-            color: Colors.pinkAccent,
+                  : null,
+            ),
+            decoration: const BoxDecoration(
+              color: botonReservaCancel,
+            ),
           ),
-        ),
-        ListTile(
-          leading: const Icon(Icons.car_rental),
-          title: const Text('Reservar cochera'),
-          onTap: () => {
-            setState(() {
-              aMostrar = vistaCocheras();
-              Navigator.pop(context);
-            })
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.card_travel),
-          title: const Text('Mis reservas'),
-          onTap: () => {
-            setState(() {
-              aMostrar = vistaReservas();
-              Navigator.pop(context);
-            })
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.edit),
-          title: const Text('Editar mis datos'),
-          onTap: () => {
-            setState(() {
-              aMostrar = vistaEditar();
-              Navigator.pop(context);
-            })
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.map),
-          title: const Text('Ver mapa'),
-          onTap: () => {
-            setState(() {
-              context.pushNamed(MapsPage.name);
-              Navigator.pop(context);
-            })
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.logout),
-          title: const Text('Salir'),
-          onTap: () => {
-            context.pushNamed(LoginPage.name),
-            Auth().signOut(),
-          },
-        )
-      ],
-    ));
+          Theme(
+            data: Theme.of(context).copyWith(
+              textTheme: TextTheme(
+                  titleMedium: GoogleFonts.rubik(
+                textStyle: const TextStyle(color: magnolia),
+              )),
+            ),
+            child: Column(
+              children: [
+                ListTile(
+                  leading:
+                      const Icon(Icons.car_rental, color: botonReservaCancel),
+                  title: Text('Reservar cochera', style: GoogleFonts.rubik()),
+                  onTap: () => {
+                    setState(() {
+                      aMostrar = vistaCocheras();
+                      Navigator.pop(context);
+                    })
+                  },
+                ),
+                ListTile(
+                  leading:
+                      const Icon(Icons.card_travel, color: botonReservaCancel),
+                  title: Text('Mis reservas', style: GoogleFonts.rubik()),
+                  onTap: () => {
+                    setState(() {
+                      aMostrar = vistaReservas();
+                      Navigator.pop(context);
+                    })
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.edit, color: botonReservaCancel),
+                  title: Text('Editar mis datos', style: GoogleFonts.rubik()),
+                  onTap: () => {
+                    setState(() {
+                      aMostrar = vistaEditar();
+                      Navigator.pop(context);
+                    })
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.map, color: botonReservaCancel),
+                  title: Text('Ver mapa', style: GoogleFonts.rubik()),
+                  onTap: () => {
+                    setState(() {
+                      context.pushNamed(MapsPage.name);
+                      Navigator.pop(context);
+                    })
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.logout, color: botonReservaCancel),
+                  title: Text('Salir', style: GoogleFonts.rubik()),
+                  onTap: () => {
+                    context.pushNamed(LoginPage.name),
+                    Auth().signOut(),
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
  Widget vistaCocheras() {
   return FutureBuilder<List<UsuarioCochera>>(
-    future: Future.value(_cocherasFuture),
+    future: Future.delayed(Duration(milliseconds: 200), () => _cocherasFuture),
     builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
         return Center(
@@ -203,7 +225,7 @@ class _UsuarioHomeState extends State<UsuarioHome> {
 
   Widget vistaReservas() {
   return FutureBuilder<List<Reserva>>(
-    future: Future.value(_reservasFuture), // Llama a la función que carga las reservas
+    future: Future.delayed(Duration(milliseconds: 200), () => _reservasFuture), // Llama a la función que carga las reservas
     builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
         // Muestra el CircularProgressIdicator mientras los datos están siendo cargados.
@@ -295,7 +317,7 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     const Text(
-                      'EDITAR USUARIO',
+                      'Editar usuario',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -349,16 +371,18 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                         'https://cdn-icons-png.flaticon.com/512/9131/9131529.png')
                     : NetworkImage(consumidor!.imageUrl!),
               ),
-        const SizedBox(height: 10), // Espacio entre la imagen y los botones
+        const SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: botonfunc),
               onPressed: () => selectImage(),
               child: const Text('Elegir imagen'),
             ),
-            const SizedBox(width: 10), // Espacio entre los botones
+            const SizedBox(width: 10),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: botonfunc),
               onPressed: () => takeImage(),
               child: const Text('Tomar imagen'),
             ),
@@ -458,7 +482,10 @@ class _UsuarioHomeState extends State<UsuarioHome> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Reservar Cochera'),
+              title: Text("Reservar en ${cochera.nombreCochera}"),
+              contentTextStyle: GoogleFonts.rubik(
+                textStyle: TextStyle(color: logoTitulos, fontSize: 20),
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -616,11 +643,12 @@ class _UsuarioHomeState extends State<UsuarioHome> {
               ),
               actions: [
                 TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Cancelar'),
-                ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text(
+                      'Cancelar',
+                    )),
                 GooglePayButton(
                   paymentConfiguration:
                       PaymentConfiguration.fromJsonString(defaultGooglePay),
@@ -758,6 +786,7 @@ class _UsuarioHomeState extends State<UsuarioHome> {
     TextEditingController apellidoController,
   ) {
     return ElevatedButton(
+      style: ElevatedButton.styleFrom(backgroundColor: botonfunc),
       onPressed: () async {
         if (isNotBlank(nombreController.text) &&
             isNotBlank(apellidoController.text)) {

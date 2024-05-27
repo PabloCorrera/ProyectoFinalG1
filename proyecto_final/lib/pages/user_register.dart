@@ -3,15 +3,20 @@ import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart' as FirebaseAuth;
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/core/utils.dart';
 import 'package:proyecto_final/entities/usuario_consumidor.dart';
+import 'package:proyecto_final/models/constant.dart';
 import 'package:proyecto_final/pages/usuario_home.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
+import '';
 
 class UserRegister extends StatefulWidget {
   UserRegister({Key? key}) : super(key: key);
@@ -67,11 +72,10 @@ class _UserRegisterState extends State<UserRegister> {
       );
 
       UsuarioConsumidor user = UsuarioConsumidor(
-        nombre: _controllerName.text,
-        apellido: _controllerSurname.text,
-        email: userMail,
-        imageUrl: ""
-      );
+          nombre: _controllerName.text,
+          apellido: _controllerSurname.text,
+          email: userMail,
+          imageUrl: "");
       String urlImagen = "";
       if (fileImagen != null) {
         String uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
@@ -81,7 +85,9 @@ class _UserRegisterState extends State<UserRegister> {
         Reference imagenASubir = referenceDirImages.child(uniqueName);
         try {
           await imagenASubir.putFile(File(fileImagen!.path));
-          await imagenASubir.getDownloadURL().then((value) => urlImagen = value);
+          await imagenASubir
+              .getDownloadURL()
+              .then((value) => urlImagen = value);
         } catch (error) {
           print(error);
           urlImagen = "";
@@ -108,6 +114,9 @@ class _UserRegisterState extends State<UserRegister> {
     return ElevatedButton(
       onPressed: () => registrarUsuario(),
       child: const Text('Confirmar'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: botonfunc,
+      ),
     );
   }
 
@@ -120,40 +129,46 @@ class _UserRegisterState extends State<UserRegister> {
     );
   }
 
-Widget imagePicker() {
-  return Column(
-    children: [
-      imagen != null
-          ? CircleAvatar(
-              radius: 64,
-              backgroundImage: MemoryImage(imagen!),
-            )
-          : const CircleAvatar(
-              radius: 64,
-              backgroundImage: NetworkImage(
-                  'https://cdn-icons-png.flaticon.com/512/9131/9131529.png'),
+  Widget imagePicker() {
+    return Column(
+      children: [
+        imagen != null
+            ? CircleAvatar(
+                radius: 64,
+                backgroundImage: MemoryImage(imagen!),
+              )
+            : const CircleAvatar(
+                radius: 64,
+                backgroundImage: NetworkImage(
+                    'https://cdn-icons-png.flaticon.com/512/9131/9131529.png'),
+              ),
+        const SizedBox(height: 10), // Espacio entre la imagen y los botones
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: botonfunc,
+              ),
+              onPressed: () => selectImage(),
+              child: const Text('Elegir imagen'),
             ),
-      const SizedBox(height: 10), // Espacio entre la imagen y los botones
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton(
-            onPressed: () => selectImage(),
-            child: const Text('Elegir imagen'),
-          ),
-          const SizedBox(width: 10), // Espacio entre los botones
-          ElevatedButton(
-            onPressed: () => takeImage(),
-            child: const Text('Tomar imagen'),
-          ),
-        ],
-      ),
-    ],
-  );
-}
+            const SizedBox(width: 10), // Espacio entre los botones
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: botonfunc,
+              ),
+              onPressed: () => takeImage(),
+              child: const Text('Tomar imagen'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 
-  takeImage()async{
- XFile? img = await pickImage(ImageSource.camera);
+  takeImage() async {
+    XFile? img = await pickImage(ImageSource.camera);
     if (img != null) {
       img.readAsBytes().then((foto) => {
             setState(() {
@@ -163,6 +178,7 @@ Widget imagePicker() {
           });
     }
   }
+
   selectImage() async {
     XFile? img = await pickImage(ImageSource.gallery);
     if (img != null) {
@@ -178,17 +194,10 @@ Widget imagePicker() {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: _title(),
-        automaticallyImplyLeading: false,
-      ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color(0xFFAF0050),
-              Color(0x00EF5350),
-            ],
+            colors: [magnolia, Colors.white],
             begin: Alignment.topCenter,
           ),
         ),
@@ -197,13 +206,11 @@ Widget imagePicker() {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'REGISTRO DE USUARIO',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+            Text(
+              'Registro de usuario',
+              style: GoogleFonts.rubik(
+                  textStyle: Theme.of(context).textTheme.titleLarge,
+                  color: logoTitulos),
             ),
             const SizedBox(height: 20),
             _entryField('Nombre', _controllerName),

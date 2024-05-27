@@ -1,15 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 const String apiKey = "AIzaSyAaH8-vbcOz4vMYOqawhepze62h_4XTbTA";
 
-const Color primaryColor = Color(0xFF006491);
-const Color textColorLightTheme = Color(0xFF0D0D0E);
+const Color logoTitulos = Color(0xFF081236);
+const Color paynesGray = Color(0xFF5E6973);
+const Color botonReservaCancel = Color(0xFF2C7F8C);
+const Color botonfunc = Color(0xFFA8DCD1);
+const Color magnolia = Color(0xFFF8F1FF);
 
-const Color secondaryColor80LightTheme = Color(0xFF202225);
-const Color secondaryColor60LightTheme = Color(0xFF313336);
-const Color secondaryColor40LightTheme = Color(0xFF585858);
-const Color secondaryColor20LightTheme = Color(0xFF787F84);
-const Color secondaryColor10LightTheme = Color(0xFFEEEEEE);
-const Color secondaryColor5LightTheme = Color(0xFFF8F8F8);
+const TextStyle primaryTextStyle = TextStyle(
+    fontWeight: FontWeight.bold,
+    fontSize: 30,
+    color: logoTitulos // Puedes agregar más atributos de estilo aquí
+    );
+
+const TextStyle secondaryTextStyle =
+    TextStyle(fontSize: 24, color: logoTitulos, fontWeight: FontWeight.w500
+        // Puedes agregar más atributos de estilo aquí
+        );
+const TextStyle terTextStyle =
+    TextStyle(fontSize: 18, color: logoTitulos, fontWeight: FontWeight.w300
+        // Puedes agregar más atributos de estilo aquí
+        );
 
 const defaultPadding = 16.0;

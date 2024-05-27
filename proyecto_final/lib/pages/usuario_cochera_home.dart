@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -7,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/core/utils.dart';
 import 'package:proyecto_final/entities/reserva.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
 import 'package:proyecto_final/entities/usuario_consumidor.dart';
+import 'package:proyecto_final/models/constant.dart';
 import 'package:proyecto_final/pages/login_register_page.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 import 'package:intl/intl.dart';
@@ -190,16 +191,22 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     return SafeArea(
         child: Scaffold(
       appBar: AppBar(
-        title: const Text('Home Usuario Cochera'),
-        backgroundColor: Colors.pink,
+        title: Text('wePark',
+            style: GoogleFonts.rowdies(
+                textStyle: Theme.of(context).textTheme.titleLarge)),
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             UserAccountsDrawerHeader(
-              accountName: const Text('Bienvenido'),
-              accountEmail: user != null ? Text(user!.email!) : null,
+              accountName: Text('Bienvenido',
+                  style: GoogleFonts.rubik(textStyle: terTextStyle)),
+              accountEmail: user != null
+                  ? Text(user!.email!,
+                      style: GoogleFonts.rubik(textStyle: terTextStyle))
+                  : null,
               currentAccountPicture: !kIsWeb
                   ? CircleAvatar(
                       backgroundImage: usuarioCochera != null &&
@@ -210,12 +217,12 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                     )
                   : null,
               decoration: const BoxDecoration(
-                color: Colors.pinkAccent,
+                color: botonReservaCancel,
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.card_travel),
-              title: const Text('Reservas activas'),
+              leading: const Icon(Icons.card_travel, color: botonReservaCancel),
+              title: Text('Reservas activas', style: GoogleFonts.rubik()),
               onTap: () => {
                 setState(() {
                   aMostrar = vistaReservas();
@@ -224,8 +231,8 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.edit),
-              title: const Text('Editar mis datos'),
+              leading: const Icon(Icons.edit, color: botonReservaCancel),
+              title: Text('Editar mis datos', style: GoogleFonts.rubik()),
               onTap: () => {
                 setState(() {
                   aMostrar = vistaEditar();
@@ -234,8 +241,8 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.bar_chart),
-              title: const Text('Recaudado'),
+              leading: const Icon(Icons.bar_chart, color: botonReservaCancel),
+              title: Text('Recaudado', style: GoogleFonts.rubik()),
               onTap: () => {
                 setState(() {
                   aMostrar = VistaEstadisticas();
@@ -244,8 +251,8 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Salir'),
+              leading: const Icon(Icons.logout, color: botonReservaCancel),
+              title: Text('Salir', style: GoogleFonts.rubik()),
               onTap: () => {
                 context.pushNamed(LoginPage.name),
                 Auth().signOut(),
@@ -289,15 +296,22 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     return Column(
       children: [
         const SizedBox(height: 12.0),
-        Text(
-          titulo + cantidadReservas.toString(),
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
+        Text(titulo + cantidadReservas.toString(),
+            style: GoogleFonts.rubik(
+              textStyle: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: logoTitulos),
+            )),
         const SizedBox(height: 12.0),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            botonReservas("Activas", 0, _reservasActivas.length),
+            botonReservas(
+              "Activas",
+              0,
+              _reservasActivas.length,
+            ),
             SizedBox(width: 12.0),
             botonReservas("Expiradas", 1, _reservasExpiradas.length),
             SizedBox(width: 12.0),
@@ -323,16 +337,13 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
       },
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all<Color>(
-          index == botonActivoIndex ? Colors.green : Colors.blue,
-        ),
+            index == botonActivoIndex ? Colors.green : botonfunc),
       ),
       child: Text(texto),
     );
   }
 
   Widget listaReservasActivas() {
-    print(
-        "cantidad de usuarios: ${_usuariosDeReservasActivas} y cant de reservas activas ${_reservasActivas.length}");
     return Expanded(
       child: _usuariosDeReservasActivas.isEmpty
           ? Center(
@@ -345,19 +356,34 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               itemCount: _usuariosDeReservasActivas.length,
               itemBuilder: (context, index) {
                 var usuario = _usuariosDeReservasActivas[index]!;
-                return ListTile(
-                  leading: const Icon(Icons.account_circle, size: 40),
-                  title: Text(usuario.nombre + " " + usuario.apellido),
-                  subtitle: Text(usuario.email!),
-                  trailing: ElevatedButton(
-                    onPressed: () {
-                      _mostrarDialogo(
-                          context, _reservasActivas[index], usuario);
-                    },
-                    child: const Text('Detalle'),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                      vertical: 8.0, horizontal: 16.0),
+                return Column(
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.account_circle, size: 40),
+                      title: Text(usuario.nombre + " " + usuario.apellido),
+                      subtitle: Text(usuario.email!),
+                      trailing: ElevatedButton(
+                        onPressed: () {
+                          _mostrarDialogo(
+                              context, _reservasActivas[index], usuario);
+                        },
+                        child: const Text('Detalle'),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 16.0),
+                    ),
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 16.0),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Colors.grey.shade300,
+                            width: 1.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 );
               },
             ),
@@ -378,18 +404,34 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
           itemCount: _usuariosDeReservasExpiradas.length,
           itemBuilder: (context, index) {
             var usuario = _usuariosDeReservasExpiradas[index]!;
-            return ListTile(
-              leading: const Icon(Icons.account_circle, size: 40),
-              title: Text(usuario.nombre + " " + usuario.apellido),
-              subtitle: Text(usuario.email!),
-              trailing: ElevatedButton(
-                onPressed: () {
-                  _mostrarDialogo(context, _reservasExpiradas[index], usuario);
-                },
-                child: const Text('Detalle'),
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            return Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.account_circle, size: 40),
+                  title: Text(usuario.nombre + " " + usuario.apellido),
+                  subtitle: Text(usuario.email!),
+                  trailing: ElevatedButton(
+                    onPressed: () {
+                      _mostrarDialogo(
+                          context, _reservasExpiradas[index], usuario);
+                    },
+                    child: const Text('Detalle'),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 8.0, horizontal: 16.0),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 16.0),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.grey.shade300,
+                        width: 1.0,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             );
           },
         ),
@@ -423,24 +465,39 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
             colorTexto = Colors.black;
           }
 
-          return ListTile(
-            leading: const Icon(Icons.account_circle, size: 40),
-            title: Text(
-              '${_usuariosDeReserva[index]!.nombre} ${_usuariosDeReserva[index]!.apellido}',
-            ),
-            subtitle: Text(
-              estadoReserva,
-              style: TextStyle(color: colorTexto),
-            ),
-            trailing: ElevatedButton(
-              onPressed: () {
-                _mostrarDialogo(context, _reservasFuture[index],
-                    _usuariosDeReserva[index]!);
-              },
-              child: const Text('Detalle'),
-            ),
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          return Column(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.account_circle, size: 40),
+                title: Text(
+                  '${_usuariosDeReserva[index]!.nombre} ${_usuariosDeReserva[index]!.apellido}',
+                ),
+                subtitle: Text(
+                  estadoReserva,
+                  style: TextStyle(color: colorTexto),
+                ),
+                trailing: ElevatedButton(
+                  onPressed: () {
+                    _mostrarDialogo(context, _reservasFuture[index],
+                        _usuariosDeReserva[index]!);
+                  },
+                  child: const Text('Detalle'),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 16.0),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Colors.grey.shade300, // Color del separador
+                      width: 1.0, // Grosor del separador
+                    ),
+                  ),
+                ),
+              ),
+            ],
           );
         },
       ),
@@ -479,13 +536,9 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    const Text(
-                      'EDITAR COCHERA',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    Text('Editar cochera',
+                        style:
+                            GoogleFonts.rubik(textStyle: secondaryTextStyle)),
                     const SizedBox(height: 20),
                     _entryField('Nombre Cochera', nombreCocheraController),
                     const SizedBox(height: 20),
@@ -516,159 +569,189 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   }
 
   Widget _submitButton(
-  TextEditingController nombreCocheraController,
-  TextEditingController descripcionController,
-  TextEditingController precioController,
-  TextEditingController cbuController,
-  TextEditingController lugaresController,
-) {
-  return ElevatedButton(
-    onPressed: () async {
-      if (isNotBlank(nombreCocheraController.text) &&
-          isNotBlank(descripcionController.text) &&
-          isNotBlank(precioController.text) &&
-          isNotBlank(cbuController.text) &&
-          isNotBlank(lugaresController.text)) {
-        if (cbuController.text.length == 22) {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (BuildContext context) {
-              return Center(child: CircularProgressIndicator());
-            },
-          );
-          try {
-            String nombreCochera = nombreCocheraController.text;
-            String descripcion = descripcionController.text;
-            double precio = double.parse(precioController.text);
-            String cbu = cbuController.text;
-            int cantLugares = int.parse(lugaresController.text);
-
-            String urlImagen = "";
-            if (fileImagen != null) {
-              String uniqueName =
-                  DateTime.now().millisecondsSinceEpoch.toString();
-
-              Reference referenceRoot = FirebaseStorage.instance.ref();
-              Reference referenceDirImages = referenceRoot.child('images');
-              Reference imagenASubir = referenceDirImages.child(uniqueName);
-              try {
-                await imagenASubir.putFile(File(fileImagen!.path));
-                await imagenASubir
-                    .getDownloadURL()
-                    .then((value) => urlImagen = value);
-              } catch (error) {
-                print(error);
-                urlImagen = "";
-              }
-            }
-            Map<String, dynamic> updatedAttributes = {
-              'nombreCochera': nombreCochera,
-              'descripcion': descripcion,
-              'price': precio,
-              'cbu': cbu,
-              'cantLugares': cantLugares,
-              'imageUrl': urlImagen
-            };
-            await databaseService.updateUsuarioCochera(
-                user!.email!, updatedAttributes);
-                setState(() {
-                  usuarioCochera!.imageUrl = urlImagen; 
-                });
-            
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content:
-                    Text('Los datos del usuario fueron editados correctamente'),
-                duration: Duration(seconds: 3),
-                backgroundColor: Colors.green,
-              ),
+    TextEditingController nombreCocheraController,
+    TextEditingController descripcionController,
+    TextEditingController precioController,
+    TextEditingController cbuController,
+    TextEditingController lugaresController,
+  ) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: botonfunc,
+      ),
+      onPressed: () async {
+        if (isNotBlank(nombreCocheraController.text) &&
+            isNotBlank(descripcionController.text) &&
+            isNotBlank(precioController.text) &&
+            isNotBlank(cbuController.text) &&
+            isNotBlank(lugaresController.text)) {
+          if (cbuController.text.length == 22) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return Center(child: CircularProgressIndicator());
+              },
             );
-          } catch (error) {
+            try {
+              String nombreCochera = nombreCocheraController.text;
+              String descripcion = descripcionController.text;
+              double precio = double.parse(precioController.text);
+              String cbu = cbuController.text;
+              int cantLugares = int.parse(lugaresController.text);
+
+              String urlImagen = "";
+              if (fileImagen != null) {
+                String uniqueName =
+                    DateTime.now().millisecondsSinceEpoch.toString();
+
+                Reference referenceRoot = FirebaseStorage.instance.ref();
+                Reference referenceDirImages = referenceRoot.child('images');
+                Reference imagenASubir = referenceDirImages.child(uniqueName);
+                try {
+                  await imagenASubir.putFile(File(fileImagen!.path));
+                  await imagenASubir
+                      .getDownloadURL()
+                      .then((value) => urlImagen = value);
+                } catch (error) {
+                  print(error);
+                  urlImagen = "";
+                }
+              }
+              Map<String, dynamic> updatedAttributes = {
+                'nombreCochera': nombreCochera,
+                'descripcion': descripcion,
+                'price': precio,
+                'cbu': cbu,
+                'cantLugares': cantLugares,
+                'imageUrl': urlImagen
+              };
+              await databaseService.updateUsuarioCochera(
+                  user!.email!, updatedAttributes);
+              setState(() {
+                usuarioCochera!.imageUrl = urlImagen;
+              });
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                      'Los datos del usuario fueron editados correctamente'),
+                  duration: Duration(seconds: 3),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            } catch (error) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Hubo un error al editar los datos'),
+                  duration: Duration(seconds: 3),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            } finally {
+              Navigator.pop(context);
+            }
+          } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Hubo un error al editar los datos'),
+                content: Text('El CBU debe tener 22 números'),
                 duration: Duration(seconds: 3),
                 backgroundColor: Colors.red,
               ),
             );
-          } finally {
-            Navigator.pop(context);
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('El CBU debe tener 22 números'),
+              content: Text('Complete los datos correctamente por favor'),
               duration: Duration(seconds: 3),
               backgroundColor: Colors.red,
             ),
           );
         }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Complete los datos correctamente por favor'),
-            duration: Duration(seconds: 3),
-            backgroundColor: Colors.red,
+      },
+      child: const Text('Editar'),
+    );
+  }
+
+  Widget VistaEstadisticas() {
+  String titulo = "Mis estadísticas";
+
+  return FutureBuilder<Map<String, dynamic>>(
+    future: Future.delayed(Duration(milliseconds: 200), () {
+      int reservasUltimos30Dias = obtenerReservasUltimos30Dias(); // Método que obtendrá el número de reservas en los últimos 30 días
+      int reservasTotales = _reservasFuture.length; // Suponiendo que _reservasExpiradas y _reservasActivas contienen todas las reservas
+      double recaudacionUltimos30Dias = obtenerRecaudacionUltimos30Dias(); // Método que obtendrá la recaudación de los últimos 30 días
+      double recaudacionTotal = _recaudacionTotal; // Suponiendo que esta variable contiene la recaudación total
+
+      return {
+        'reservasUltimos30Dias': reservasUltimos30Dias,
+        'reservasTotales': reservasTotales,
+        'recaudacionUltimos30Dias': recaudacionUltimos30Dias,
+        'recaudacionTotal': recaudacionTotal,
+      };
+    }),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      } else if (snapshot.hasError) {
+        return Center(
+          child: Text('Error al cargar las estadísticas.'),
+        );
+      } else if (snapshot.hasData) {
+        var data = snapshot.data!;
+        int reservasUltimos30Dias = data['reservasUltimos30Dias'];
+        int reservasTotales = data['reservasTotales'];
+        double recaudacionUltimos30Dias = data['recaudacionUltimos30Dias'];
+        double recaudacionTotal = data['recaudacionTotal'];
+
+        return Scaffold(
+          body: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Text(
+                    titulo,
+                    style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Reservas de los últimos 30 días: $reservasUltimos30Dias',
+                  style: const TextStyle(fontSize: 18),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Reservas Totales: $reservasTotales',
+                  style: const TextStyle(fontSize: 18),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Recaudación de los últimos 30 días: \$${recaudacionUltimos30Dias.toStringAsFixed(2)}',
+                  style: const TextStyle(fontSize: 18),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Recaudación Total: \$${recaudacionTotal.toStringAsFixed(2)}',
+                  style: const TextStyle(fontSize: 18),
+                ),
+              ],
+            ),
           ),
+        );
+      } else {
+        return Center(
+          child: Text('No hay estadísticas disponibles.'),
         );
       }
     },
-    child: const Text('Editar'),
   );
 }
 
-
-  @override
-  Widget VistaEstadisticas() {
-    String titulo = "Mis estadísticas";
-    int reservasUltimos30Dias =
-        obtenerReservasUltimos30Dias(); // Método que obtendrá el número de reservas en los últimos 30 días
-    int reservasTotales = _reservasFuture
-        .length; // Suponiendo que _reservasExpiradas y _reservasActivas contienen todas las reservas
-    double recaudacionUltimos30Dias =
-        obtenerRecaudacionUltimos30Dias(); // Método que obtendrá la recaudación de los últimos 30 días
-    double recaudacionTotal =
-        _recaudacionTotal; // Suponiendo que esta variable contiene la recaudación total
-
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Text(
-                titulo,
-                style:
-                    const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Reservas de los últimos 30 días: $reservasUltimos30Dias',
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Reservas Totales: $reservasTotales',
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Recaudación de los últimos 30 días: \$${recaudacionUltimos30Dias.toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Recaudación Total: \$${recaudacionTotal.toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 18),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
 // Ejemplo de métodos para obtener los datos requeridos
   int obtenerReservasUltimos30Dias() {
@@ -833,6 +916,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   Widget _entryField(String title, TextEditingController controller) {
     return TextFormField(
       controller: controller,
+      style: GoogleFonts.rubik(),
       decoration: InputDecoration(
         labelText: title,
       ),
@@ -875,13 +959,19 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: botonfunc,
+              ),
               onPressed: () => selectImage(),
-              child: const Text('Elegir imagen'),
+              child: Text('Elegir imagen', style: GoogleFonts.rubik()),
             ),
             const SizedBox(width: 10), // Espacio entre los botones
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: botonfunc,
+              ),
               onPressed: () => takeImage(),
-              child: const Text('Tomar imagen'),
+              child: Text('Tomar imagen', style: GoogleFonts.rubik()),
             ),
           ],
         ),

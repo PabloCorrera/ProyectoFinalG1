@@ -30,7 +30,7 @@ class LocationListTile extends StatelessWidget {
         const Divider(
           height: 2,
           thickness: 2,
-          color: secondaryColor5LightTheme,
+          color: botonReservaCancel,
         ),
       ],
     );
