@@ -64,6 +64,17 @@ class LineChartWidget extends StatelessWidget {
                     return 'Ult 30 días';
                 }
               }
+
+              if (!sesentaDias && noventaDias) {
+                switch (value.toInt()) {
+                  case 1:
+                    return 'Ult 90 días';
+                  case 4:
+                    return 'Ult 60 días';
+                  case 7:
+                    return 'Ult 30 días';
+                }
+              }
               if (sesentaDias && !noventaDias) {
                 switch (value.toInt()) {
                   case 2:
@@ -84,11 +95,11 @@ class LineChartWidget extends StatelessWidget {
             getTextStyles: (context, value) => const TextStyle(
               color: Color.fromRGBO(2, 6, 11, 1),
               fontWeight: FontWeight.bold,
-              fontSize: 15, // Increased font size
+              fontSize: 15,
             ),
             reservedSize: 35,
             margin: 10,
-            interval: interval,
+            interval: interval, // Set the interval based on maxYValue
             getTitles: (double value) {
               return value.toInt().toString();
             },
@@ -102,24 +113,31 @@ class LineChartWidget extends StatelessWidget {
           border: Border.all(color: const Color(0xff37434d), width: 2),
         ),
         lineBarsData: [
-          LineChartBarData(
-            spots: sesentaDias
-                ? noventaDias
-                    ? [
-                        FlSpot(0, 0),
-                        FlSpot(1, ultimos90.toDouble()),
-                        FlSpot(4, ultimos60.toDouble()),
-                        FlSpot(7, ultimos30.toDouble()),
-                      ]
-                    : [
-                        FlSpot(0, 0),
-                        FlSpot(2, ultimos60.toDouble()),
-                        FlSpot(6, ultimos30.toDouble()),
-                      ]
-                : [
-                    FlSpot(0, 0),
-                    FlSpot(1, ultimos30.toDouble()),
-                  ],
+         LineChartBarData(
+  spots: sesentaDias
+      ? (noventaDias
+          ? [
+              FlSpot(0, 0),
+              FlSpot(1, ultimos90.toDouble()),
+              FlSpot(4, ultimos60.toDouble()),
+              FlSpot(7, ultimos30.toDouble()),
+            ]
+          : [
+              FlSpot(0, 0),
+              FlSpot(2, ultimos60.toDouble()),
+              FlSpot(6, ultimos30.toDouble()),
+            ])
+      : (noventaDias
+          ? [
+              FlSpot(0, 0),
+              FlSpot(1, ultimos90.toDouble()),
+              FlSpot(4, ultimos60.toDouble()),
+              FlSpot(7, ultimos30.toDouble()),
+            ]
+          : [
+              FlSpot(0, 0),
+              FlSpot(1, ultimos30.toDouble()),
+            ]),
             isCurved: true,
             colors: gradientColors,
             barWidth: 5,

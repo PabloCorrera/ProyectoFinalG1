@@ -346,7 +346,21 @@ class _UsuarioHomeState extends State<UsuarioHome> {
             } else {
               // Si no hay reservas en el historial
               return Center(
-                child: Text('No hay reservas en el historial'),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'No hay reservas en el historial',
+                      style: TextStyle(fontSize: 24.0),
+                    ),
+                    SizedBox(height: 16.0),
+                    Icon(
+                      Icons.directions_car,
+                      size: 70.0,
+                      color: Color(0xFF2C7F8C),
+                    ),
+                  ],
+                ),
               );
             }
           }
