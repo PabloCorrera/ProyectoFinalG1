@@ -34,7 +34,7 @@ class LineChartWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double maxYValue = maxY == 0 ? 30 : maxY;
+    final double maxYValue = maxY == 0 ? 5 : maxY;
     final double interval = maxYValue / 5 > 0 ? maxYValue / 5 : 1; 
 
     return LineChart(
@@ -96,11 +96,11 @@ class LineChartWidget extends StatelessWidget {
             getTextStyles: (context, value) => const TextStyle(
               color: Color.fromRGBO(2, 6, 11, 1),
               fontWeight: FontWeight.bold,
-              fontSize: 15, // Increased font size
+              fontSize: 15,
             ),
             reservedSize: 35,
             margin: 10,
-            interval: interval,
+            interval: interval, 
             getTitles: (double value) {
               return value.toInt().toString();
             },

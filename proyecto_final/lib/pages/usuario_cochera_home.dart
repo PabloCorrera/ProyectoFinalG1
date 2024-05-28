@@ -356,7 +356,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               Spacer(), 
               Text(
                 'No hay reservas activas',
-                style: TextStyle(fontSize: 32.0), 
+      style: TextStyle(fontSize: 32.0), 
               ),
               SizedBox(height: 16.0), 
               Icon(
@@ -366,10 +366,10 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               ),
               Icon(
                 Icons.clear,
-               size: 60.0,
+                size: 60.0,
                 color: Color(0xFF2C7F8C), 
               ),
-              Spacer(flex: 2),
+              Spacer(flex: 2), 
             ],
           )
         : ListView.builder(
@@ -418,9 +418,9 @@ Widget listaReservasExpiradas() {
           Spacer(), 
           Text(
             'No hay reservas expiradas',
-            style: TextStyle(fontSize: 30.0),
-          ),
-          SizedBox(height: 16.0), 
+                 style: TextStyle(fontSize: 30.0), 
+              ),
+              SizedBox(height: 16.0), 
               Icon(
                 Icons.directions_car,
                 size: 60.0,
@@ -428,10 +428,10 @@ Widget listaReservasExpiradas() {
               ),
               Icon(
                 Icons.clear,
-               size: 60.0,
+                size: 60.0,
                 color: Color(0xFF2C7F8C), 
               ),
-              Spacer(flex: 2),
+              Spacer(flex: 2), 
         ],
       ),
     );
@@ -487,7 +487,7 @@ Widget historialDeReservas() {
               Spacer(), 
               Text(
                 'No hay reservas',
-                style: TextStyle(fontSize: 32.0), 
+                style: TextStyle(fontSize: 42.0), 
               ),
               SizedBox(height: 16.0), 
               Icon(
@@ -497,7 +497,7 @@ Widget historialDeReservas() {
               ),
               Icon(
                 Icons.clear,
-               size: 60.0,
+                size: 60.0,
                 color: Color(0xFF2C7F8C), 
               ),
               Spacer(flex: 2),
@@ -741,15 +741,16 @@ Widget historialDeReservas() {
 Widget VistaEstadisticas() {
   String titulo = "Mis estadísticas";
   int reservasUltimos30Dias = obtenerCantidadReservasUltimos30Dias(); 
+  int reservasUltimos60dias = obtenerCantidadReservasUltimos60DiasHasta30Dias();
   
   int reservasTotales = _reservasFuture.length; 
   double recaudacionUltimos30Dias = obtenerRecaudacionUltimos30Dias();
   int reservasUlt30 = obtenerCantidadReservasUltimos30Dias(); 
-  int reservasUlt60 = obtenerCantidadReservasUltimos60Dias(); 
-  int reservasUlt90 = obtenerCantidadReservasUltimos90Dias(); 
+  int reservasUlt60 = obtenerCantidadReservasUltimos60DiasHasta30Dias(); 
+  int reservasUlt90 = obtenerCantidadReservasUltimos90DiasHasta60Dias(); 
   double recaudacionTotal = _recaudacionTotal; 
-   bool sesentaDias = hayReservaAnteriorA60Dias();
-   bool noventaDias = hayReservaAnteriorA90Dias();
+   bool sesentaDias = hayReservasUltimos60a30Dias();
+   bool noventaDias = hayReservasUltimos90a60Dias();
 
   return Scaffold(
 body: Padding(
@@ -773,7 +774,6 @@ body: Padding(
             'Reservas Totales: $reservasTotales',
             style: const TextStyle(fontSize: 18),
           ),
-          const SizedBox(height: 16),
           Text(
             'Recaudación de los últimos 30 días: \$${recaudacionUltimos30Dias.toStringAsFixed(2)}',
             style: const TextStyle(fontSize: 18),
@@ -786,7 +786,7 @@ body: Padding(
           const SizedBox(height: 24),
           Center(
             child: Text(
-              'Gráfico de Reservas',
+              'Cantidad de Reservas',
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
@@ -825,32 +825,39 @@ int obtenerCantidadReservasUltimos30Dias() {
       .length;
 }
 
-int obtenerCantidadReservasUltimos60Dias() {
+int obtenerCantidadReservasUltimos60DiasHasta30Dias() {
   DateTime fechaHoy = DateTime.now();
   DateTime hace60Dias = fechaHoy.subtract(Duration(days: 60));
+  DateTime hace30Dias = fechaHoy.subtract(Duration(days: 30));
+  
   return _reservasFuture
-      .where((reserva) => reserva.fechaSalida.toDate().isAfter(hace60Dias))
+      .where((reserva) => reserva.fechaSalida.toDate().isAfter(hace60Dias) && reserva.fechaSalida.toDate().isBefore(hace30Dias))
       .length;
 }
 
-int obtenerCantidadReservasUltimos90Dias() {
+int obtenerCantidadReservasUltimos90DiasHasta60Dias() {
   DateTime fechaHoy = DateTime.now();
   DateTime hace90Dias = fechaHoy.subtract(Duration(days: 90));
+  DateTime hace60Dias = fechaHoy.subtract(Duration(days: 60));
   return _reservasFuture
-      .where((reserva) => reserva.fechaSalida.toDate().isAfter(hace90Dias))
+      .where((reserva) => reserva.fechaSalida.toDate().isAfter(hace90Dias) && reserva.fechaSalida.toDate().isBefore(hace60Dias))
       .length;
 }
 
-bool hayReservaAnteriorA60Dias() {
-  DateTime fechaHoy = DateTime.now();
-  DateTime hace60Dias = fechaHoy.subtract(Duration(days: 60));
-  return _reservasExpiradas.any((reserva) => reserva.fechaSalida.toDate().isBefore(hace60Dias));
-}
+bool hayReservasUltimos60a30Dias() {
+    DateTime fechaHoy = DateTime.now();
+    DateTime hace60Dias = fechaHoy.subtract(Duration(days: 60));
+    DateTime hace30Dias = fechaHoy.subtract(Duration(days: 30));
+    return _reservasFuture.any((reserva) =>
+        reserva.fechaSalida.toDate().isAfter(hace60Dias) &&
+        reserva.fechaSalida.toDate().isBefore(hace30Dias));
+  }
 
-bool hayReservaAnteriorA90Dias() {
+bool hayReservasUltimos90a60Dias() {
   DateTime fechaHoy = DateTime.now();
   DateTime hace90Dias = fechaHoy.subtract(Duration(days: 90));
-  return _reservasExpiradas.any((reserva) => reserva.fechaSalida.toDate().isBefore(hace90Dias));
+  DateTime hace60Dias = fechaHoy.subtract(Duration(days: 60));
+  return _reservasFuture.any((reserva) => reserva.fechaSalida.toDate().isAfter(hace90Dias) &&  reserva.fechaSalida.toDate().isBefore(hace60Dias) );
 }
 
   bool isNotBlank(String value) {
