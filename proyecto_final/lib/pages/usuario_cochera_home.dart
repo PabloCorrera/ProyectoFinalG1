@@ -269,7 +269,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
           future: _initialLoadFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else {
@@ -302,7 +302,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
         const SizedBox(height: 12.0),
         Text(titulo + cantidadReservas.toString(),
             style: GoogleFonts.rubik(
-              textStyle: TextStyle(
+              textStyle: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: logoTitulos),
@@ -316,9 +316,9 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               0,
               _reservasActivas.length,
             ),
-            SizedBox(width: 12.0),
+            const SizedBox(width: 12.0),
             botonReservas("Expiradas", 1, _reservasExpiradas.length),
-            SizedBox(width: 12.0),
+            const SizedBox(width: 12.0),
             botonReservas("Totales", 2, _reservasFuture.length),
           ],
         ),
@@ -348,225 +348,241 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   }
 
   Widget listaReservasActivas() {
-  return Expanded(
-    child: _usuariosDeReservasActivas.isEmpty
-        ? Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Spacer(), 
-              Text(
-                'No hay reservas activas',
-      style: TextStyle(fontSize: 32.0), 
-              ),
-              SizedBox(height: 16.0), 
-              Icon(
-                Icons.directions_car,
-                size: 60.0,
-                color: Color(0xFF2C7F8C), 
-              ),
-              Icon(
-                Icons.clear,
-                size: 60.0,
-                color: Color(0xFF2C7F8C), 
-              ),
-              Spacer(flex: 2), 
-            ],
-          )
-        : ListView.builder(
-            itemCount: _usuariosDeReservasActivas.length,
-            itemBuilder: (context, index) {
-              var usuario = _usuariosDeReservasActivas[index]!;
-              return Column(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.account_circle, size: 40),
-                    title: Text(usuario.nombre + " " + usuario.apellido),
-                    subtitle: Text(usuario.email!),
-                    trailing: ElevatedButton(
-                      onPressed: () {
-                        _mostrarDialogo(
-                            context, _reservasActivas[index], usuario);
-                      },
-                      child: const Text('Detalle'),
+    return Expanded(
+      child: _usuariosDeReservasActivas.isEmpty
+          ? const Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Spacer(),
+                Text(
+                  'No hay reservas activas',
+                  style: TextStyle(fontSize: 32.0),
+                ),
+                SizedBox(height: 16.0),
+                Icon(
+                  Icons.directions_car,
+                  size: 60.0,
+                  color: Color(0xFF2C7F8C),
+                ),
+                Icon(
+                  Icons.clear,
+                  size: 60.0,
+                  color: Color(0xFF2C7F8C),
+                ),
+                Spacer(flex: 2),
+              ],
+            )
+          : ListView.builder(
+              itemCount: _usuariosDeReservasActivas.length,
+              itemBuilder: (context, index) {
+                var usuario = _usuariosDeReservasActivas[index]!;
+                return Column(
+                  children: [
+                    ListTile(
+                      leading: usuario.imageUrl != null
+                          ? CircleAvatar(
+                              backgroundImage: NetworkImage(usuario.imageUrl!),
+                              radius: 20,
+                            )
+                          : const Icon(Icons.account_circle, size: 40),
+                      title: Text(usuario.nombre + " " + usuario.apellido),
+                      subtitle: Text(usuario.email!),
+                      trailing: ElevatedButton(
+                        onPressed: () {
+                          _mostrarDialogo(
+                              context, _reservasActivas[index], usuario);
+                        },
+                        child: const Text('Detalle'),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 16.0),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 8.0, horizontal: 16.0),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 16.0),
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Colors.grey.shade300,
-                          width: 1.0,
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Colors.grey.shade300,
+                            width: 1.0,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              );
-            },
-          ),
-  );
-}
-Widget listaReservasExpiradas() {
-  if (_usuariosDeReservasExpiradas.isEmpty) {
-    return Expanded(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Spacer(), 
-          Text(
-            'No hay reservas expiradas',
-                 style: TextStyle(fontSize: 30.0), 
-              ),
-              SizedBox(height: 16.0), 
-              Icon(
-                Icons.directions_car,
-                size: 60.0,
-                color: Color(0xFF2C7F8C), 
-              ),
-              Icon(
-                Icons.clear,
-                size: 60.0,
-                color: Color(0xFF2C7F8C), 
-              ),
-              Spacer(flex: 2), 
-        ],
-      ),
-    );
-  } else {
-    return Expanded(
-      child: ListView.builder(
-        itemCount: _usuariosDeReservasExpiradas.length,
-        itemBuilder: (context, index) {
-          var usuario = _usuariosDeReservasExpiradas[index]!;
-          return Column(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.account_circle, size: 40),
-                title: Text(usuario.nombre + " " + usuario.apellido),
-                subtitle: Text(usuario.email!),
-                trailing: ElevatedButton(
-                  onPressed: () {
-                    _mostrarDialogo(
-                        context, _reservasExpiradas[index], usuario);
-                  },
-                  child: const Text('Detalle'),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                    vertical: 8.0, horizontal: 16.0),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 16.0),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: Colors.grey.shade300,
-                      width: 1.0,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
-      ),
+                  ],
+                );
+              },
+            ),
     );
   }
-}
 
-Widget historialDeReservas() {
-  DateTime fechaHoy = DateTime.now();
-
-  return _usuariosDeReserva.isEmpty
-      ? Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Spacer(), 
-              Text(
-                'No hay reservas',
-                style: TextStyle(fontSize: 42.0), 
-              ),
-              SizedBox(height: 16.0), 
-              Icon(
-                Icons.directions_car,
-                size: 60.0,
-                color: Color(0xFF2C7F8C), 
-              ),
-              Icon(
-                Icons.clear,
-                size: 60.0,
-                color: Color(0xFF2C7F8C), 
-              ),
-              Spacer(flex: 2),
-            ],
-          ),
-        )
-      : Expanded(
-          child: ListView.builder(
-            itemCount: _usuariosDeReserva.length,
-            itemBuilder: (context, index) {
-              DateTime fechaSalida =
-                  _reservasFuture[index].fechaSalida.toDate();
-              DateTime fechaEntrada =
-                  _reservasFuture[index].fechaEntrada.toDate();
-
-              String estadoReserva;
-              Color colorTexto;
-              if (fechaSalida.isBefore(fechaHoy)) {
-                estadoReserva = 'Expirada';
-                colorTexto = Colors.red;
-              } else if (fechaSalida.isAfter(fechaHoy)) {
-                estadoReserva = 'Activa';
-                colorTexto = Colors.green;
-              } else if (fechaEntrada.isAfter(fechaHoy)) {
-                estadoReserva = 'No iniciada';
-                colorTexto = Colors.blue;
-              } else {
-                estadoReserva = 'En curso';
-                colorTexto = Colors.black;
-              }
-
-              return Column(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.account_circle, size: 40),
-                    title: Text(
-                      '${_usuariosDeReserva[index]!.nombre} ${_usuariosDeReserva[index]!.apellido}',
-                    ),
-                    subtitle: Text(
-                      estadoReserva,
-                      style: TextStyle(color: colorTexto),
-                    ),
-                    trailing: ElevatedButton(
-                      onPressed: () {
-                        _mostrarDialogo(
-                            context, _reservasFuture[index], _usuariosDeReserva[index]!);
-                      },
-                      child: const Text('Detalle'),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 8.0, horizontal: 16.0),
+  Widget listaReservasExpiradas() {
+    if (_usuariosDeReservasExpiradas.isEmpty) {
+      return const Expanded(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Spacer(),
+            Text(
+              'No hay reservas expiradas',
+              style: TextStyle(fontSize: 30.0),
+            ),
+            SizedBox(height: 16.0),
+            Icon(
+              Icons.directions_car,
+              size: 60.0,
+              color: Color(0xFF2C7F8C),
+            ),
+            Icon(
+              Icons.clear,
+              size: 60.0,
+              color: Color(0xFF2C7F8C),
+            ),
+            Spacer(flex: 2),
+          ],
+        ),
+      );
+    } else {
+      return Expanded(
+        child: ListView.builder(
+          itemCount: _usuariosDeReservasExpiradas.length,
+          itemBuilder: (context, index) {
+            var usuario = _usuariosDeReservasExpiradas[index]!;
+            return Column(
+              children: [
+                ListTile(
+                  leading: usuario.imageUrl != null
+                          ? CircleAvatar(
+                              backgroundImage: NetworkImage(usuario.imageUrl!),
+                              radius: 20,
+                            )
+                          : const Icon(Icons.account_circle, size: 40),
+                  title: Text(usuario.nombre + " " + usuario.apellido),
+                  subtitle: Text(usuario.email!),
+                  trailing: ElevatedButton(
+                    onPressed: () {
+                      _mostrarDialogo(
+                          context, _reservasExpiradas[index], usuario);
+                    },
+                    child: const Text('Detalle'),
                   ),
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 16.0),
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Colors.grey.shade300, 
-                          width: 1.0, 
-                        ),
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 8.0, horizontal: 16.0),
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.grey.shade300,
+                        width: 1.0,
                       ),
                     ),
                   ),
-                ],
-              );
-            },
-          ),
-        );
-}
+                ),
+              ],
+            );
+          },
+        ),
+      );
+    }
+  }
+
+  Widget historialDeReservas() {
+    DateTime fechaHoy = DateTime.now();
+
+    return _usuariosDeReserva.isEmpty
+        ? const Expanded(
+            child: const Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Spacer(),
+                Text(
+                  'No hay reservas',
+                  style: TextStyle(fontSize: 42.0),
+                ),
+                SizedBox(height: 16.0),
+                Icon(
+                  Icons.directions_car,
+                  size: 60.0,
+                  color: Color(0xFF2C7F8C),
+                ),
+                Icon(
+                  Icons.clear,
+                  size: 60.0,
+                  color: Color(0xFF2C7F8C),
+                ),
+                Spacer(flex: 2),
+              ],
+            ),
+          )
+        : Expanded(
+            child: ListView.builder(
+              itemCount: _usuariosDeReserva.length,
+              itemBuilder: (context, index) {
+                DateTime fechaSalida =
+                    _reservasFuture[index].fechaSalida.toDate();
+                DateTime fechaEntrada =
+                    _reservasFuture[index].fechaEntrada.toDate();
+
+                String estadoReserva;
+                Color colorTexto;
+                if (fechaSalida.isBefore(fechaHoy)) {
+                  estadoReserva = 'Expirada';
+                  colorTexto = Colors.red;
+                } else if (fechaSalida.isAfter(fechaHoy)) {
+                  estadoReserva = 'Activa';
+                  colorTexto = Colors.green;
+                } else if (fechaEntrada.isAfter(fechaHoy)) {
+                  estadoReserva = 'No iniciada';
+                  colorTexto = Colors.blue;
+                } else {
+                  estadoReserva = 'En curso';
+                  colorTexto = Colors.black;
+                }
+
+                return Column(
+                  children: [
+                    ListTile(
+                      leading: _usuariosDeReserva[index]!.imageUrl != null
+                          ? CircleAvatar(
+                              backgroundImage: NetworkImage(_usuariosDeReserva[index]!.imageUrl!),
+                              radius: 20,
+                            )
+                          : const Icon(Icons.account_circle, size: 40),
+                      title: Text(
+                        '${_usuariosDeReserva[index]!.nombre} ${_usuariosDeReserva[index]!.apellido}',
+                      ),
+                      subtitle: Text(
+                        estadoReserva,
+                        style: TextStyle(color: colorTexto),
+                      ),
+                      trailing: ElevatedButton(
+                        onPressed: () {
+                          _mostrarDialogo(context, _reservasFuture[index],
+                              _usuariosDeReserva[index]!);
+                        },
+                        child: const Text('Detalle'),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 16.0),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Colors.grey.shade300,
+                            width: 1.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          );
+  }
 
   Widget vistaEditar() {
     final TextEditingController nombreCocheraController =
@@ -653,7 +669,7 @@ Widget historialDeReservas() {
               context: context,
               barrierDismissible: false,
               builder: (BuildContext context) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               },
             );
             try {
@@ -664,6 +680,9 @@ Widget historialDeReservas() {
               int cantLugares = int.parse(lugaresController.text);
 
               String urlImagen = "";
+               if(usuarioCochera!.imageUrl!=null&&usuarioCochera!.imageUrl!=""){
+                    urlImagen = usuarioCochera!.imageUrl!;
+                  }
               if (fileImagen != null) {
                 String uniqueName =
                     DateTime.now().millisecondsSinceEpoch.toString();
@@ -678,7 +697,12 @@ Widget historialDeReservas() {
                       .then((value) => urlImagen = value);
                 } catch (error) {
                   print(error);
-                  urlImagen = "";
+                  if(usuarioCochera!.imageUrl!=null&&usuarioCochera!.imageUrl!=""){
+                    urlImagen = usuarioCochera!.imageUrl!;
+                  }
+                  else {
+                    urlImagen = "";
+                  }
                 }
               }
               Map<String, dynamic> updatedAttributes = {
@@ -738,127 +762,131 @@ Widget historialDeReservas() {
   }
 
   @override
-Widget VistaEstadisticas() {
-  String titulo = "Mis estadísticas";
-  int reservasUltimos30Dias = obtenerCantidadReservasUltimos30Dias(); 
-  int reservasUltimos60dias = obtenerCantidadReservasUltimos60DiasHasta30Dias();
-  
-  int reservasTotales = _reservasFuture.length; 
-  double recaudacionUltimos30Dias = obtenerRecaudacionUltimos30Dias();
-  int reservasUlt30 = obtenerCantidadReservasUltimos30Dias(); 
-  int reservasUlt60 = obtenerCantidadReservasUltimos60DiasHasta30Dias(); 
-  int reservasUlt90 = obtenerCantidadReservasUltimos90DiasHasta60Dias(); 
-  double recaudacionTotal = _recaudacionTotal; 
-   bool sesentaDias = hayReservasUltimos60a30Dias();
-   bool noventaDias = hayReservasUltimos90a60Dias();
+  Widget VistaEstadisticas() {
+    String titulo = "Mis estadísticas";
+    int reservasUltimos30Dias = obtenerCantidadReservasUltimos30Dias();
+    int reservasUltimos60dias =
+        obtenerCantidadReservasUltimos60DiasHasta30Dias();
 
-  return Scaffold(
-body: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Text(
-              titulo,
-              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+    int reservasTotales = _reservasFuture.length;
+    double recaudacionUltimos30Dias = obtenerRecaudacionUltimos30Dias();
+    int reservasUlt30 = obtenerCantidadReservasUltimos30Dias();
+    int reservasUlt60 = obtenerCantidadReservasUltimos60DiasHasta30Dias();
+    int reservasUlt90 = obtenerCantidadReservasUltimos90DiasHasta60Dias();
+    double recaudacionTotal = _recaudacionTotal;
+    bool sesentaDias = hayReservasUltimos60a30Dias();
+    bool noventaDias = hayReservasUltimos90a60Dias();
+
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Text(
+                titulo,
+                style:
+                    const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+              ),
             ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Reservas de los últimos 30 días: $reservasUltimos30Dias',
-            style: const TextStyle(fontSize: 18),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Reservas Totales: $reservasTotales',
-            style: const TextStyle(fontSize: 18),
-          ),
-          Text(
-            'Recaudación de los últimos 30 días: \$${recaudacionUltimos30Dias.toStringAsFixed(2)}',
-            style: const TextStyle(fontSize: 18),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Recaudación Total: \$${recaudacionTotal.toStringAsFixed(2)}',
-            style: const TextStyle(fontSize: 18),
-          ),
-          const SizedBox(height: 24),
-          Center(
-            child: Text(
-              'Cantidad de Reservas',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            const SizedBox(height: 24),
+            Text(
+              'Reservas de los últimos 30 días: $reservasUltimos30Dias',
+              style: const TextStyle(fontSize: 18),
             ),
-          ),
-          const SizedBox(height: 16), 
-          Expanded(
-            child: LineChartWidget(
-              ultimos30: reservasUlt30,
-              ultimos60: reservasUlt60,
-              ultimos90: reservasUlt90,
-              sesentaDias: sesentaDias,
-              noventaDias: noventaDias
-              
-            ), 
+            const SizedBox(height: 16),
+            Text(
+              'Reservas Totales: $reservasTotales',
+              style: const TextStyle(fontSize: 18),
             ),
-        ],
+            Text(
+              'Recaudación de los últimos 30 días: \$${recaudacionUltimos30Dias.toStringAsFixed(2)}',
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Recaudación Total: \$${recaudacionTotal.toStringAsFixed(2)}',
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 24),
+            const Center(
+              child: Text(
+                'Cantidad de Reservas',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: LineChartWidget(
+                  ultimos30: reservasUlt30,
+                  ultimos60: reservasUlt60,
+                  ultimos90: reservasUlt90,
+                  sesentaDias: sesentaDias,
+                  noventaDias: noventaDias),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-
-
-double obtenerRecaudacionUltimos30Dias() {
-  DateTime fechaHoy = DateTime.now();
-  DateTime hace30Dias = fechaHoy.subtract(Duration(days: 30));
-  return _reservasExpiradas
-      .where((reserva) => reserva.fechaSalida.toDate().isAfter(hace30Dias))
-      .fold(0.0, (sum, reserva) => sum + reserva.precioTotal);
-}
-
-int obtenerCantidadReservasUltimos30Dias() {
-  DateTime fechaHoy = DateTime.now();
-  DateTime hace30Dias = fechaHoy.subtract(Duration(days: 30));
-  return _reservasFuture
-      .where((reserva) => reserva.fechaSalida.toDate().isAfter(hace30Dias))
-      .length;
-}
-
-int obtenerCantidadReservasUltimos60DiasHasta30Dias() {
-  DateTime fechaHoy = DateTime.now();
-  DateTime hace60Dias = fechaHoy.subtract(Duration(days: 60));
-  DateTime hace30Dias = fechaHoy.subtract(Duration(days: 30));
-  
-  return _reservasFuture
-      .where((reserva) => reserva.fechaSalida.toDate().isAfter(hace60Dias) && reserva.fechaSalida.toDate().isBefore(hace30Dias))
-      .length;
-}
-
-int obtenerCantidadReservasUltimos90DiasHasta60Dias() {
-  DateTime fechaHoy = DateTime.now();
-  DateTime hace90Dias = fechaHoy.subtract(Duration(days: 90));
-  DateTime hace60Dias = fechaHoy.subtract(Duration(days: 60));
-  return _reservasFuture
-      .where((reserva) => reserva.fechaSalida.toDate().isAfter(hace90Dias) && reserva.fechaSalida.toDate().isBefore(hace60Dias))
-      .length;
-}
-
-bool hayReservasUltimos60a30Dias() {
+  double obtenerRecaudacionUltimos30Dias() {
     DateTime fechaHoy = DateTime.now();
-    DateTime hace60Dias = fechaHoy.subtract(Duration(days: 60));
-    DateTime hace30Dias = fechaHoy.subtract(Duration(days: 30));
+    DateTime hace30Dias = fechaHoy.subtract(const Duration(days: 30));
+    return _reservasExpiradas
+        .where((reserva) => reserva.fechaSalida.toDate().isAfter(hace30Dias))
+        .fold(0.0, (sum, reserva) => sum + reserva.precioTotal);
+  }
+
+  int obtenerCantidadReservasUltimos30Dias() {
+    DateTime fechaHoy = DateTime.now();
+    DateTime hace30Dias = fechaHoy.subtract(const Duration(days: 30));
+    return _reservasFuture
+        .where((reserva) => reserva.fechaSalida.toDate().isAfter(hace30Dias))
+        .length;
+  }
+
+  int obtenerCantidadReservasUltimos60DiasHasta30Dias() {
+    DateTime fechaHoy = DateTime.now();
+    DateTime hace60Dias = fechaHoy.subtract(const Duration(days: 60));
+    DateTime hace30Dias = fechaHoy.subtract(const Duration(days: 30));
+
+    return _reservasFuture
+        .where((reserva) =>
+            reserva.fechaSalida.toDate().isAfter(hace60Dias) &&
+            reserva.fechaSalida.toDate().isBefore(hace30Dias))
+        .length;
+  }
+
+  int obtenerCantidadReservasUltimos90DiasHasta60Dias() {
+    DateTime fechaHoy = DateTime.now();
+    DateTime hace90Dias = fechaHoy.subtract(const Duration(days: 90));
+    DateTime hace60Dias = fechaHoy.subtract(const Duration(days: 60));
+    return _reservasFuture
+        .where((reserva) =>
+            reserva.fechaSalida.toDate().isAfter(hace90Dias) &&
+            reserva.fechaSalida.toDate().isBefore(hace60Dias))
+        .length;
+  }
+
+  bool hayReservasUltimos60a30Dias() {
+    DateTime fechaHoy = DateTime.now();
+    DateTime hace60Dias = fechaHoy.subtract(const Duration(days: 60));
+    DateTime hace30Dias = fechaHoy.subtract(const Duration(days: 30));
     return _reservasFuture.any((reserva) =>
         reserva.fechaSalida.toDate().isAfter(hace60Dias) &&
         reserva.fechaSalida.toDate().isBefore(hace30Dias));
   }
 
-bool hayReservasUltimos90a60Dias() {
-  DateTime fechaHoy = DateTime.now();
-  DateTime hace90Dias = fechaHoy.subtract(Duration(days: 90));
-  DateTime hace60Dias = fechaHoy.subtract(Duration(days: 60));
-  return _reservasFuture.any((reserva) => reserva.fechaSalida.toDate().isAfter(hace90Dias) &&  reserva.fechaSalida.toDate().isBefore(hace60Dias) );
-}
+  bool hayReservasUltimos90a60Dias() {
+    DateTime fechaHoy = DateTime.now();
+    DateTime hace90Dias = fechaHoy.subtract(const Duration(days: 90));
+    DateTime hace60Dias = fechaHoy.subtract(const Duration(days: 60));
+    return _reservasFuture.any((reserva) =>
+        reserva.fechaSalida.toDate().isAfter(hace90Dias) &&
+        reserva.fechaSalida.toDate().isBefore(hace60Dias));
+  }
 
   bool isNotBlank(String value) {
     return value.trim().isNotEmpty;

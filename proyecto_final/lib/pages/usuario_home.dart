@@ -892,6 +892,9 @@ class _UsuarioHomeState extends State<UsuarioHome> {
               String apellido = apellidoController.text;
 
               String urlImagen = "";
+               if(consumidor!.imageUrl!=null&&consumidor!.imageUrl!=""){
+                    urlImagen = consumidor!.imageUrl!;
+                  }
               if (fileImagen != null) {
                 String uniqueName =
                     DateTime.now().millisecondsSinceEpoch.toString();
@@ -906,7 +909,13 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                       .then((value) => urlImagen = value);
                 } catch (error) {
                   print(error);
-                  urlImagen = "";
+                  if(consumidor!.imageUrl!=null&&consumidor!.imageUrl!=""){
+                    urlImagen = consumidor!.imageUrl!;
+                  }
+                  else {
+                    urlImagen = "";
+                  }
+                  
                 }
               }
 
