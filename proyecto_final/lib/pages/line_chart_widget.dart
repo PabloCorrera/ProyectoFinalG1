@@ -21,7 +21,7 @@ class LineChartWidget extends StatelessWidget {
   final int ultimos90;
   final bool sesentaDias;
   final bool noventaDias;
-  final int numero =10;
+
 
   double get maxY {
     double maxReservas = [
@@ -56,6 +56,17 @@ class LineChartWidget extends StatelessWidget {
             margin: 6,
             getTitles: (double value) {
               if (sesentaDias && noventaDias) {
+                switch (value.toInt()) {
+                  case 1:
+                    return 'Ult 90 días';
+                  case 4:
+                    return 'Ult 60 días';
+                  case 7:
+                    return 'Ult 30 días';
+                }
+              }
+
+              if (!sesentaDias && noventaDias) {
                 switch (value.toInt()) {
                   case 1:
                     return 'Ult 90 días';
@@ -103,24 +114,31 @@ class LineChartWidget extends StatelessWidget {
           border: Border.all(color: const Color(0xff37434d), width: 2),
         ),
         lineBarsData: [
-          LineChartBarData(
-            spots: sesentaDias
-                ? noventaDias
-                    ? [
-                        FlSpot(0, 0),
-                        FlSpot(1, ultimos90.toDouble()),
-                        FlSpot(4, ultimos60.toDouble()),
-                        FlSpot(7, ultimos30.toDouble()),
-                      ]
-                    : [
-                        FlSpot(0, 0),
-                        FlSpot(2, ultimos60.toDouble()),
-                        FlSpot(6, ultimos30.toDouble()),
-                      ]
-                : [
-                    FlSpot(0, 0),
-                    FlSpot(1, ultimos30.toDouble()),
-                  ],
+         LineChartBarData(
+  spots: sesentaDias
+      ? (noventaDias
+          ? [
+              FlSpot(0, 0),
+              FlSpot(1, ultimos90.toDouble()),
+              FlSpot(4, ultimos60.toDouble()),
+              FlSpot(7, ultimos30.toDouble()),
+            ]
+          : [
+              FlSpot(0, 0),
+              FlSpot(2, ultimos60.toDouble()),
+              FlSpot(6, ultimos30.toDouble()),
+            ])
+      : (noventaDias
+          ? [
+              FlSpot(0, 0),
+              FlSpot(1, ultimos90.toDouble()),
+              FlSpot(4, ultimos60.toDouble()),
+              FlSpot(7, ultimos30.toDouble()),
+            ]
+          : [
+              FlSpot(0, 0),
+              FlSpot(1, ultimos30.toDouble()),
+            ]),
             isCurved: true,
             colors: gradientColors,
             barWidth: 5,
