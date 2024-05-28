@@ -761,21 +761,17 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     );
   }
 
-  @override
+  
   Widget VistaEstadisticas() {
     String titulo = "Mis estadísticas";
     int reservasUltimos30Dias = obtenerCantidadReservasUltimos30Dias();
-    int reservasUltimos60dias =
-        obtenerCantidadReservasUltimos60DiasHasta30Dias();
+
 
     int reservasTotales = _reservasFuture.length;
     double recaudacionUltimos30Dias = obtenerRecaudacionUltimos30Dias();
     int reservasUlt30 = obtenerCantidadReservasUltimos30Dias();
-    int reservasUlt60 = obtenerCantidadReservasUltimos60DiasHasta30Dias();
-    int reservasUlt90 = obtenerCantidadReservasUltimos90DiasHasta60Dias();
     double recaudacionTotal = _recaudacionTotal;
-    bool sesentaDias = hayReservasUltimos60a30Dias();
-    bool noventaDias = hayReservasUltimos90a60Dias();
+
 
     return Scaffold(
       body: Padding(
@@ -795,16 +791,17 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               'Reservas de los últimos 30 días: $reservasUltimos30Dias',
               style: const TextStyle(fontSize: 18),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             Text(
               'Reservas Totales: $reservasTotales',
               style: const TextStyle(fontSize: 18),
             ),
+            const SizedBox(height: 24),
             Text(
               'Recaudación de los últimos 30 días: \$${recaudacionUltimos30Dias.toStringAsFixed(2)}',
               style: const TextStyle(fontSize: 18),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             Text(
               'Recaudación Total: \$${recaudacionTotal.toStringAsFixed(2)}',
               style: const TextStyle(fontSize: 18),
@@ -816,20 +813,18 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             Expanded(
               child: LineChartWidget(
                   ultimos30: reservasUlt30,
-                  ultimos60: reservasUlt60,
-                  ultimos90: reservasUlt90,
-                  sesentaDias: sesentaDias,
-                  noventaDias: noventaDias),
+                 ),
             ),
           ],
         ),
       ),
     );
   }
+
 
   double obtenerRecaudacionUltimos30Dias() {
     DateTime fechaHoy = DateTime.now();
@@ -847,46 +842,6 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
         .length;
   }
 
-  int obtenerCantidadReservasUltimos60DiasHasta30Dias() {
-    DateTime fechaHoy = DateTime.now();
-    DateTime hace60Dias = fechaHoy.subtract(const Duration(days: 60));
-    DateTime hace30Dias = fechaHoy.subtract(const Duration(days: 30));
-
-    return _reservasFuture
-        .where((reserva) =>
-            reserva.fechaSalida.toDate().isAfter(hace60Dias) &&
-            reserva.fechaSalida.toDate().isBefore(hace30Dias))
-        .length;
-  }
-
-  int obtenerCantidadReservasUltimos90DiasHasta60Dias() {
-    DateTime fechaHoy = DateTime.now();
-    DateTime hace90Dias = fechaHoy.subtract(const Duration(days: 90));
-    DateTime hace60Dias = fechaHoy.subtract(const Duration(days: 60));
-    return _reservasFuture
-        .where((reserva) =>
-            reserva.fechaSalida.toDate().isAfter(hace90Dias) &&
-            reserva.fechaSalida.toDate().isBefore(hace60Dias))
-        .length;
-  }
-
-  bool hayReservasUltimos60a30Dias() {
-    DateTime fechaHoy = DateTime.now();
-    DateTime hace60Dias = fechaHoy.subtract(const Duration(days: 60));
-    DateTime hace30Dias = fechaHoy.subtract(const Duration(days: 30));
-    return _reservasFuture.any((reserva) =>
-        reserva.fechaSalida.toDate().isAfter(hace60Dias) &&
-        reserva.fechaSalida.toDate().isBefore(hace30Dias));
-  }
-
-  bool hayReservasUltimos90a60Dias() {
-    DateTime fechaHoy = DateTime.now();
-    DateTime hace90Dias = fechaHoy.subtract(const Duration(days: 90));
-    DateTime hace60Dias = fechaHoy.subtract(const Duration(days: 60));
-    return _reservasFuture.any((reserva) =>
-        reserva.fechaSalida.toDate().isAfter(hace90Dias) &&
-        reserva.fechaSalida.toDate().isBefore(hace60Dias));
-  }
 
   bool isNotBlank(String value) {
     return value.trim().isNotEmpty;
