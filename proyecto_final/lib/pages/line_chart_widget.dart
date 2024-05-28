@@ -1,0 +1,171 @@
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+
+class LineChartWidget extends StatelessWidget {
+  LineChartWidget({
+    Key? key,
+    required this.ultimos30,
+    required this.ultimos60,
+    required this.ultimos90,
+    required this.sesentaDias,
+    required this.noventaDias
+  }) : super(key: key);
+
+  final List<Color> gradientColors = [
+    const Color(0xff23b6e6),
+    const Color(0xff02d39a),
+  ];
+
+  final int ultimos30;
+  final int ultimos60;
+  final int ultimos90;
+  final bool sesentaDias;
+  final bool noventaDias;
+
+  double get maxY {
+    double maxReservas = [ultimos30.toDouble(), ultimos60.toDouble(), ultimos90.toDouble()].reduce((a, b) => a > b ? a : b);
+    // Limitamos el máximo del eje y a 1.2 veces el valor máximo de recaudación
+    return (maxReservas * 2).ceilToDouble();
+  }
+
+  @override
+  Widget build(BuildContext context) => LineChart(
+        LineChartData(
+          backgroundColor: const Color(0xffE0E0E0), // Fondo gris claro
+          minX: 0,
+          maxX: sesentaDias ? 8 : 2, // Ajusta el maxX según el valor de sesentaDias
+          minY: 0,
+          maxY: maxY, // Usamos el valor calculado para el rango máximo del eje y
+          titlesData: FlTitlesData(
+            bottomTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 22,
+              getTextStyles: (context, value) => const TextStyle(
+                color: Color(0xff68737d),
+                fontWeight: FontWeight.bold, // Negrita
+                fontSize: 14,
+              ),
+              margin: 6, // Ajusta el margen si es necesario
+              getTitles: (double value) {
+                if (sesentaDias && noventaDias) {
+                  switch (value.toInt()) {
+                    case 1:
+                      return 'Ult 90 días';
+                    case 4:
+                      return 'Ult 60 días';
+                    case 7:
+                      return 'Ult 30 días';
+                  }
+                }
+                  if (sesentaDias && !noventaDias) {
+                  switch (value.toInt()) {
+                    case 2:
+                      return 'Ult 60 días';
+                    case 6:
+                      return 'Ult 30 días';
+      
+                  }
+                } else {
+                  if (value.toInt() == 1) {
+                    return 'Ult 30 días';
+                  }
+                }
+                return '';
+              },
+            ),
+            leftTitles: SideTitles(
+              showTitles: true,
+              getTextStyles: (context, value) => const TextStyle(
+                color: Color(0xff67727d),
+                fontWeight: FontWeight.bold, // Negrita
+                fontSize: 10, // Tamaño de fuente más pequeño
+              ),
+              reservedSize: 35, // Tamaño de reserva ajustado para más espacio a la izquierda
+              margin: 10, // Margen ajustado
+              interval: 10, // Intervalo de 10 entre los títulos
+              getTitles: (double value) {
+                // Devuelve el valor como texto para mostrar en el título
+                return value.toInt().toString();
+              },
+            ),
+          ),
+          gridData: FlGridData(
+            show: false, // Oculta las líneas de la cuadrícula
+          ),
+          borderData: FlBorderData(
+            show: true,
+            border: Border.all(color: const Color(0xff37434d), width: 2), // Borde más oscuro y más grueso
+          ),
+          lineBarsData: [
+            LineChartBarData(
+  spots: sesentaDias
+                  ? noventaDias
+                      ? [
+                          FlSpot(0, 0), // Punto de inicio en (0, 0)
+                          FlSpot(
+                              1,
+                              ultimos90
+                                  .toDouble()), // Recaudación de los últimos 90 días
+                          FlSpot(
+                              4,
+                              ultimos60
+                                  .toDouble()), // Recaudación de los últimos 60 días
+                          FlSpot(
+                              7,
+                              ultimos30
+                                  .toDouble()), // Recaudación de los últimos 30 días
+                        ]
+                      : [
+                          FlSpot(0, 0), // Punto de inicio en (0, 0)
+                          FlSpot(
+                              2,
+                              ultimos60
+                                  .toDouble()), // Recaudación de los últimos 60 días
+                          FlSpot(
+                              6,
+                              ultimos30
+                                  .toDouble()), // Recaudación de los últimos 30 días
+                        ]
+                  : [
+                      FlSpot(0, 0), // Punto de inicio en (0, 0)
+                      FlSpot(
+                          1,
+                          ultimos30
+                              .toDouble()), // Recaudación de los últimos 30 días
+                    ],
+              isCurved: true,
+              colors: gradientColors,
+              barWidth: 5,
+              belowBarData: BarAreaData(
+                show: true,
+                colors: gradientColors.map((color) => color.withOpacity(0.3)).toList(),
+              ),
+              dotData: FlDotData(
+                show: true,
+                getDotPainter: (spot, percent, bar, index) {
+                  return FlDotCirclePainter(
+                    radius: 6,
+                    color: gradientColors.first,
+                    strokeWidth: 2,
+                    strokeColor: gradientColors.last,
+                  );
+                },
+              ),
+            ),
+          ],
+          lineTouchData: LineTouchData(
+            touchTooltipData: LineTouchTooltipData(
+              tooltipBgColor: Colors.blueAccent,
+              getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+                return touchedBarSpots.map((barSpot) {
+                  return LineTooltipItem(
+                    '${barSpot.y.toStringAsFixed(2)}',
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  );
+                }).toList();
+              },
+            ),
+          ),
+        ),
+      );
+}
