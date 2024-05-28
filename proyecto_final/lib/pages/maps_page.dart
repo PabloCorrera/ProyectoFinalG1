@@ -9,6 +9,7 @@ import 'package:proyecto_final/auth.dart';
 import 'package:proyecto_final/entities/reserva.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
 import 'package:proyecto_final/models/constant.dart';
+import 'package:proyecto_final/pages/usuario_home.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 import 'package:proyecto_final/assets/payment_config.dart';
 import 'package:pay/pay.dart';
@@ -98,6 +99,10 @@ class MapsPageState extends State<MapsPage> {
       _cocheras = usuarios;
     });
   }
+}
+
+Future<List<Reserva>> getReservas() async {
+  return databaseService.getReservasPorUsuario(user!.email!);
 }
 
 Future<void> _showReservarDialog(
@@ -386,7 +391,8 @@ void reservar(
                     ),
                     backgroundColor: botonfunc,
                   ),
-                )
+                ),
+                context.pushNamed(UsuarioHome.name)
               }
             else
               {

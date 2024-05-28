@@ -12,16 +12,16 @@ const Color magnolia = Color(0xFFF8F1FF);
 const TextStyle primaryTextStyle = TextStyle(
     fontWeight: FontWeight.bold,
     fontSize: 30,
-    color: logoTitulos // Puedes agregar más atributos de estilo aquí
+    color: logoTitulos
     );
 
 const TextStyle secondaryTextStyle =
     TextStyle(fontSize: 24, color: logoTitulos, fontWeight: FontWeight.w500
-        // Puedes agregar más atributos de estilo aquí
+        
         );
 const TextStyle terTextStyle =
     TextStyle(fontSize: 18, color: logoTitulos, fontWeight: FontWeight.w300
-        // Puedes agregar más atributos de estilo aquí
+        
         );
 
 const defaultPadding = 16.0;

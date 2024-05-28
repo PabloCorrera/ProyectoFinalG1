@@ -144,6 +144,7 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                     setState(() {
                       aMostrar = vistaReservas();
                       Navigator.pop(context);
+                      _loadReservas();
                     })
                   },
                 ),
@@ -521,16 +522,22 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                                 aMostrar = vistaReservas();
                                 if (cantReservasPre > _reservasFuture.length) {
                                   ScaffoldMessenger.of(context)
-                                      .showSnackBar(const SnackBar(
+                                      .showSnackBar(SnackBar(
                                     content: Text(
-                                        'Reserva cancelada satisfactoriamente'),
-                                    backgroundColor: Colors.green,
+                                        'Reserva cancelada satisfactoriamente',
+                                        style: GoogleFonts.rubik(
+                                            textStyle: secondaryTextStyle,
+                                            fontSize: 20)),
+                                    backgroundColor: botonfunc,
                                   ));
                                 } else {
                                   ScaffoldMessenger.of(context)
-                                      .showSnackBar(const SnackBar(
+                                      .showSnackBar(SnackBar(
                                     content: Text(
-                                        'No se pudo cancelar la reserva, intente nuevamente.'),
+                                        'No se pudo cancelar la reserva, intente nuevamente.',
+                                        style: GoogleFonts.rubik(
+                                            textStyle: secondaryTextStyle,
+                                            fontSize: 20)),
                                     backgroundColor: Colors.red,
                                   ));
                                 }
@@ -919,17 +926,21 @@ class _UsuarioHomeState extends State<UsuarioHome> {
               });
 
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
+                SnackBar(
                   content: Text(
-                      'Los datos del usuario fueron editados correctamente'),
+                      'Los datos del usuario fueron editados correctamente',
+                      style: GoogleFonts.rubik(
+                          textStyle: secondaryTextStyle, fontSize: 20)),
                   duration: Duration(seconds: 3),
-                  backgroundColor: Colors.green,
+                  backgroundColor: botonfunc,
                 ),
               );
             } catch (error) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Hubo un error al editar los datos'),
+                SnackBar(
+                  content: Text('Hubo un error al editar los datos',
+                      style: GoogleFonts.rubik(
+                          textStyle: secondaryTextStyle, fontSize: 20)),
                   duration: Duration(seconds: 3),
                   backgroundColor: Colors.red,
                 ),
@@ -940,8 +951,10 @@ class _UsuarioHomeState extends State<UsuarioHome> {
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Complete los datos correctamente por favor'),
+            SnackBar(
+              content: Text('Complete los datos correctamente por favor',
+                  style: GoogleFonts.rubik(
+                      textStyle: secondaryTextStyle, fontSize: 20)),
               duration: Duration(seconds: 3),
               backgroundColor: Colors.red,
             ),
