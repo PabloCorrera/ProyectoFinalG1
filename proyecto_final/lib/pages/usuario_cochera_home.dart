@@ -202,8 +202,11 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
           padding: EdgeInsets.zero,
           children: [
             UserAccountsDrawerHeader(
-              accountName: Text('Bienvenido',
-                  style: GoogleFonts.rubik(textStyle: terTextStyle)),
+              accountName: Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Text('Bienvenido',
+                    style: GoogleFonts.rubik(textStyle: secondaryTextStyle)),
+              ),
               accountEmail: user != null
                   ? Text(user!.email!,
                       style: GoogleFonts.rubik(textStyle: terTextStyle))
@@ -340,11 +343,11 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
         backgroundColor: MaterialStateProperty.all<Color>(
             index == botonActivoIndex ? Colors.green : botonfunc),
       ),
-      child: Text(texto),
+      child: Text(texto, style: GoogleFonts.rubik()),
     );
   }
 
-Widget listaReservasActivas() {
+  Widget listaReservasActivas() {
   return Expanded(
     child: _usuariosDeReservasActivas.isEmpty
         ? Column(
@@ -638,8 +641,7 @@ Widget historialDeReservas() {
   ) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        backgroundColor: botonfunc,
-      ),
+          backgroundColor: botonfunc, textStyle: GoogleFonts.rubik()),
       onPressed: () async {
         if (isNotBlank(nombreCocheraController.text) &&
             isNotBlank(descripcionController.text) &&
@@ -738,7 +740,7 @@ Widget historialDeReservas() {
   @override
 Widget VistaEstadisticas() {
   String titulo = "Mis estadísticas";
-  int reservasUltimos30Dias = obtenerReservasUltimos30Dias(); 
+  int reservasUltimos30Dias = obtenerCantidadReservasUltimos30Dias(); 
   
   int reservasTotales = _reservasFuture.length; 
   double recaudacionUltimos30Dias = obtenerRecaudacionUltimos30Dias();
@@ -794,8 +796,8 @@ body: Padding(
               ultimos30: reservasUlt30,
               ultimos60: reservasUlt60,
               ultimos90: reservasUlt90,
-              sesentaDias: false,
-              noventaDias: false
+              sesentaDias: sesentaDias,
+              noventaDias: noventaDias
               
             ), 
             ),
@@ -806,13 +808,6 @@ body: Padding(
 }
 
 
-int obtenerReservasUltimos30Dias() {
-  DateTime fechaHoy = DateTime.now();
-  DateTime hace30Dias = fechaHoy.subtract(Duration(days: 30));
-  return _reservasFuture
-      .where((reserva) => reserva.fechaSalida.toDate().isAfter(hace30Dias))
-      .length;
-}
 
 double obtenerRecaudacionUltimos30Dias() {
   DateTime fechaHoy = DateTime.now();

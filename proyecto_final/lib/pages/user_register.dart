@@ -39,9 +39,8 @@ class _UserRegisterState extends State<UserRegister> {
   Widget _entryField(String title, TextEditingController controller) {
     return TextField(
       controller: controller,
-      decoration: InputDecoration(
-        labelText: title,
-      ),
+      decoration:
+          InputDecoration(labelText: title, labelStyle: GoogleFonts.rubik()),
       inputFormatters: [
         FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]')),
       ],
@@ -61,7 +60,6 @@ class _UserRegisterState extends State<UserRegister> {
   void registrarUsuario() async {
     if (_controllerName.text.trim().isNotEmpty &&
         _controllerSurname.text.trim().isNotEmpty) {
-
       // Mostrar el indicador de progreso
       showDialog(
         context: context,
@@ -96,8 +94,8 @@ class _UserRegisterState extends State<UserRegister> {
       user.imageUrl = urlImagen;
 
       _databaseService.addUsuarioConsumidor(user);
-      await Future.delayed(const Duration(seconds: 3)); 
-      
+      await Future.delayed(const Duration(seconds: 3));
+
       // Ocultar el indicador de progreso
       Navigator.pop(context);
 
@@ -109,14 +107,12 @@ class _UserRegisterState extends State<UserRegister> {
     }
   }
 
-
   Widget _submitButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () => registrarUsuario(),
       child: const Text('Confirmar'),
       style: ElevatedButton.styleFrom(
-        backgroundColor: botonfunc,
-      ),
+          backgroundColor: botonfunc, textStyle: GoogleFonts.rubik()),
     );
   }
 
@@ -148,16 +144,14 @@ class _UserRegisterState extends State<UserRegister> {
           children: [
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: botonfunc,
-              ),
+                  backgroundColor: botonfunc, textStyle: GoogleFonts.rubik()),
               onPressed: () => selectImage(),
               child: const Text('Elegir imagen'),
             ),
             const SizedBox(width: 10), // Espacio entre los botones
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: botonfunc,
-              ),
+                  backgroundColor: botonfunc, textStyle: GoogleFonts.rubik()),
               onPressed: () => takeImage(),
               child: const Text('Tomar imagen'),
             ),
@@ -194,6 +188,9 @@ class _UserRegisterState extends State<UserRegister> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: magnolia,
+      ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(

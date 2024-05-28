@@ -24,28 +24,27 @@ class LineChartWidget extends StatelessWidget {
 
   double get maxY {
     double maxReservas = [ultimos30.toDouble(), ultimos60.toDouble(), ultimos90.toDouble()].reduce((a, b) => a > b ? a : b);
-    // Limitamos el máximo del eje y a 1.2 veces el valor máximo de recaudación
-    return (maxReservas * 2).ceilToDouble();
+    return (maxReservas * 1.5).ceilToDouble();
   }
 
   @override
   Widget build(BuildContext context) => LineChart(
         LineChartData(
-          backgroundColor: const Color(0xffE0E0E0), // Fondo gris claro
+          backgroundColor: const Color(0xffE0E0E0), 
           minX: 0,
-          maxX: sesentaDias ? 8 : 2, // Ajusta el maxX según el valor de sesentaDias
+          maxX: sesentaDias ? 8 : 2, 
           minY: 0,
-          maxY: maxY, // Usamos el valor calculado para el rango máximo del eje y
+          maxY: ultimos90 == 0 ? 2 : ultimos90 * 1.5, 
           titlesData: FlTitlesData(
             bottomTitles: SideTitles(
               showTitles: true,
               reservedSize: 22,
               getTextStyles: (context, value) => const TextStyle(
                 color: Color(0xff68737d),
-                fontWeight: FontWeight.bold, // Negrita
+                fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
-              margin: 6, // Ajusta el margen si es necesario
+              margin: 6, 
               getTitles: (double value) {
                 if (sesentaDias && noventaDias) {
                   switch (value.toInt()) {
@@ -77,61 +76,60 @@ class LineChartWidget extends StatelessWidget {
               showTitles: true,
               getTextStyles: (context, value) => const TextStyle(
                 color: Color(0xff67727d),
-                fontWeight: FontWeight.bold, // Negrita
-                fontSize: 10, // Tamaño de fuente más pequeño
+                fontWeight: FontWeight.bold, 
+                fontSize: 10, 
               ),
-              reservedSize: 35, // Tamaño de reserva ajustado para más espacio a la izquierda
-              margin: 10, // Margen ajustado
-              interval: 10, // Intervalo de 10 entre los títulos
+              reservedSize: 35,
+              margin: 10, 
+              interval: 10,
               getTitles: (double value) {
-                // Devuelve el valor como texto para mostrar en el título
                 return value.toInt().toString();
               },
             ),
           ),
           gridData: FlGridData(
-            show: false, // Oculta las líneas de la cuadrícula
+            show: false, 
           ),
           borderData: FlBorderData(
             show: true,
-            border: Border.all(color: const Color(0xff37434d), width: 2), // Borde más oscuro y más grueso
+            border: Border.all(color: const Color(0xff37434d), width: 2),
           ),
           lineBarsData: [
             LineChartBarData(
   spots: sesentaDias
                   ? noventaDias
                       ? [
-                          FlSpot(0, 0), // Punto de inicio en (0, 0)
+                          FlSpot(0, 0), 
                           FlSpot(
                               1,
                               ultimos90
-                                  .toDouble()), // Recaudación de los últimos 90 días
+                                  .toDouble()), 
                           FlSpot(
                               4,
                               ultimos60
-                                  .toDouble()), // Recaudación de los últimos 60 días
+                                  .toDouble()), 
                           FlSpot(
                               7,
                               ultimos30
-                                  .toDouble()), // Recaudación de los últimos 30 días
+                                  .toDouble()),
                         ]
                       : [
-                          FlSpot(0, 0), // Punto de inicio en (0, 0)
+                          FlSpot(0, 0), 
                           FlSpot(
                               2,
                               ultimos60
-                                  .toDouble()), // Recaudación de los últimos 60 días
+                                  .toDouble()), 
                           FlSpot(
                               6,
                               ultimos30
-                                  .toDouble()), // Recaudación de los últimos 30 días
+                                  .toDouble()), 
                         ]
                   : [
-                      FlSpot(0, 0), // Punto de inicio en (0, 0)
+                      FlSpot(0, 0),
                       FlSpot(
                           1,
                           ultimos30
-                              .toDouble()), // Recaudación de los últimos 30 días
+                              .toDouble()), 
                     ],
               isCurved: true,
               colors: gradientColors,

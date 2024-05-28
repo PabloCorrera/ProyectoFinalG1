@@ -101,7 +101,10 @@ class _UsuarioHomeState extends State<UsuarioHome> {
               'Bienvenido ${consumidor!.nombre}',
               style: GoogleFonts.rubik(textStyle: secondaryTextStyle),
             ),
-            accountEmail: user != null ? Text(user!.email!) : null,
+            accountEmail: user != null
+                ? Text(user!.email!,
+                    style: GoogleFonts.rubik(textStyle: terTextStyle))
+                : null,
             currentAccountPicture: CircleAvatar(
               backgroundImage: consumidor != null &&
                       consumidor?.imageUrl != null &&
@@ -180,116 +183,177 @@ class _UsuarioHomeState extends State<UsuarioHome> {
     );
   }
 
- Widget vistaCocheras() {
-  return FutureBuilder<List<UsuarioCochera>>(
-    future: Future.delayed(Duration(milliseconds: 200), () => _cocherasFuture),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return Center(
-          child: CircularProgressIndicator(),
-        );
-      } else if (snapshot.hasError) {
-        return Center(
-          child: Text('Error al cargar las cocheras.'),
-        );
-      } else {
-        if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-          return ListView.builder(
-            itemCount: snapshot.data!.length,
-            itemBuilder: (context, index) {
-              final cochera = snapshot.data![index];
-              return ListTile(
-                title: Text(cochera.direccion),
-                subtitle: Text("Precio por hora: ${cochera.price}"),
-                trailing: ElevatedButton(
-                  onPressed: () {
-                    _showReservarDialog(context, cochera);
-                  },
-                  child: const Text('Reservar'),
-                ),
-              );
-            },
-          );
-        } else {
+  Widget vistaCocheras() {
+    return FutureBuilder<List<UsuarioCochera>>(
+      future:
+          Future.delayed(Duration(milliseconds: 200), () => _cocherasFuture),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
-            child: Text('No hay cocheras disponibles.'),
+            child: CircularProgressIndicator(),
           );
-        }
-      }
-    },
-  );
-}
-
-
-
-
-  Widget vistaReservas() {
-  return FutureBuilder<List<Reserva>>(
-    future: Future.delayed(Duration(milliseconds: 200), () => _reservasFuture), // Llama a la función que carga las reservas
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        // Muestra el CircularProgressIdicator mientras los datos están siendo cargados.
-        return Center(
-          child: CircularProgressIndicator(),
-        );
-      } else {
-        if (snapshot.hasError) {
-          // Muestra un mensaje de error si hubo un error al cargar los datos.
+        } else if (snapshot.hasError) {
           return Center(
-            child: Text('Error al cargar las reservas.'),
+            child: Text('Error al cargar las cocheras.'),
           );
         } else {
           if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-            // Si hay datos y no están vacíos, construye la ListView
             return ListView.builder(
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
-                final reserva = snapshot.data![index];
-                bool puedeCancelar = faltanMasDeCuarentaYcincoMinutos(reserva.fechaEntrada);
-                String estado = estadoReserva(reserva.fechaEntrada);
-                String fechaEntrada = DateFormat('yyyy-MM-dd kk:mm').format(reserva.fechaEntrada.toDate());
-                String fechaSalida = DateFormat('yyyy-MM-dd kk:mm').format(reserva.fechaSalida.toDate());
-                
-                return ListTile(
-                  title: Text(reserva.direccion),
-                  trailing: puedeCancelar
-                      ? ElevatedButton(
-                          onPressed: () {
-                            showDialogCancelarReserva(context, reserva);
-                          },
-                          child: const Text('Cancelar'),
-                        )
-                      : null,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Fecha entrada: $fechaEntrada"),
-                      Text("Fecha salida: $fechaSalida"),
-                      Text(
-                        estado,
-                        style: TextStyle(
-                            color: estado == "Reserva activa" ? Colors.green : Colors.red),
-                      )
-                    ],
-                  ),
-                  onTap: () {},
+                final cochera = snapshot.data![index];
+                return Column(
+                  children: [
+                    ListTile(
+                      title: Text(
+                        cochera.nombreCochera,
+                        style: GoogleFonts.rubik(
+                            textStyle: secondaryTextStyle, fontSize: 22),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(cochera.direccion,
+                              style:
+                                  GoogleFonts.rubik(textStyle: terTextStyle)),
+                          Text("precio por hora: ${cochera.price}",
+                              style:
+                                  GoogleFonts.rubik(textStyle: terTextStyle)),
+                        ],
+                      ),
+                      trailing: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: botonfunc,
+                            textStyle: GoogleFonts.rubik()),
+                        onPressed: () {
+                          _showReservarDialog(context, cochera);
+                        },
+                        child: Text(
+                          'Reservar',
+                          style: GoogleFonts.rubik(),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Colors.grey.shade400,
+                            width: 1.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 );
               },
             );
           } else {
-            // Si no hay reservas en el historial
             return Center(
-              child: Text('No hay reservas en el historial'),
+              child: Text('No hay cocheras disponibles.'),
             );
           }
         }
-      }
-    },
-  );
-}
+      },
+    );
+  }
 
-  
+  Widget vistaReservas() {
+    return FutureBuilder<List<Reserva>>(
+      future: Future.delayed(Duration(milliseconds: 200),
+          () => _reservasFuture), // Llama a la función que carga las reservas
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Muestra el CircularProgressIdicator mientras los datos están siendo cargados.
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          if (snapshot.hasError) {
+            // Muestra un mensaje de error si hubo un error al cargar los datos.
+            return Center(
+              child: Text('Error al cargar las reservas.'),
+            );
+          } else {
+            if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+              // Si hay datos y no están vacíos, construye la ListView
+              return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  final reserva = snapshot.data![index];
+                  bool puedeCancelar =
+                      faltanMasDeCuarentaYcincoMinutos(reserva.fechaEntrada);
+                  String estado = estadoReserva(reserva.fechaEntrada);
+                  String fechaEntrada = DateFormat('yyyy-MM-dd kk:mm')
+                      .format(reserva.fechaEntrada.toDate());
+                  String fechaSalida = DateFormat('yyyy-MM-dd kk:mm')
+                      .format(reserva.fechaSalida.toDate());
+
+                  return Column(
+                    children: [
+                      ListTile(
+                        title: Text(reserva.direccion,
+                            style: GoogleFonts.rubik(
+                                textStyle: terTextStyle,
+                                fontWeight: FontWeight.w400)),
+                        trailing: puedeCancelar
+                            ? ElevatedButton(
+                                onPressed: () {
+                                  showDialogCancelarReserva(context, reserva);
+                                },
+                                child: const Text('Cancelar'),
+                              )
+                            : null,
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 16.0),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Fecha entrada: $fechaEntrada",
+                                style:
+                                    GoogleFonts.rubik(textStyle: terTextStyle)),
+                            Text("Fecha salida: $fechaSalida",
+                                style:
+                                    GoogleFonts.rubik(textStyle: terTextStyle)),
+                            Text(
+                              estado,
+                              style: GoogleFonts.rubik(
+                                  textStyle: TextStyle(
+                                      color: estado == "Reserva activa"
+                                          ? Colors.green
+                                          : Colors.red,
+                                      fontSize: 18)),
+                            )
+                          ],
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.symmetric(horizontal: 16.0),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 1.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              );
+            } else {
+              // Si no hay reservas en el historial
+              return Center(
+                child: Text('No hay reservas en el historial'),
+              );
+            }
+          }
+        }
+      },
+    );
+  }
 
   Widget vistaEditar() {
     final TextEditingController nombreController = TextEditingController();
@@ -489,7 +553,7 @@ class _UsuarioHomeState extends State<UsuarioHome> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('Fecha y hora de entrada:'),
+                  Text('Fecha y hora de entrada:', style: GoogleFonts.rubik()),
                   Row(
                     children: [
                       Expanded(
@@ -527,7 +591,9 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                             }
                           },
                           child: Text(
-                              '${fechaEntrada!.day}/${fechaEntrada!.month}/${fechaEntrada!.year}'),
+                            '${fechaEntrada!.day}/${fechaEntrada!.month}/${fechaEntrada!.year}',
+                            style: GoogleFonts.rubik(),
+                          ),
                         ),
                       ),
                       Expanded(
@@ -573,7 +639,10 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  const Text('Fecha y hora de salida:'),
+                  Text(
+                    'Fecha y hora de salida:',
+                    style: GoogleFonts.rubik(),
+                  ),
                   Row(
                     children: [
                       Expanded(
@@ -636,7 +705,7 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                   Center(
                     child: Text(
                       'Precio de la reserva: \$${cochera.calcularPrecioTotal(fechaEntrada!, fechaSalida!)}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: GoogleFonts.rubik(textStyle: secondaryTextStyle),
                     ),
                   ),
                 ],
@@ -742,9 +811,11 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                 {
                   Navigator.of(context).pop(),
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Reserva exitosa.'),
-                      backgroundColor: Colors.green,
+                    SnackBar(
+                      content: Text('Reserva exitosa.',
+                          style: GoogleFonts.rubik(
+                              textStyle: secondaryTextStyle, fontSize: 20)),
+                      backgroundColor: botonfunc,
                     ),
                   )
                 }
@@ -752,8 +823,10 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                 {
                   Navigator.of(context).pop(),
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('No se pudo realizar la reserva.'),
+                    SnackBar(
+                      content: Text('No se pudo realizar la reserva.',
+                          style: GoogleFonts.rubik(
+                              textStyle: secondaryTextStyle, fontSize: 20)),
                       backgroundColor: Colors.red,
                     ),
                   )
@@ -762,9 +835,11 @@ class _UsuarioHomeState extends State<UsuarioHome> {
       } else {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-                'No hay disponibilidad para la fecha y hora seleccionadas.'),
+                'No hay disponibilidad para la fecha y hora seleccionadas.',
+                style: GoogleFonts.rubik(
+                    textStyle: secondaryTextStyle, fontSize: 20)),
             backgroundColor: Colors.red,
           ),
         );
