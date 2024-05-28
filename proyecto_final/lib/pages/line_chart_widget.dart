@@ -5,10 +5,8 @@ class LineChartWidget extends StatelessWidget {
   LineChartWidget({
     Key? key,
     required this.ultimos30,
-    required this.ultimos60,
-    required this.ultimos90,
-    required this.sesentaDias,
-    required this.noventaDias,
+
+
   }) : super(key: key);
 
   final List<Color> gradientColors = [
@@ -17,17 +15,13 @@ class LineChartWidget extends StatelessWidget {
   ];
 
   final int ultimos30;
-  final int ultimos60;
-  final int ultimos90;
-  final bool sesentaDias;
-  final bool noventaDias;
+
+  
 
 
   double get maxY {
     double maxReservas = [
       ultimos30.toDouble(),
-      ultimos60.toDouble(),
-      ultimos90.toDouble()
     ].reduce((a, b) => a > b ? a : b);
     return (maxReservas * 1.5).ceilToDouble();
   }
@@ -41,7 +35,7 @@ class LineChartWidget extends StatelessWidget {
       LineChartData(
         backgroundColor: const Color(0xffE0E0E0),
         minX: 0,
-        maxX: sesentaDias ? 8 : 2,
+        maxX: 2,
         minY: 0,
         maxY: maxYValue,
         titlesData: FlTitlesData(
@@ -55,39 +49,9 @@ class LineChartWidget extends StatelessWidget {
             ),
             margin: 6,
             getTitles: (double value) {
-              if (sesentaDias && noventaDias) {
-                switch (value.toInt()) {
-                  case 1:
-                    return 'Ult 90 días';
-                  case 4:
-                    return 'Ult 60 días';
-                  case 7:
-                    return 'Ult 30 días';
-                }
-              }
-
-              if (!sesentaDias && noventaDias) {
-                switch (value.toInt()) {
-                  case 1:
-                    return 'Ult 90 días';
-                  case 4:
-                    return 'Ult 60 días';
-                  case 7:
-                    return 'Ult 30 días';
-                }
-              }
-              if (sesentaDias && !noventaDias) {
-                switch (value.toInt()) {
-                  case 2:
-                    return 'Ult 60 días';
-                  case 6:
-                    return 'Ult 30 días';
-                }
-              } else {
                 if (value.toInt() == 1) {
-                  return 'Ult 30 días';
+                  return 'Ultimos 30 días';
                 }
-              }
               return '';
             },
           ),
@@ -115,27 +79,7 @@ class LineChartWidget extends StatelessWidget {
         ),
         lineBarsData: [
          LineChartBarData(
-  spots: sesentaDias
-      ? (noventaDias
-          ? [
-              FlSpot(0, 0),
-              FlSpot(1, ultimos90.toDouble()),
-              FlSpot(4, ultimos60.toDouble()),
-              FlSpot(7, ultimos30.toDouble()),
-            ]
-          : [
-              FlSpot(0, 0),
-              FlSpot(2, ultimos60.toDouble()),
-              FlSpot(6, ultimos30.toDouble()),
-            ])
-      : (noventaDias
-          ? [
-              FlSpot(0, 0),
-              FlSpot(1, ultimos90.toDouble()),
-              FlSpot(4, ultimos60.toDouble()),
-              FlSpot(7, ultimos30.toDouble()),
-            ]
-          : [
+  spots:  ([
               FlSpot(0, 0),
               FlSpot(1, ultimos30.toDouble()),
             ]),

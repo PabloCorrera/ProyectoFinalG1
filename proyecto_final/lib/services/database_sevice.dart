@@ -202,6 +202,7 @@ class DatabaseService {
     final ref = _firestore
         .collection(RESERVA)
         .where("cocheraEmail", isEqualTo: mailCochera)
+        .orderBy("fechaCreacion", descending: true)
         .withConverter(
             fromFirestore: Reserva.fromFirestore,
             toFirestore: (Reserva reserva, _) => reserva.toFirestore());

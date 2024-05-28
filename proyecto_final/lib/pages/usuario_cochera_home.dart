@@ -273,7 +273,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
           future: _initialLoadFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else {
@@ -306,7 +306,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
         const SizedBox(height: 12.0),
         Text(titulo + cantidadReservas.toString(),
             style: GoogleFonts.rubik(
-              textStyle: TextStyle(
+              textStyle: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: logoTitulos),
@@ -320,9 +320,9 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               0,
               _reservasActivas.length,
             ),
-            SizedBox(width: 12.0),
+            const SizedBox(width: 12.0),
             botonReservas("Expiradas", 1, _reservasExpiradas.length),
-            SizedBox(width: 12.0),
+            const SizedBox(width: 12.0),
             botonReservas("Totales", 2, _reservasFuture.length),
           ],
         ),
@@ -354,7 +354,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   Widget listaReservasActivas() {
     return Expanded(
       child: _usuariosDeReservasActivas.isEmpty
-          ? Column(
+          ? const Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Spacer(),
@@ -383,7 +383,12 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                 return Column(
                   children: [
                     ListTile(
-                      leading: const Icon(Icons.account_circle, size: 40),
+                      leading: usuario.imageUrl != null
+                          ? CircleAvatar(
+                              backgroundImage: NetworkImage(usuario.imageUrl!),
+                              radius: 20,
+                            )
+                          : const Icon(Icons.account_circle, size: 40),
                       title: Text(usuario.nombre + " " + usuario.apellido,
                           style: GoogleFonts.rubik()),
                       subtitle: Text(
@@ -401,7 +406,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                           vertical: 8.0, horizontal: 16.0),
                     ),
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: 16.0),
+                      margin: const EdgeInsets.symmetric(horizontal: 16.0),
                       decoration: BoxDecoration(
                         border: Border(
                           bottom: BorderSide(
@@ -420,7 +425,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
 
   Widget listaReservasExpiradas() {
     if (_usuariosDeReservasExpiradas.isEmpty) {
-      return Expanded(
+      return const Expanded(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -453,7 +458,12 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
             return Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.account_circle, size: 40),
+                  leading: usuario.imageUrl != null
+                      ? CircleAvatar(
+                          backgroundImage: NetworkImage(usuario.imageUrl!),
+                          radius: 20,
+                        )
+                      : const Icon(Icons.account_circle, size: 40),
                   title: Text(usuario.nombre + " " + usuario.apellido,
                       style: GoogleFonts.rubik()),
                   subtitle: Text(usuario.email!,
@@ -469,7 +479,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                       vertical: 8.0, horizontal: 16.0),
                 ),
                 Container(
-                  margin: EdgeInsets.symmetric(horizontal: 16.0),
+                  margin: const EdgeInsets.symmetric(horizontal: 16.0),
                   decoration: BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
@@ -491,8 +501,8 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     DateTime fechaHoy = DateTime.now();
 
     return _usuariosDeReserva.isEmpty
-        ? Expanded(
-            child: Column(
+        ? const Expanded(
+            child: const Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Spacer(),
@@ -543,7 +553,13 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                 return Column(
                   children: [
                     ListTile(
-                      leading: const Icon(Icons.account_circle, size: 40),
+                      leading: _usuariosDeReserva[index]!.imageUrl != null
+                          ? CircleAvatar(
+                              backgroundImage: NetworkImage(
+                                  _usuariosDeReserva[index]!.imageUrl!),
+                              radius: 20,
+                            )
+                          : const Icon(Icons.account_circle, size: 40),
                       title: Text(
                         '${_usuariosDeReserva[index]!.nombre} ${_usuariosDeReserva[index]!.apellido}',
                       ),
@@ -558,13 +574,13 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                           _mostrarDialogo(context, _reservasFuture[index],
                               _usuariosDeReserva[index]!);
                         },
-                        child: Text('Detalle', style: GoogleFonts.rubik()),
+                        child: const Text('Detalle'),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                           vertical: 8.0, horizontal: 16.0),
                     ),
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: 16.0),
+                      margin: const EdgeInsets.symmetric(horizontal: 16.0),
                       decoration: BoxDecoration(
                         border: Border(
                           bottom: BorderSide(
@@ -666,7 +682,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               context: context,
               barrierDismissible: false,
               builder: (BuildContext context) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               },
             );
             try {
@@ -677,6 +693,10 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               int cantLugares = int.parse(lugaresController.text);
 
               String urlImagen = "";
+              if (usuarioCochera!.imageUrl != null &&
+                  usuarioCochera!.imageUrl != "") {
+                urlImagen = usuarioCochera!.imageUrl!;
+              }
               if (fileImagen != null) {
                 String uniqueName =
                     DateTime.now().millisecondsSinceEpoch.toString();
@@ -691,7 +711,12 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                       .then((value) => urlImagen = value);
                 } catch (error) {
                   print(error);
-                  urlImagen = "";
+                  if (usuarioCochera!.imageUrl != null &&
+                      usuarioCochera!.imageUrl != "") {
+                    urlImagen = usuarioCochera!.imageUrl!;
+                  } else {
+                    urlImagen = "";
+                  }
                 }
               }
               Map<String, dynamic> updatedAttributes = {
@@ -756,21 +781,14 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
     );
   }
 
-  @override
   Widget VistaEstadisticas() {
     String titulo = "Mis estadísticas";
     int reservasUltimos30Dias = obtenerCantidadReservasUltimos30Dias();
-    int reservasUltimos60dias =
-        obtenerCantidadReservasUltimos60DiasHasta30Dias();
 
     int reservasTotales = _reservasFuture.length;
     double recaudacionUltimos30Dias = obtenerRecaudacionUltimos30Dias();
     int reservasUlt30 = obtenerCantidadReservasUltimos30Dias();
-    int reservasUlt60 = obtenerCantidadReservasUltimos60DiasHasta30Dias();
-    int reservasUlt90 = obtenerCantidadReservasUltimos90DiasHasta60Dias();
     double recaudacionTotal = _recaudacionTotal;
-    bool sesentaDias = hayReservasUltimos60a30Dias();
-    bool noventaDias = hayReservasUltimos90a60Dias();
 
     return Scaffold(
       body: Padding(
@@ -821,11 +839,8 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
             const SizedBox(height: 16),
             Expanded(
               child: LineChartWidget(
-                  ultimos30: reservasUlt30,
-                  ultimos60: reservasUlt60,
-                  ultimos90: reservasUlt90,
-                  sesentaDias: sesentaDias,
-                  noventaDias: noventaDias),
+                ultimos30: reservasUlt30,
+              ),
             ),
           ],
         ),
@@ -835,7 +850,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
 
   double obtenerRecaudacionUltimos30Dias() {
     DateTime fechaHoy = DateTime.now();
-    DateTime hace30Dias = fechaHoy.subtract(Duration(days: 30));
+    DateTime hace30Dias = fechaHoy.subtract(const Duration(days: 30));
     return _reservasExpiradas
         .where((reserva) => reserva.fechaSalida.toDate().isAfter(hace30Dias))
         .fold(0.0, (sum, reserva) => sum + reserva.precioTotal);
@@ -843,51 +858,10 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
 
   int obtenerCantidadReservasUltimos30Dias() {
     DateTime fechaHoy = DateTime.now();
-    DateTime hace30Dias = fechaHoy.subtract(Duration(days: 30));
+    DateTime hace30Dias = fechaHoy.subtract(const Duration(days: 30));
     return _reservasFuture
         .where((reserva) => reserva.fechaSalida.toDate().isAfter(hace30Dias))
         .length;
-  }
-
-  int obtenerCantidadReservasUltimos60DiasHasta30Dias() {
-    DateTime fechaHoy = DateTime.now();
-    DateTime hace60Dias = fechaHoy.subtract(Duration(days: 60));
-    DateTime hace30Dias = fechaHoy.subtract(Duration(days: 30));
-
-    return _reservasFuture
-        .where((reserva) =>
-            reserva.fechaSalida.toDate().isAfter(hace60Dias) &&
-            reserva.fechaSalida.toDate().isBefore(hace30Dias))
-        .length;
-  }
-
-  int obtenerCantidadReservasUltimos90DiasHasta60Dias() {
-    DateTime fechaHoy = DateTime.now();
-    DateTime hace90Dias = fechaHoy.subtract(Duration(days: 90));
-    DateTime hace60Dias = fechaHoy.subtract(Duration(days: 60));
-    return _reservasFuture
-        .where((reserva) =>
-            reserva.fechaSalida.toDate().isAfter(hace90Dias) &&
-            reserva.fechaSalida.toDate().isBefore(hace60Dias))
-        .length;
-  }
-
-  bool hayReservasUltimos60a30Dias() {
-    DateTime fechaHoy = DateTime.now();
-    DateTime hace60Dias = fechaHoy.subtract(Duration(days: 60));
-    DateTime hace30Dias = fechaHoy.subtract(Duration(days: 30));
-    return _reservasFuture.any((reserva) =>
-        reserva.fechaSalida.toDate().isAfter(hace60Dias) &&
-        reserva.fechaSalida.toDate().isBefore(hace30Dias));
-  }
-
-  bool hayReservasUltimos90a60Dias() {
-    DateTime fechaHoy = DateTime.now();
-    DateTime hace90Dias = fechaHoy.subtract(Duration(days: 90));
-    DateTime hace60Dias = fechaHoy.subtract(Duration(days: 60));
-    return _reservasFuture.any((reserva) =>
-        reserva.fechaSalida.toDate().isAfter(hace90Dias) &&
-        reserva.fechaSalida.toDate().isBefore(hace60Dias));
   }
 
   bool isNotBlank(String value) {

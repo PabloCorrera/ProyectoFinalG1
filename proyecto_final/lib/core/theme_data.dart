@@ -7,10 +7,10 @@ class AppTheme {
   ThemeData getTheme() {
     return ThemeData(
         primaryColor: botonReservaCancel,
-        backgroundColor: magnolia,
+        //backgroundColor: magnolia,
         secondaryHeaderColor: logoTitulos,
         indicatorColor: botonfunc,
-        bottomAppBarColor: paynesGray,
+        //bottomAppBarColor: paynesGray,
         textTheme: const TextTheme(
           titleLarge: primaryTextStyle,
           bodyMedium: secondaryTextStyle,
@@ -18,6 +18,7 @@ class AppTheme {
         appBarTheme: const AppBarTheme(
           centerTitle: false,
           color: botonReservaCancel,
-        ));
+        )
+        );
   }
 }
