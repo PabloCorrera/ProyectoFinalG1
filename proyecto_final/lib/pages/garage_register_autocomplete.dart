@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:image_picker/image_picker.dart';
@@ -32,12 +33,13 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
   final TextEditingController _description = TextEditingController();
   final TextEditingController _controllerGarageName = TextEditingController();
   final TextEditingController _controllerGarageAdress = TextEditingController();
-  final TextEditingController _controllerQuantitySpaces = TextEditingController();
+  final TextEditingController _controllerQuantitySpaces =
+      TextEditingController();
   final TextEditingController _controllerPrice = TextEditingController();
   final TextEditingController _controllerName = TextEditingController();
   final TextEditingController _controllerSurname = TextEditingController();
   final TextEditingController _controllerCbu = TextEditingController();
-  
+
   double latitud = 0;
   double lngitud = 0;
 
@@ -91,94 +93,95 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
     }
   }
 
-Widget _submitButton() {
-  return ElevatedButton(
-    onPressed: () async {
-      print("se recibio la direccion" + _controllerGarageAdress.text);
-      await convertAdressToLatLng(_controllerGarageAdress.text);
-      String email = emailUsuario ?? "";
-      if (isNotBlank(_controllerName.text) &&
-          isNotBlank(_controllerSurname.text) &&
-          isNotBlank(_controllerGarageName.text) &&
-          isNotBlank(_controllerGarageAdress.text) &&
-          isNotBlank(_description.text) &&
-          isNotBlank(_controllerPrice.text) &&
-          isNotBlank(_controllerQuantitySpaces.text) &&
-          isNotBlank(_controllerCbu.text)) 
-      {
-        if (_controllerCbu.text.length == 22) {
+  Widget _submitButton() {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+          backgroundColor: botonfunc, textStyle: GoogleFonts.rubik()),
+      onPressed: () async {
+        print("se recibio la direccion" + _controllerGarageAdress.text);
+        await convertAdressToLatLng(_controllerGarageAdress.text);
+        String email = emailUsuario ?? "";
+        if (isNotBlank(_controllerName.text) &&
+            isNotBlank(_controllerSurname.text) &&
+            isNotBlank(_controllerGarageName.text) &&
+            isNotBlank(_controllerGarageAdress.text) &&
+            isNotBlank(_description.text) &&
+            isNotBlank(_controllerPrice.text) &&
+            isNotBlank(_controllerQuantitySpaces.text) &&
+            isNotBlank(_controllerCbu.text)) {
+          if (_controllerCbu.text.length == 22) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return Center(child: CircularProgressIndicator());
+              },
+            );
+            UsuarioCochera usuarioCochera = UsuarioCochera(
+                nombre: _controllerName.text,
+                apellido: _controllerSurname.text,
+                email: email,
+                nombreCochera: _controllerGarageName.text,
+                direccion: _controllerGarageAdress.text,
+                descripcion: _description.text,
+                price: double.parse(_controllerPrice.text),
+                cantLugares: int.parse(_controllerQuantitySpaces.text),
+                lat: latitud,
+                lng: lngitud,
+                cbu: _controllerCbu.text,
+                imageUrl: "");
+            String urlImagen = "";
+            if (fileImagen != null) {
+              String uniqueName =
+                  DateTime.now().millisecondsSinceEpoch.toString();
 
-          showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return Center(child: CircularProgressIndicator());
-        },
-          );
-          UsuarioCochera usuarioCochera = UsuarioCochera(
-            nombre: _controllerName.text,
-            apellido: _controllerSurname.text,
-            email: email,
-            nombreCochera: _controllerGarageName.text,
-            direccion: _controllerGarageAdress.text,
-            descripcion: _description.text,
-            price: double.parse(_controllerPrice.text),
-            cantLugares: int.parse(_controllerQuantitySpaces.text),
-            lat: latitud,
-            lng: lngitud,
-            cbu: _controllerCbu.text,
-            imageUrl: ""
-          );
-          String urlImagen = "";
-          if (fileImagen != null) {
-        String uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
-
-        Reference referenceRoot = FirebaseStorage.instance.ref();
-        Reference referenceDirImages = referenceRoot.child('images');
-        Reference imagenASubir = referenceDirImages.child(uniqueName);
-        try {
-          await imagenASubir.putFile(File(fileImagen!.path));
-          await imagenASubir.getDownloadURL().then((value) => urlImagen = value);
-        } catch (error) {
-          print(error);
-          urlImagen = "";
-        }
-      }
-        usuarioCochera.imageUrl = urlImagen;
-        _databaseService.addUsuarioCochera(usuarioCochera);
-        await Future.delayed(const Duration(seconds: 3));
-        Navigator.pop(context);
-        context.pushNamed(UsuarioCocheraHome.name);
+              Reference referenceRoot = FirebaseStorage.instance.ref();
+              Reference referenceDirImages = referenceRoot.child('images');
+              Reference imagenASubir = referenceDirImages.child(uniqueName);
+              try {
+                await imagenASubir.putFile(File(fileImagen!.path));
+                await imagenASubir
+                    .getDownloadURL()
+                    .then((value) => urlImagen = value);
+              } catch (error) {
+                print(error);
+                urlImagen = "";
+              }
+            }
+            usuarioCochera.imageUrl = urlImagen;
+            _databaseService.addUsuarioCochera(usuarioCochera);
+            await Future.delayed(const Duration(seconds: 3));
+            Navigator.pop(context);
+            context.pushNamed(UsuarioCocheraHome.name);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('El CBU debe tener 22 números'),
+                duration: Duration(seconds: 3),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('El CBU debe tener 22 números'),
+              content:
+                  Text('Por favor, complete todos los campos correctamente.'),
               duration: Duration(seconds: 3),
               backgroundColor: Colors.red,
             ),
           );
         }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Por favor, complete todos los campos correctamente.'),
-            duration: Duration(seconds: 3),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    },
-    child: Text('Confirmar'),
-  );
-}
-
+      },
+      child: Text('Confirmar'),
+    );
+  }
 
   Widget _entryField(String title, TextEditingController controller) {
     return TextField(
       controller: controller,
-      decoration: InputDecoration(
-        labelText: title,
-      ),
+      decoration:
+          InputDecoration(labelText: title, labelStyle: GoogleFonts.rubik()),
       inputFormatters: [
         FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
       ],
@@ -188,24 +191,21 @@ Widget _submitButton() {
   Widget _entryFieldNumber(String title, TextEditingController controller) {
     return TextField(
         controller: controller,
-        decoration: InputDecoration(
-          labelText: title,
-        ),
+        decoration:
+            InputDecoration(labelText: title, labelStyle: GoogleFonts.rubik()),
         keyboardType: TextInputType.number,
         inputFormatters: <TextInputFormatter>[
           FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
         ]);
   }
 
-
   Widget _title() {
-    return const Text(
-      'Registro de Cochera',
-      style: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-      ),
-    );
+    return Text('Registro de Cochera',
+        style: GoogleFonts.rubik(
+            textStyle: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+        )));
   }
 
   Widget _errorMessage() {
@@ -221,34 +221,24 @@ Widget _submitButton() {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: _title(),
+        backgroundColor: magnolia,
       ),
       body: SingleChildScrollView(
         child: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFFAF0050),
-                Color(0x00EF5350),
-              ],
-              begin: Alignment.topCenter,
-            ),
-          ),
+          decoration: const BoxDecoration(color: magnolia),
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              const Text(
-                'REGISTRO DE COCHERA',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
+              const SizedBox(height: 50),
+              Text('Registro de cochera',
+                  style: GoogleFonts.rubik(textStyle: secondaryTextStyle)),
               const SizedBox(height: 20),
-              _entryField('Nombre', _controllerName),
+              _entryField(
+                'Nombre',
+                _controllerName,
+              ),
               const SizedBox(height: 20),
               _entryField('Apellido', _controllerSurname),
               const SizedBox(height: 20),
@@ -259,6 +249,7 @@ Widget _submitButton() {
               Padding(
                 padding: const EdgeInsets.all(defaultPadding),
                 child: TextFormField(
+                  style: GoogleFonts.rubik(),
                   controller: _controllerGarageAdress,
                   onTap: () async {
                     try {
@@ -278,7 +269,6 @@ Widget _submitButton() {
                   ),
                 ),
               ),
-
               ListView.builder(
                 itemCount: placePredictions.length,
                 shrinkWrap:
@@ -290,10 +280,10 @@ Widget _submitButton() {
                   location: placePredictions[index].description!,
                 ),
               ),
-
               _entryFieldNumber('Precio por hora', _controllerPrice),
               const SizedBox(height: 20),
-              _entryFieldNumber('Cantidad de lugares', _controllerQuantitySpaces),
+              _entryFieldNumber(
+                  'Cantidad de lugares', _controllerQuantitySpaces),
               const SizedBox(height: 20),
               _entryFieldNumber('CBU', _controllerCbu),
               const SizedBox(height: 20),
@@ -310,42 +300,44 @@ Widget _submitButton() {
     );
   }
 
-
   Widget imagePicker() {
-  return Column(
-    children: [
-      imagen != null
-          ? CircleAvatar(
-              radius: 64,
-              backgroundImage: MemoryImage(imagen!),
-            )
-          : const CircleAvatar(
-              radius: 64,
-              backgroundImage: NetworkImage(
-                  'https://cdn-icons-png.flaticon.com/512/9131/9131529.png'),
+    return Column(
+      children: [
+        imagen != null
+            ? CircleAvatar(
+                radius: 64,
+                backgroundImage: MemoryImage(imagen!),
+              )
+            : const CircleAvatar(
+                radius: 64,
+                backgroundImage: NetworkImage(
+                    'https://cdn-icons-png.flaticon.com/512/9131/9131529.png'),
+              ),
+        const SizedBox(height: 10), // Espacio entre la imagen y los botones
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: botonfunc, textStyle: GoogleFonts.rubik()),
+              onPressed: () => selectImage(),
+              child: const Text('Elegir imagen'),
             ),
-      const SizedBox(height: 10), // Espacio entre la imagen y los botones
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton(
-            onPressed: () => selectImage(),
-            child: const Text('Elegir imagen'),
-          ),
-          const SizedBox(width: 10), // Espacio entre los botones
-          ElevatedButton(
-            onPressed: () => takeImage(),
-            child: const Text('Tomar imagen'),
-          ),
-        ],
-      ),
-    ],
-  );
-}
+            const SizedBox(width: 10), // Espacio entre los botones
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: botonfunc, textStyle: GoogleFonts.rubik()),
+              onPressed: () => takeImage(),
+              child: const Text('Tomar imagen'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 
-
-takeImage()async{
- XFile? img = await pickImage(ImageSource.camera);
+  takeImage() async {
+    XFile? img = await pickImage(ImageSource.camera);
     if (img != null) {
       img.readAsBytes().then((foto) => {
             setState(() {
@@ -355,6 +347,7 @@ takeImage()async{
           });
     }
   }
+
   selectImage() async {
     XFile? img = await pickImage(ImageSource.gallery);
     if (img != null) {

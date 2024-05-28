@@ -114,12 +114,19 @@ Future<void> _showReservarDialog(
         builder: (context, setState) {
           return AlertDialog(
             title: Text("Reservar en ${cochera.nombreCochera}"),
-            titleTextStyle: TextStyle(color: logoTitulos, fontSize: 20),
+            titleTextStyle: terTextStyle,
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(cochera.direccion),
-                const Text('Fecha y hora de entrada:'),
+                Text(
+                  cochera.direccion,
+                  style: GoogleFonts.rubik(
+                      textStyle: secondaryTextStyle, fontSize: 18),
+                ),
+                Text(
+                  'Fecha y hora de entrada:',
+                  style: GoogleFonts.rubik(textStyle: terTextStyle),
+                ),
                 Row(
                   children: [
                     Expanded(
@@ -202,7 +209,8 @@ Future<void> _showReservarDialog(
                   ],
                 ),
                 const SizedBox(height: 20),
-                const Text('Fecha y hora de salida:'),
+                Text('Fecha y hora de salida:',
+                    style: GoogleFonts.rubik(textStyle: terTextStyle)),
                 Row(
                   children: [
                     Expanded(
@@ -265,7 +273,7 @@ Future<void> _showReservarDialog(
                 Center(
                   child: Text(
                     'Precio de la reserva: \$${cochera.calcularPrecioTotal(fechaEntrada!, fechaSalida!)}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: GoogleFonts.rubik(textStyle: secondaryTextStyle),
                   ),
                 ),
               ],
@@ -370,9 +378,13 @@ void reservar(
               {
                 Navigator.of(context).pop(),
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Reserva exitosa.'),
-                    backgroundColor: Colors.green,
+                  SnackBar(
+                    content: Text(
+                      'Reserva exitosa.',
+                      style: GoogleFonts.rubik(
+                          textStyle: secondaryTextStyle, fontSize: 20),
+                    ),
+                    backgroundColor: botonfunc,
                   ),
                 )
               }
@@ -380,8 +392,12 @@ void reservar(
               {
                 Navigator.of(context).pop(),
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('No se pudo realizar la reserva.'),
+                  SnackBar(
+                    content: Text(
+                      'No se pudo realizar la reserva.',
+                      style: GoogleFonts.rubik(
+                          textStyle: secondaryTextStyle, fontSize: 20),
+                    ),
                     backgroundColor: Colors.red,
                   ),
                 )
@@ -390,9 +406,11 @@ void reservar(
     } else {
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content:
-              Text('No hay disponibilidad para la fecha y hora seleccionadas.'),
+        SnackBar(
+          content: Text(
+              'No hay disponibilidad para la fecha y hora seleccionadas.',
+              style: GoogleFonts.rubik(
+                  textStyle: secondaryTextStyle, fontSize: 20)),
           backgroundColor: Colors.red,
         ),
       );

@@ -101,7 +101,10 @@ class _UsuarioHomeState extends State<UsuarioHome> {
               'Bienvenido ${consumidor!.nombre}',
               style: GoogleFonts.rubik(textStyle: secondaryTextStyle),
             ),
-            accountEmail: user != null ? Text(user!.email!) : null,
+            accountEmail: user != null
+                ? Text(user!.email!,
+                    style: GoogleFonts.rubik(textStyle: terTextStyle))
+                : null,
             currentAccountPicture: CircleAvatar(
               backgroundImage: consumidor != null &&
                       consumidor?.imageUrl != null &&
@@ -204,7 +207,8 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                     ListTile(
                       title: Text(
                         cochera.nombreCochera,
-                        style: GoogleFonts.rubik(),
+                        style: GoogleFonts.rubik(
+                            textStyle: secondaryTextStyle, fontSize: 22),
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,8 +223,8 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                       ),
                       trailing: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: botonfunc,
-                        ),
+                            backgroundColor: botonfunc,
+                            textStyle: GoogleFonts.rubik()),
                         onPressed: () {
                           _showReservarDialog(context, cochera);
                         },
@@ -549,7 +553,7 @@ class _UsuarioHomeState extends State<UsuarioHome> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('Fecha y hora de entrada:'),
+                  Text('Fecha y hora de entrada:', style: GoogleFonts.rubik()),
                   Row(
                     children: [
                       Expanded(
@@ -587,7 +591,9 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                             }
                           },
                           child: Text(
-                              '${fechaEntrada!.day}/${fechaEntrada!.month}/${fechaEntrada!.year}'),
+                            '${fechaEntrada!.day}/${fechaEntrada!.month}/${fechaEntrada!.year}',
+                            style: GoogleFonts.rubik(),
+                          ),
                         ),
                       ),
                       Expanded(
@@ -633,7 +639,10 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  const Text('Fecha y hora de salida:'),
+                  Text(
+                    'Fecha y hora de salida:',
+                    style: GoogleFonts.rubik(),
+                  ),
                   Row(
                     children: [
                       Expanded(
@@ -696,7 +705,7 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                   Center(
                     child: Text(
                       'Precio de la reserva: \$${cochera.calcularPrecioTotal(fechaEntrada!, fechaSalida!)}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: GoogleFonts.rubik(textStyle: secondaryTextStyle),
                     ),
                   ),
                 ],
@@ -802,10 +811,11 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                 {
                   Navigator.of(context).pop(),
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text('Reserva exitosa.',
-                          style: TextStyle(fontSize: 20)),
-                      backgroundColor: botonReservaCancel,
+                          style: GoogleFonts.rubik(
+                              textStyle: secondaryTextStyle, fontSize: 20)),
+                      backgroundColor: botonfunc,
                     ),
                   )
                 }
@@ -813,8 +823,10 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                 {
                   Navigator.of(context).pop(),
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('No se pudo realizar la reserva.'),
+                    SnackBar(
+                      content: Text('No se pudo realizar la reserva.',
+                          style: GoogleFonts.rubik(
+                              textStyle: secondaryTextStyle, fontSize: 20)),
                       backgroundColor: Colors.red,
                     ),
                   )
@@ -823,9 +835,11 @@ class _UsuarioHomeState extends State<UsuarioHome> {
       } else {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-                'No hay disponibilidad para la fecha y hora seleccionadas.'),
+                'No hay disponibilidad para la fecha y hora seleccionadas.',
+                style: GoogleFonts.rubik(
+                    textStyle: secondaryTextStyle, fontSize: 20)),
             backgroundColor: Colors.red,
           ),
         );
