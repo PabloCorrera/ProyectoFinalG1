@@ -784,9 +784,9 @@ body: Padding(
             style: const TextStyle(fontSize: 18),
           ),
           const SizedBox(height: 24),
-          Center( // Usamos Center para centrar el texto
+          Center(
             child: Text(
-              'Gráfico de Líneas',
+              'Gráfico de Reservas',
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
