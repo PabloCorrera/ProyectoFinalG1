@@ -34,7 +34,7 @@ class LineChartWidget extends StatelessWidget {
           minX: 0,
           maxX: sesentaDias ? 8 : 2, 
           minY: 0,
-          maxY: ultimos90 == 0 ? 2 : ultimos90 * 1.5, 
+          maxY: ultimos90 == 0 ? 2 : maxY, 
           titlesData: FlTitlesData(
             bottomTitles: SideTitles(
               showTitles: true,
