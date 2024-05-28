@@ -356,18 +356,18 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
               Spacer(), 
               Text(
                 'No hay reservas activas',
-                style: TextStyle(fontSize: 24.0), 
+                style: TextStyle(fontSize: 32.0), 
               ),
               SizedBox(height: 16.0), 
               Icon(
                 Icons.directions_car,
-                size: 40.0,
-                color: Colors.red, 
+                size: 60.0,
+                color: Color(0xFF2C7F8C), 
               ),
               Icon(
                 Icons.clear,
-                size: 40.0,
-                color: Colors.red,
+               size: 60.0,
+                color: Color(0xFF2C7F8C), 
               ),
               Spacer(flex: 2),
             ],
@@ -418,20 +418,20 @@ Widget listaReservasExpiradas() {
           Spacer(), 
           Text(
             'No hay reservas expiradas',
-            style: TextStyle(fontSize: 24.0),
+            style: TextStyle(fontSize: 30.0),
           ),
           SizedBox(height: 16.0), 
-          Icon(
-            Icons.directions_car,
-            size: 40.0,
-            color: Colors.red,
-          ),
-          Icon(
-            Icons.clear,
-            size: 40.0,
-            color: Colors.red, 
-          ),
-          Spacer(flex: 2), 
+              Icon(
+                Icons.directions_car,
+                size: 60.0,
+                color: Color(0xFF2C7F8C), 
+              ),
+              Icon(
+                Icons.clear,
+               size: 60.0,
+                color: Color(0xFF2C7F8C), 
+              ),
+              Spacer(flex: 2),
         ],
       ),
     );
@@ -487,20 +487,20 @@ Widget historialDeReservas() {
               Spacer(), 
               Text(
                 'No hay reservas',
-                style: TextStyle(fontSize: 24.0), 
+                style: TextStyle(fontSize: 32.0), 
               ),
               SizedBox(height: 16.0), 
               Icon(
                 Icons.directions_car,
-                size: 40.0,
-                color: Colors.red,
+                size: 60.0,
+                color: Color(0xFF2C7F8C), 
               ),
               Icon(
                 Icons.clear,
-                size: 40.0,
-                color: Colors.red, 
+               size: 60.0,
+                color: Color(0xFF2C7F8C), 
               ),
-              Spacer(flex: 2), 
+              Spacer(flex: 2),
             ],
           ),
         )

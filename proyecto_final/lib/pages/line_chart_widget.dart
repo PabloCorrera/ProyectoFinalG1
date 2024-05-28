@@ -21,20 +21,22 @@ class LineChartWidget extends StatelessWidget {
   final int ultimos90;
   final bool sesentaDias;
   final bool noventaDias;
+  final int numero =10;
 
   double get maxY {
     double maxReservas = [ultimos30.toDouble(), ultimos60.toDouble(), ultimos90.toDouble()].reduce((a, b) => a > b ? a : b);
+    // Limitamos el máximo del eje y a 1.5 veces el valor máximo de recaudación
     return (maxReservas * 1.5).ceilToDouble();
   }
 
   @override
   Widget build(BuildContext context) => LineChart(
         LineChartData(
-          backgroundColor: const Color(0xffE0E0E0), 
+          backgroundColor: const Color(0xffE0E0E0),
           minX: 0,
-          maxX: sesentaDias ? 8 : 2, 
+          maxX: sesentaDias ? 8 : 2,
           minY: 0,
-          maxY: ultimos90 == 0 ? 2 : maxY, 
+          maxY: maxY,
           titlesData: FlTitlesData(
             bottomTitles: SideTitles(
               showTitles: true,
@@ -44,7 +46,7 @@ class LineChartWidget extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
-              margin: 6, 
+              margin: 6,
               getTitles: (double value) {
                 if (sesentaDias && noventaDias) {
                   switch (value.toInt()) {
@@ -55,14 +57,12 @@ class LineChartWidget extends StatelessWidget {
                     case 7:
                       return 'Ult 30 días';
                   }
-                }
-                  if (sesentaDias && !noventaDias) {
+                } else if (sesentaDias && !noventaDias) {
                   switch (value.toInt()) {
                     case 2:
                       return 'Ult 60 días';
                     case 6:
                       return 'Ult 30 días';
-      
                   }
                 } else {
                   if (value.toInt() == 1) {
@@ -76,19 +76,19 @@ class LineChartWidget extends StatelessWidget {
               showTitles: true,
               getTextStyles: (context, value) => const TextStyle(
                 color: Color(0xff67727d),
-                fontWeight: FontWeight.bold, 
-                fontSize: 10, 
+                fontWeight: FontWeight.bold,
+                fontSize: 10,
               ),
               reservedSize: 35,
-              margin: 10, 
-              interval: 10,
+              margin: 10,
+              interval: maxY / 5, // Ajuste de intervalo
               getTitles: (double value) {
                 return value.toInt().toString();
               },
             ),
           ),
           gridData: FlGridData(
-            show: false, 
+            show: false,
           ),
           borderData: FlBorderData(
             show: true,
@@ -96,40 +96,22 @@ class LineChartWidget extends StatelessWidget {
           ),
           lineBarsData: [
             LineChartBarData(
-  spots: sesentaDias
+              spots: sesentaDias
                   ? noventaDias
                       ? [
-                          FlSpot(0, 0), 
-                          FlSpot(
-                              1,
-                              ultimos90
-                                  .toDouble()), 
-                          FlSpot(
-                              4,
-                              ultimos60
-                                  .toDouble()), 
-                          FlSpot(
-                              7,
-                              ultimos30
-                                  .toDouble()),
+                          FlSpot(0, 0),
+                          FlSpot(1, ultimos90.toDouble()),
+                          FlSpot(4, ultimos60.toDouble()),
+                          FlSpot(7, ultimos30.toDouble()),
                         ]
                       : [
-                          FlSpot(0, 0), 
-                          FlSpot(
-                              2,
-                              ultimos60
-                                  .toDouble()), 
-                          FlSpot(
-                              6,
-                              ultimos30
-                                  .toDouble()), 
+                          FlSpot(0, 0),
+                          FlSpot(2, ultimos60.toDouble()),
+                          FlSpot(6, ultimos30.toDouble()),
                         ]
                   : [
                       FlSpot(0, 0),
-                      FlSpot(
-                          1,
-                          ultimos30
-                              .toDouble()), 
+                      FlSpot(1, ultimos30.toDouble()),
                     ],
               isCurved: true,
               colors: gradientColors,
