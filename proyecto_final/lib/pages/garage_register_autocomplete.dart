@@ -232,6 +232,13 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               const SizedBox(height: 50),
+              Text(
+                'wePark',
+                style: GoogleFonts.rowdies(
+                    textStyle: Theme.of(context).textTheme.titleLarge,
+                    color: logoTitulos),
+              ),
+              const SizedBox(height: 20), 
               Text('Registro de cochera',
                   style: GoogleFonts.rubik(textStyle: secondaryTextStyle)),
               const SizedBox(height: 20),

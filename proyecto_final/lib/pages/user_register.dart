@@ -191,35 +191,45 @@ class _UserRegisterState extends State<UserRegister> {
       appBar: AppBar(
         backgroundColor: magnolia,
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [magnolia, Colors.white],
-            begin: Alignment.topCenter,
-          ),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 40),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Registro de usuario',
-              style: GoogleFonts.rubik(
-                  textStyle: Theme.of(context).textTheme.titleLarge,
-                  color: logoTitulos),
+      body: SingleChildScrollView(
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [magnolia, Colors.white],
+              begin: Alignment.topCenter,
             ),
-            const SizedBox(height: 20),
-            _entryField('Nombre', _controllerName),
-            const SizedBox(height: 20),
-            _entryField('Apellido', _controllerSurname),
-            const SizedBox(height: 20),
-            imagePicker(),
-            const SizedBox(height: 20),
-            _errorMessage(),
-            const SizedBox(height: 20),
-            _submitButton(context),
-          ],
+          ),
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const SizedBox(height: 50),
+              Text(
+                'wePark',
+                style: GoogleFonts.rowdies(
+                    textStyle: Theme.of(context).textTheme.titleLarge,
+                    color: logoTitulos),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Registro de usuario',
+                style: GoogleFonts.rubik(
+                    textStyle: Theme.of(context).textTheme.titleLarge,
+                    color: logoTitulos),
+              ),
+              const SizedBox(height: 20),
+              _entryField('Nombre', _controllerName),
+              const SizedBox(height: 20),
+              _entryField('Apellido', _controllerSurname),
+              const SizedBox(height: 20),
+              imagePicker(),
+              const SizedBox(height: 20),
+              _errorMessage(),
+              const SizedBox(height: 20),
+              _submitButton(context),
+            ],
+          ),
         ),
       ),
     );
