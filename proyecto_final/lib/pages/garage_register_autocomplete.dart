@@ -238,9 +238,10 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
                     textStyle: Theme.of(context).textTheme.titleLarge,
                     color: logoTitulos),
               ),
-              const SizedBox(height: 20), 
+              const SizedBox(height: 20),
               Text('Registro de cochera',
-                  style: GoogleFonts.rubik(textStyle: secondaryTextStyle)),
+                  style: GoogleFonts.rubik(
+                      textStyle: Theme.of(context).textTheme.titleLarge)),
               const SizedBox(height: 20),
               _entryField(
                 'Nombre',
