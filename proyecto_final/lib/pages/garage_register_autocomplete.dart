@@ -184,6 +184,7 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
           InputDecoration(labelText: title, labelStyle: GoogleFonts.rubik()),
       inputFormatters: [
         FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
+        LengthLimitingTextInputFormatter(30),
       ],
     );
   }
@@ -196,6 +197,7 @@ class _GarageRegisterAutoPlete extends State<GarageRegisterAutoPlete> {
         keyboardType: TextInputType.number,
         inputFormatters: <TextInputFormatter>[
           FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+          LengthLimitingTextInputFormatter(22),
         ]);
   }
 

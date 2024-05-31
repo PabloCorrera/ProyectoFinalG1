@@ -30,15 +30,10 @@ class MapsPageState extends State<MapsPage> {
   List<UsuarioCochera> _cocheras = [];
   List<LatLng> posiciones = [];
 
-  static const CameraPosition _kGooglePlex = CameraPosition(
+  static const CameraPosition posicionInicial = CameraPosition(
     target: LatLng(-34.61014682261275, -58.429135724657954),
     zoom: 14.4746,
   );
-
-  static const CameraPosition _kLake = CameraPosition(
-      target: LatLng(-34.61014682261275, -58.429135724657954),
-      tilt: 59.440717697143555,
-      zoom: 15.4555);
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +48,7 @@ class MapsPageState extends State<MapsPage> {
         ),
         body: GoogleMap(
           mapType: MapType.normal,
-          initialCameraPosition: _kGooglePlex,
+          initialCameraPosition: posicionInicial,
           onMapCreated: (GoogleMapController controller) {
             _controller.complete(controller);
           },
@@ -63,12 +58,6 @@ class MapsPageState extends State<MapsPage> {
         ),
       ),
     );
-  }
-
-//Metodo para ir a un punto en particular
-  Future<void> _goToTheLake() async {
-    final GoogleMapController controller = await _controller.future;
-    await controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
   }
 
   @override
