@@ -12,7 +12,7 @@ import 'package:proyecto_final/pages/usuario_home.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
 
 class Wrapper extends StatefulWidget {
-    static const String name = 'Wrapper';
+  static const String name = 'Wrapper';
   const Wrapper({super.key});
 
   @override
@@ -22,14 +22,17 @@ class Wrapper extends StatefulWidget {
 class _WrapperState extends State<Wrapper> {
   @override
   Widget build(BuildContext context) {
-    FirebaseAuth.instance.authStateChanges().listen((user) {
-      user!=null?redirigirUsuario(user.email!):context.pushNamed(LoginPage.name);
-    },);
-    return const Scaffold(
-      body: SizedBox()
-    );
+   FirebaseAuth.instance.authStateChanges().firstWhere((user) => user != null).then((user) {
+  if (user != null) {
+    redirigirUsuario(user.email!);
+  } else {
+    context.pushNamed(LoginPage.name);
   }
-  
+});
+
+    return const Scaffold(body: SizedBox());
+  }
+
   Future<void> redirigirUsuario(String email) async {
     bool isConsumer =
         await DatabaseService().getTipoUsuario(email) == "consumidor";
@@ -47,4 +50,3 @@ class _WrapperState extends State<Wrapper> {
     }
   }
 }
-

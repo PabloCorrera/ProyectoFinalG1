@@ -127,8 +127,9 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<bool?> _mostrarDialogo(BuildContext context) async {
+  Future<bool?> _mostrarDialogo(BuildContext context) {
     return showDialog<bool>(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
