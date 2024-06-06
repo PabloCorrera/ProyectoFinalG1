@@ -1009,6 +1009,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
       ),
       inputFormatters: [
         FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
+        LengthLimitingTextInputFormatter(30),
       ],
     );
   }
@@ -1023,6 +1024,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
         ),
         inputFormatters: <TextInputFormatter>[
           FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+          LengthLimitingTextInputFormatter(22),
         ]);
   }
 

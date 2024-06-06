@@ -43,6 +43,7 @@ class _UserRegisterState extends State<UserRegister> {
           InputDecoration(labelText: title, labelStyle: GoogleFonts.rubik()),
       inputFormatters: [
         FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]')),
+        LengthLimitingTextInputFormatter(30),
       ],
     );
   }
