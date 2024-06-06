@@ -67,7 +67,9 @@ class DatabaseService {
           .where('email', isEqualTo: userCochera.email)
           .get();
 
+
       if (query.docs.isEmpty) {
+
         await _usuariosCocheraRef.add(userCochera);
         return true; 
       } else {
@@ -113,7 +115,7 @@ class DatabaseService {
       } else if (queryCochera.docs.isNotEmpty) {
         return 'cochera';
       } else {
-        return null;
+        return null; 
       }
     } catch (e) {
       print('Error al obtener el tipo de usuario: $e');

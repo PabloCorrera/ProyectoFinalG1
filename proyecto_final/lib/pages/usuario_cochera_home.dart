@@ -1113,6 +1113,7 @@ double obtenerRecaudacionCuartaSemana() {
       ),
       inputFormatters: [
         FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
+        LengthLimitingTextInputFormatter(30),
       ],
     );
   }
@@ -1127,6 +1128,7 @@ double obtenerRecaudacionCuartaSemana() {
         ),
         inputFormatters: <TextInputFormatter>[
           FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+          LengthLimitingTextInputFormatter(22),
         ]);
   }
 

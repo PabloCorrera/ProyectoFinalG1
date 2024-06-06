@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -125,8 +127,9 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<bool?> _mostrarDialogo(BuildContext context) async {
+  Future<bool?> _mostrarDialogo(BuildContext context) {
     return showDialog<bool>(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -197,16 +200,16 @@ class _LoginPageState extends State<LoginPage> {
             textStyle: Theme.of(context).textTheme.titleLarge));
   }
 
-  Widget _entryField(
-    String title,
-    TextEditingController controller,
-  ) {
+  Widget _entryField(String title, TextEditingController controller) {
     return TextField(
       controller: controller,
       obscureText: title == "Contraseña" ? true : false,
       decoration: InputDecoration(
         labelText: title,
       ),
+      inputFormatters: [
+        LengthLimitingTextInputFormatter(50),
+      ],
     );
   }
 
@@ -214,17 +217,59 @@ class _LoginPageState extends State<LoginPage> {
     return Text(errorMessage == '' ? '' : 'Humm ? $errorMessage');
   }
 
- Widget _submitButton() {
-  return Container(
-    width: double.infinity,
-    height: 45,
-    decoration: BoxDecoration(
-      color: Theme.of(context).indicatorColor,
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: TextButton(
-      onPressed: () async {
-        // Mostrar el diálogo con el indicador de carga
+  Widget _submitButton() {
+    return Container(
+      width: double.infinity,
+      height: 45,
+      decoration: BoxDecoration(
+        color: Theme.of(context).indicatorColor,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: TextButton(
+        onPressed: () async {
+          // Mostrar el diálogo con el indicador de carga
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) {
+              return Center(child: CircularProgressIndicator());
+            },
+          );
+
+          try {
+            if (isLogin) {
+              await signInWithEmailAndPassword();
+            } else {
+              await createUserWithEmailAndPassword();
+            }
+          } catch (e) {
+            // Maneja el error si es necesario
+          } finally {
+            // Cerrar el diálogo después de completar la operación
+            Navigator.pop(context);
+          }
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              isLogin ? 'Login' : 'Register',
+              selectionColor: Theme.of(context).primaryColor,
+            ),
+            const SizedBox(width: 5),
+            const Icon(
+              FontAwesomeIcons.car,
+              color: Colors.white,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _loginOrRegisterButton() {
+    return TextButton(
+      onPressed: () {
         showDialog(
           context: context,
           barrierDismissible: false,
@@ -233,59 +278,15 @@ class _LoginPageState extends State<LoginPage> {
           },
         );
 
-        try {
-          if (isLogin) {
-            await signInWithEmailAndPassword();
-          } else {
-            await createUserWithEmailAndPassword();
-          }
-        } catch (e) {
-          // Maneja el error si es necesario
-        } finally {
-          // Cerrar el diálogo después de completar la operación
-          Navigator.pop(context);
-        }
+        setState(() {
+          isLogin = !isLogin;
+        });
+
+        Navigator.pop(context);
       },
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            isLogin ? 'Login' : 'Register',
-            selectionColor: Theme.of(context).primaryColor,
-          ),
-          const SizedBox(width: 5),
-          const Icon(
-            FontAwesomeIcons.car,
-            color: Colors.white,
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-
-  Widget _loginOrRegisterButton() {
-  return TextButton(
-    onPressed: () {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return Center(child: CircularProgressIndicator());
-        },
-      );
-
-      setState(() {
-        isLogin = !isLogin;
-      });
-
-      Navigator.pop(context);
-    },
-    child: Text(isLogin ? 'Registrate en wePark' : 'Iniciar sesión'),
-  );
-}
-
+      child: Text(isLogin ? 'Registrate en wePark' : 'Iniciar sesión'),
+    );
+  }
 
   Widget _signInWithGoogle() {
     if (isLogin) {

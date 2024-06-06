@@ -431,6 +431,7 @@ class _UsuarioHomeState extends State<UsuarioHome> {
       ),
       inputFormatters: [
         FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
+        LengthLimitingTextInputFormatter(30),
       ],
     );
   }
@@ -899,9 +900,9 @@ class _UsuarioHomeState extends State<UsuarioHome> {
               String apellido = apellidoController.text;
 
               String urlImagen = "";
-               if(consumidor!.imageUrl!=null&&consumidor!.imageUrl!=""){
-                    urlImagen = consumidor!.imageUrl!;
-                  }
+              if (consumidor!.imageUrl != null && consumidor!.imageUrl != "") {
+                urlImagen = consumidor!.imageUrl!;
+              }
               if (fileImagen != null) {
                 String uniqueName =
                     DateTime.now().millisecondsSinceEpoch.toString();
@@ -916,13 +917,12 @@ class _UsuarioHomeState extends State<UsuarioHome> {
                       .then((value) => urlImagen = value);
                 } catch (error) {
                   print(error);
-                  if(consumidor!.imageUrl!=null&&consumidor!.imageUrl!=""){
+                  if (consumidor!.imageUrl != null &&
+                      consumidor!.imageUrl != "") {
                     urlImagen = consumidor!.imageUrl!;
-                  }
-                  else {
+                  } else {
                     urlImagen = "";
                   }
-                  
                 }
               }
 

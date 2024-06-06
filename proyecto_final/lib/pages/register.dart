@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 
 class RegisterPage extends StatelessWidget {
@@ -51,6 +52,10 @@ class Register extends StatelessWidget {
                 ),
               ),
             ),
+        inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
+        LengthLimitingTextInputFormatter(30),
+      ],
           ),
         ),
         const SizedBox(height: 16),
@@ -67,6 +72,10 @@ class Register extends StatelessWidget {
                 ),
               ),
             ),
+             inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
+            LengthLimitingTextInputFormatter(30),
+      ],
           ),
         ),
         Padding(
