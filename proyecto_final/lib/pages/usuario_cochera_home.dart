@@ -1,5 +1,4 @@
-//import 'dart:html';
-//import 'dart:io';
+
 
 import 'dart:io';
 
@@ -42,16 +41,20 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   late List<Reserva> _reservasExpiradas = [];
   late List<UsuarioConsumidor?> _usuariosDeReservasActivas = [];
   late List<UsuarioConsumidor?> _usuariosDeReservasExpiradas = [];
+
   late List<UsuarioConsumidor?> _usuariosDeReserva = [];
   OpcionesRecaudacion opcionSeleccionada = OpcionesRecaudacion.total;
+
   String titulo = 'Total Recaudado:';
   int botonActivoIndex = 0;
   String tituloReservas = "Reservas activas :";
+
   List<String> titulosReservas = [
     "Reservas activas :",
     "Reservas expiradas :",
     "Reservas totales :"
   ];
+
   int cantidadReservas = 0;
   late List<UsuarioConsumidor?> _usuariosDeReservaAnteriores = [];
   late double _recaudacionTotal = 0;
@@ -88,6 +91,8 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
           .then((_) => _loadReservasExpiradas())
           .then((_) => _loadUsuariosReservasActivas())
           .then((_) => _loadUsuariosDeReservasExpiradas());
+
+          
     } catch (e) {
       print(e);
     }
@@ -784,11 +789,20 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   Widget VistaEstadisticas() {
     String titulo = "Mis estadísticas";
     int reservasUltimos30Dias = obtenerCantidadReservasUltimos30Dias();
-
+    int cantidadReservasPrimerSemana = 5;
+    int cantidadReservas2daSemana = 7;
+    int cantidadReservas3eraSemana = 4;
+    int cantidadReservas4taSemana = 2;
+    double recaudacion1erSemana = 5000;
+    double recaudacion2daSemana = 8000;
+    double recaudacion3eraSemana = 2000;
+    double recaudacion4taSemana = 9000;
+    List<int> arrayCantidades = [cantidadReservasPrimerSemana,cantidadReservas2daSemana,cantidadReservas3eraSemana,cantidadReservas4taSemana];
+    List<double> arrayRecaudaciones = [recaudacion1erSemana,recaudacion2daSemana,recaudacion3eraSemana,recaudacion4taSemana];
     int reservasTotales = _reservasFuture.length;
     double recaudacionUltimos30Dias = obtenerRecaudacionUltimos30Dias();
     int reservasUlt30 = obtenerCantidadReservasUltimos30Dias();
-    double recaudacionTotal = _recaudacionTotal;
+    double recaudacionTotal = obtenerRecaudacionTotal();
 
     return Scaffold(
       body: Padding(
@@ -838,8 +852,10 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: LineChartWidget(
+              child: BarChartWidget(
                 ultimos30: reservasUlt30,
+                arrayCantidades : arrayCantidades,
+                arrayRecaudaciones: arrayRecaudaciones,
               ),
             ),
           ],
@@ -851,18 +867,106 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   double obtenerRecaudacionUltimos30Dias() {
     DateTime fechaHoy = DateTime.now();
     DateTime hace30Dias = fechaHoy.subtract(const Duration(days: 30));
-    return _reservasExpiradas
-        .where((reserva) => reserva.fechaSalida.toDate().isAfter(hace30Dias))
+    return _reservasFuture
+        .where((reserva) => reserva.fechaCreacion.toDate().isAfter(hace30Dias))
         .fold(0.0, (sum, reserva) => sum + reserva.precioTotal);
   }
+
+  double obtenerRecaudacionTotal() {
+  return _reservasFuture.fold(0.0, (sum, reserva) => sum + reserva.precioTotal);
+}
 
   int obtenerCantidadReservasUltimos30Dias() {
     DateTime fechaHoy = DateTime.now();
     DateTime hace30Dias = fechaHoy.subtract(const Duration(days: 30));
     return _reservasFuture
-        .where((reserva) => reserva.fechaSalida.toDate().isAfter(hace30Dias))
+        .where((reserva) => reserva.fechaEntrada.toDate().isAfter(hace30Dias))
         .length;
   }
+
+  int obtenerCantidadReservasPrimerSemana() {
+  DateTime fechaHoy = DateTime.now();
+  DateTime hace30Dias = fechaHoy.subtract(const Duration(days: 30));
+  DateTime hace23Dias = fechaHoy.subtract(const Duration(days: 23));
+  
+  return _reservasFuture
+      .where((reserva) => reserva.fechaEntrada.toDate().isAfter(hace30Dias) && reserva.fechaEntrada.toDate().isBefore(hace23Dias))
+      .length;
+}
+
+double obtenerRecaudacionPrimerSemana() {
+  DateTime fechaHoy = DateTime.now();
+  DateTime hace30Dias = fechaHoy.subtract(const Duration(days: 30));
+  DateTime hace23Dias = fechaHoy.subtract(const Duration(days: 23));
+  
+  return _reservasFuture
+      .where((reserva) => reserva.fechaEntrada.toDate().isAfter(hace30Dias) && reserva.fechaEntrada.toDate().isBefore(hace23Dias))
+      .fold(0.0, (sum, reserva) => sum + reserva.precioTotal);
+}
+
+int obtenerCantidadReservasSegundaSemana() {
+  DateTime fechaHoy = DateTime.now();
+  DateTime hace22Dias = fechaHoy.subtract(const Duration(days: 22));
+  DateTime hace16Dias = fechaHoy.subtract(const Duration(days: 16));
+
+  return _reservasFuture
+      .where((reserva) => reserva.fechaEntrada.toDate().isAfter(hace22Dias) && reserva.fechaEntrada.toDate().isBefore(hace16Dias))
+      .length;
+}
+
+double obtenerRecaudacionSegundaSemana() {
+  DateTime fechaHoy = DateTime.now();
+  DateTime hace22Dias = fechaHoy.subtract(const Duration(days: 22));
+  DateTime hace16Dias = fechaHoy.subtract(const Duration(days: 16));
+
+  return _reservasFuture
+      .where((reserva) => reserva.fechaEntrada.toDate().isAfter(hace22Dias) && reserva.fechaEntrada.toDate().isBefore(hace16Dias))
+      .fold(0.0, (sum, reserva) => sum + reserva.precioTotal);
+}
+
+
+int obtenerCantidadReservasTercerSemana() {
+  DateTime fechaHoy = DateTime.now();
+  DateTime hace15Dias = fechaHoy.subtract(const Duration(days: 15));
+  DateTime hace9Dias = fechaHoy.subtract(const Duration(days: 9));
+
+  return _reservasFuture
+      .where((reserva) => reserva.fechaEntrada.toDate().isAfter(hace15Dias) && reserva.fechaEntrada.toDate().isBefore(hace9Dias))
+      .length;
+}
+
+double obtenerRecaudacionTercerSemana() {
+  DateTime fechaHoy = DateTime.now();
+  DateTime hace15Dias = fechaHoy.subtract(const Duration(days: 15));
+  DateTime hace9Dias = fechaHoy.subtract(const Duration(days: 9));
+
+  return _reservasFuture
+      .where((reserva) => reserva.fechaEntrada.toDate().isAfter(hace15Dias) && reserva.fechaEntrada.toDate().isBefore(hace9Dias))
+      .fold(0.0, (sum, reserva) => sum + reserva.precioTotal);
+}
+
+
+int obtenerCantidadReservasCuartaSemana() {
+  DateTime fechaHoy = DateTime.now();
+  DateTime hace8Dias = fechaHoy.subtract(const Duration(days: 8));
+  DateTime hace1Dia = fechaHoy.subtract(const Duration(days: 1));
+
+  return _reservasFuture
+      .where((reserva) => reserva.fechaEntrada.toDate().isAfter(hace8Dias) && reserva.fechaEntrada.toDate().isBefore(hace1Dia))
+      .length;
+}
+
+double obtenerRecaudacionCuartaSemana() {
+  DateTime fechaHoy = DateTime.now();
+  DateTime hace8Dias = fechaHoy.subtract(const Duration(days: 8));
+  DateTime hace1Dia = fechaHoy.subtract(const Duration(days: 1));
+
+  return _reservasFuture
+      .where((reserva) => reserva.fechaEntrada.toDate().isAfter(hace8Dias) && reserva.fechaEntrada.toDate().isBefore(hace1Dia))
+      .fold(0.0, (sum, reserva) => sum + reserva.precioTotal);
+}
+
+
 
   bool isNotBlank(String value) {
     return value.trim().isNotEmpty;
