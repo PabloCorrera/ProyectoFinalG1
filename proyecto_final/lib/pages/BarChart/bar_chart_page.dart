@@ -6,7 +6,7 @@ class BarChartPage extends StatelessWidget {
 
   BarChartPage({
     Key? key,
-    required this.ultimos30,
+    required this.ultimos28,
     List<int>? arrayCantidades,
     List<double>? arrayRecaudaciones,
   }) : super(key: key) {
@@ -19,7 +19,7 @@ class BarChartPage extends StatelessWidget {
     Color.fromARGB(255, 98, 189, 203),
   ];
 
-  final int ultimos30;
+  final int ultimos28;
   late final List<int> arrayCantidades;
   late final List<double> arrayRecaudaciones;
 
@@ -35,7 +35,7 @@ class BarChartPage extends StatelessWidget {
           padding: const EdgeInsets.only(top: 16),
           child: BarChartWidget(
 
-                ultimos30: ultimos30,
+                ultimos28: ultimos28,
                 arrayCantidades : arrayCantidades,
                 arrayRecaudaciones: arrayRecaudaciones,
           ),
