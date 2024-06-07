@@ -908,63 +908,60 @@ double obtenerRecaudacionPrimerSemana() {
 
 int obtenerCantidadReservasSegundaSemana() {
   DateTime fechaHoy = DateTime.now();
-  DateTime hace20Dias = fechaHoy.subtract(const Duration(days: 20));
+  DateTime hace21Dias = fechaHoy.subtract(const Duration(days: 21));
   DateTime hace14Dias = fechaHoy.subtract(const Duration(days: 14));
 
   return _reservasFuture
-      .where((reserva) => reserva.fechaCreacion.toDate().isAfter(hace20Dias) && reserva.fechaCreacion.toDate().isBefore(hace14Dias))
+      .where((reserva) => reserva.fechaCreacion.toDate().isAfter(hace21Dias) && reserva.fechaCreacion.toDate().isBefore(hace14Dias))
       .length;
 }
 
 double obtenerRecaudacionSegundaSemana() {
   DateTime fechaHoy = DateTime.now();
-  DateTime hace20Dias = fechaHoy.subtract(const Duration(days: 20));
+  DateTime hace21Dias = fechaHoy.subtract(const Duration(days: 21));
   DateTime hace14Dias = fechaHoy.subtract(const Duration(days: 14));
 
   return _reservasFuture
-      .where((reserva) => reserva.fechaCreacion.toDate().isAfter(hace20Dias) && reserva.fechaCreacion.toDate().isBefore(hace14Dias))
+      .where((reserva) => reserva.fechaCreacion.toDate().isAfter(hace21Dias) && reserva.fechaCreacion.toDate().isBefore(hace14Dias))
       .fold(0.0, (sum, reserva) => sum + reserva.precioTotal);
 }
 
 
 int obtenerCantidadReservasTercerSemana() {
   DateTime fechaHoy = DateTime.now();
-  DateTime hace13Dias = fechaHoy.subtract(const Duration(days: 13));
+  DateTime hace14Dias = fechaHoy.subtract(const Duration(days: 14));
   DateTime hace7Dias = fechaHoy.subtract(const Duration(days: 7));
 
   return _reservasFuture
-      .where((reserva) => reserva.fechaCreacion.toDate().isAfter(hace13Dias) && reserva.fechaCreacion.toDate().isBefore(hace7Dias))
+      .where((reserva) => reserva.fechaCreacion.toDate().isAfter(hace14Dias) && reserva.fechaCreacion.toDate().isBefore(hace7Dias))
       .length;
 }
 
 double obtenerRecaudacionTercerSemana() {
   DateTime fechaHoy = DateTime.now();
-  DateTime hace13Dias = fechaHoy.subtract(const Duration(days: 13));
+  DateTime hace14Dias = fechaHoy.subtract(const Duration(days: 14));
   DateTime hace7Dias = fechaHoy.subtract(const Duration(days: 7));
 
   return _reservasFuture
-      .where((reserva) => reserva.fechaCreacion.toDate().isAfter(hace13Dias) && reserva.fechaCreacion.toDate().isBefore(hace7Dias))
+      .where((reserva) => reserva.fechaCreacion.toDate().isAfter(hace14Dias) && reserva.fechaCreacion.toDate().isBefore(hace7Dias))
       .fold(0.0, (sum, reserva) => sum + reserva.precioTotal);
 }
 
 
 int obtenerCantidadReservasCuartaSemana() {
   DateTime fechaHoy = DateTime.now();
-  DateTime hace6Dias = fechaHoy.subtract(const Duration(days: 6));
-  DateTime hace0Dias = fechaHoy.subtract(const Duration(days: 0));
-
+  DateTime hace7Dias = fechaHoy.subtract(const Duration(days: 7));
   return _reservasFuture
-      .where((reserva) => reserva.fechaCreacion.toDate().isAfter(hace6Dias) && reserva.fechaCreacion.toDate().isBefore(hace0Dias))
+      .where((reserva) => reserva.fechaCreacion.toDate().isAfter(hace7Dias))
       .length;
 }
 
 double obtenerRecaudacionCuartaSemana() {
   DateTime fechaHoy = DateTime.now();
-  DateTime hace6Dias = fechaHoy.subtract(const Duration(days: 6));
-  DateTime hace0Dias = fechaHoy.subtract(const Duration(days: 0));
+  DateTime hace7Dias = fechaHoy.subtract(const Duration(days: 7));
 
   return _reservasFuture
-      .where((reserva) => reserva.fechaCreacion.toDate().isAfter(hace6Dias) && reserva.fechaCreacion.toDate().isBefore(hace0Dias))
+      .where((reserva) => reserva.fechaCreacion.toDate().isAfter(hace7Dias))
       .fold(0.0, (sum, reserva) => sum + reserva.precioTotal);
 }
 
