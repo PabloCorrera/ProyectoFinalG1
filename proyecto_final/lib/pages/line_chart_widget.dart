@@ -46,28 +46,34 @@ class BarChartWidget extends StatelessWidget {
               backgroundColor: const Color(0xffE0E0E0),
               minY: 0,
               maxY: maxYValue,
-              barGroups: List.generate(
-                arrayCantidades.length,
-                (index) => BarChartGroupData(
-                  x: index * 2 + 1,
-                  barRods: [
-                    BarChartRodData(
-                      y: arrayCantidades[index].toDouble(),
-                      colors: gradientColors,
-                      width: 60, // Ancho de las barras aumentado
-                      borderRadius: BorderRadius.circular(4),
-                      backDrawRodData: BackgroundBarChartRodData(
-                        show: true,
-                        y: maxYValue,
-                        colors: [const Color(0xffE0E0E0)],
+              barGroups: arrayCantidades.isNotEmpty
+                  ? List.generate(
+                      arrayCantidades.length,
+                      (index) => BarChartGroupData(
+                        x: index * 2 + 1,
+                        barRods: [
+                          BarChartRodData(
+                            y: arrayCantidades[index].toDouble(),
+                            colors: gradientColors,
+                            width: 60, // Ancho de las barras aumentado
+                            borderRadius: BorderRadius.circular(4),
+                            backDrawRodData: BackgroundBarChartRodData(
+                              show: true,
+                              y: maxYValue,
+                              colors: [const Color(0xffE0E0E0)],
+                            ),
+                            rodStackItems: [
+                              BarChartRodStackItem(
+                                0,
+                                arrayCantidades[index].toDouble(),
+                                gradientColors.first,
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                      rodStackItems: [
-                        BarChartRodStackItem(0, arrayCantidades[index].toDouble(), gradientColors.first),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+                    )
+                  : [],
               titlesData: FlTitlesData(
                 bottomTitles: SideTitles(
                   showTitles: true,

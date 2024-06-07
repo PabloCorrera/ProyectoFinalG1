@@ -17,6 +17,7 @@ import 'package:proyecto_final/entities/reserva.dart';
 import 'package:proyecto_final/entities/usuario_cochera.dart';
 import 'package:proyecto_final/entities/usuario_consumidor.dart';
 import 'package:proyecto_final/models/constant.dart';
+import 'package:proyecto_final/pages/BarChart/bar_chart_page.dart';
 import 'package:proyecto_final/pages/line_chart_widget.dart';
 import 'package:proyecto_final/pages/login_register_page.dart';
 import 'package:proyecto_final/services/database_sevice.dart';
@@ -62,6 +63,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
   late UsuarioCochera? usuarioCochera = UsuarioCochera();
   final String nombreUsuario = "";
   final String apellidoPersona = "";
+  
 
   Widget? aMostrar;
   Widget? reservasAMostrar;
@@ -852,10 +854,12 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: BarChartWidget(
+              child: BarChartPage(
                 ultimos30: reservasUlt30,
                 arrayCantidades : arrayCantidades,
                 arrayRecaudaciones: arrayRecaudaciones,
+
+
               ),
             ),
           ],
