@@ -20,7 +20,7 @@ class BarChartWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (this.ultimos28 == 0) {
-      return Center(
+      return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -54,11 +54,10 @@ class BarChartWidget extends StatelessWidget {
           touchTooltipData: BarTouchTooltipData(
             tooltipBgColor: Colors.blueGrey,
             getTooltipItem: (group, groupIndex, rod, rodIndex) {
-              String additionalValue = '\nRecaudado: \$${arrayRecaudaciones[groupIndex].toString()}';
               return BarTooltipItem(
-                'Reservas: ${rod.y.round()}$additionalValue',
-                TextStyle(
-                  color: const Color.fromARGB(255, 7, 7, 0),
+                'Reservas: ${rod.y.round()}',
+                const TextStyle(
+                  color: Color.fromARGB(255, 7, 7, 0),
                   fontWeight: FontWeight.bold,
                   fontSize: 18, 
                 ),
@@ -69,7 +68,7 @@ class BarChartWidget extends StatelessWidget {
         titlesData: FlTitlesData(
           bottomTitles: SideTitles(
             showTitles: true,
-            getTextStyles: (context, value) => TextStyle(
+            getTextStyles: (context, value) => const TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.bold,
               fontSize: 16,
@@ -78,13 +77,13 @@ class BarChartWidget extends StatelessWidget {
             getTitles: (double value) {
               switch (value.toInt()) {
                 case 0:
-                  return '1er Sem';
+                  return 'S1';
                 case 1:
-                  return '2da Sem';
+                  return 'S2';
                 case 2:
-                  return '3er Sem';
+                  return 'S3';
                 case 3:
-                  return '4ta Sem';
+                  return 'S4';
                 default:
                   return '';
               }
@@ -92,7 +91,7 @@ class BarChartWidget extends StatelessWidget {
           ),
 leftTitles: SideTitles(
             showTitles: true,
-            getTextStyles: (context, value) => TextStyle(
+            getTextStyles: (context, value) => const TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.bold,
               fontSize: 14,

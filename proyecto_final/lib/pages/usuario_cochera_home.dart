@@ -844,7 +844,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
             const SizedBox(height: 24),
             Center(
               child: Text(
-                   'Cantidad e Ingresos semanales. Últimos 28 días :',
+                   'Reservas de las ultimas 4 semanas',
                 style: GoogleFonts.rubik(
                     textStyle: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold)),
@@ -886,7 +886,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
         .length;
   }
 
-  int obtenerCantidadReservasPrimerSemana() {
+  int obtenerCantidadReservasCuartaSemana() {
   DateTime fechaHoy = DateTime.now();
   DateTime hace28Dias = fechaHoy.subtract(const Duration(days: 28));
   DateTime hace21Dias = fechaHoy.subtract(const Duration(days: 21));
@@ -896,7 +896,7 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
       .length;
 }
 
-double obtenerRecaudacionPrimerSemana() {
+double obtenerRecaudacionCuartaSemana() {
   DateTime fechaHoy = DateTime.now();
   DateTime hace28Dias = fechaHoy.subtract(const Duration(days: 28));
   DateTime hace21Dias = fechaHoy.subtract(const Duration(days: 21));
@@ -905,40 +905,40 @@ double obtenerRecaudacionPrimerSemana() {
       .where((reserva) => reserva.fechaCreacion.toDate().isAfter(hace28Dias) && reserva.fechaCreacion.toDate().isBefore(hace21Dias))
       .fold(0.0, (sum, reserva) => sum + reserva.precioTotal);
 }
-
-int obtenerCantidadReservasSegundaSemana() {
-  DateTime fechaHoy = DateTime.now();
-  DateTime hace21Dias = fechaHoy.subtract(const Duration(days: 21));
-  DateTime hace14Dias = fechaHoy.subtract(const Duration(days: 14));
-
-  return _reservasFuture
-      .where((reserva) => reserva.fechaCreacion.toDate().isAfter(hace21Dias) && reserva.fechaCreacion.toDate().isBefore(hace14Dias))
-      .length;
-}
-
-double obtenerRecaudacionSegundaSemana() {
-  DateTime fechaHoy = DateTime.now();
-  DateTime hace21Dias = fechaHoy.subtract(const Duration(days: 21));
-  DateTime hace14Dias = fechaHoy.subtract(const Duration(days: 14));
-
-  return _reservasFuture
-      .where((reserva) => reserva.fechaCreacion.toDate().isAfter(hace21Dias) && reserva.fechaCreacion.toDate().isBefore(hace14Dias))
-      .fold(0.0, (sum, reserva) => sum + reserva.precioTotal);
-}
-
 
 int obtenerCantidadReservasTercerSemana() {
   DateTime fechaHoy = DateTime.now();
+  DateTime hace21Dias = fechaHoy.subtract(const Duration(days: 21));
   DateTime hace14Dias = fechaHoy.subtract(const Duration(days: 14));
-  DateTime hace7Dias = fechaHoy.subtract(const Duration(days: 7));
 
   return _reservasFuture
-      .where((reserva) => reserva.fechaCreacion.toDate().isAfter(hace14Dias) && reserva.fechaCreacion.toDate().isBefore(hace7Dias))
+      .where((reserva) => reserva.fechaCreacion.toDate().isAfter(hace21Dias) && reserva.fechaCreacion.toDate().isBefore(hace14Dias))
       .length;
 }
 
 double obtenerRecaudacionTercerSemana() {
   DateTime fechaHoy = DateTime.now();
+  DateTime hace21Dias = fechaHoy.subtract(const Duration(days: 21));
+  DateTime hace14Dias = fechaHoy.subtract(const Duration(days: 14));
+
+  return _reservasFuture
+      .where((reserva) => reserva.fechaCreacion.toDate().isAfter(hace21Dias) && reserva.fechaCreacion.toDate().isBefore(hace14Dias))
+      .fold(0.0, (sum, reserva) => sum + reserva.precioTotal);
+}
+
+
+int obtenerCantidadReservasSegundaSemana() {
+  DateTime fechaHoy = DateTime.now();
+  DateTime hace14Dias = fechaHoy.subtract(const Duration(days: 14));
+  DateTime hace7Dias = fechaHoy.subtract(const Duration(days: 7));
+
+  return _reservasFuture
+      .where((reserva) => reserva.fechaCreacion.toDate().isAfter(hace14Dias) && reserva.fechaCreacion.toDate().isBefore(hace7Dias))
+      .length;
+}
+
+double obtenerRecaudacionSegundaSemana() {
+  DateTime fechaHoy = DateTime.now();
   DateTime hace14Dias = fechaHoy.subtract(const Duration(days: 14));
   DateTime hace7Dias = fechaHoy.subtract(const Duration(days: 7));
 
@@ -948,7 +948,7 @@ double obtenerRecaudacionTercerSemana() {
 }
 
 
-int obtenerCantidadReservasCuartaSemana() {
+int obtenerCantidadReservasPrimerSemana() {
   DateTime fechaHoy = DateTime.now();
   DateTime hace7Dias = fechaHoy.subtract(const Duration(days: 7));
   return _reservasFuture
@@ -956,7 +956,7 @@ int obtenerCantidadReservasCuartaSemana() {
       .length;
 }
 
-double obtenerRecaudacionCuartaSemana() {
+double obtenerRecaudacionPrimerSemana() {
   DateTime fechaHoy = DateTime.now();
   DateTime hace7Dias = fechaHoy.subtract(const Duration(days: 7));
 

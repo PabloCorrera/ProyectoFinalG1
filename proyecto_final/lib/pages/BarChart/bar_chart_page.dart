@@ -31,7 +31,7 @@ class BarChartPage extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(5),
       ),
-      color: Color.fromARGB(255, 151, 151, 176),
+     // color: Color.fromARGB(255, 151, 151, 176),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
