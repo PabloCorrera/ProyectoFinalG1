@@ -22,15 +22,15 @@ class Wrapper extends StatefulWidget {
 class _WrapperState extends State<Wrapper> {
   @override
   Widget build(BuildContext context) {
-   FirebaseAuth.instance.authStateChanges().firstWhere((user) => user != null).then((user) {
-  if (user != null) {
-    redirigirUsuario(user.email!);
-  } else {
-    context.pushNamed(LoginPage.name);
-  }
-});
+//    FirebaseAuth.instance.authStateChanges().firstWhere((user) => user != null).then((user) {
+//   if (user != null) {
+//     redirigirUsuario(user.email!);
+//   } else {
+//     context.pushNamed(LoginPage.name);
+//   }
+// });
 
-    return const Scaffold(body: SizedBox());
+    return LoginPage();
   }
 
   Future<void> redirigirUsuario(String email) async {
