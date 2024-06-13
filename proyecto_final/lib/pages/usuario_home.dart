@@ -97,14 +97,20 @@ class _UsuarioHomeState extends State<UsuarioHome> {
         padding: EdgeInsets.zero,
         children: [
           UserAccountsDrawerHeader(
-            accountName: Text(
-              'Bienvenido ${consumidor!.nombre}',
-              style: GoogleFonts.rubik(textStyle: secondaryTextStyle),
+            accountName: Padding(
+              padding: const EdgeInsets.only(top: 26.0),
+              child: Text(
+                'Bienvenido ${consumidor!.nombre}',
+                style: GoogleFonts.rubik(textStyle: secondaryTextStyle),
+              ),
             ),
-            accountEmail: user != null
-                ? Text(user!.email!,
-                    style: GoogleFonts.rubik(textStyle: terTextStyle))
-                : null,
+            accountEmail: Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: user != null
+                  ? Text(user!.email!,
+                      style: GoogleFonts.rubik(textStyle: terTextStyle))
+                  : null,
+            ),
             currentAccountPicture: CircleAvatar(
               backgroundImage: consumidor != null &&
                       consumidor?.imageUrl != null &&
