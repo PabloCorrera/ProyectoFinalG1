@@ -649,7 +649,8 @@ class _UsuarioCocheraHomeState extends State<UsuarioCocheraHome> {
                     const SizedBox(height: 20),
                     _entryFieldNumber('Cantidad de lugares', lugaresController),
                     const SizedBox(height: 20),
-                    imagePicker(),
+                    !kIsWeb?
+                    imagePicker():SizedBox(height: 1,),
                     const SizedBox(height: 20),
                     _submitButton(
                         nombreCocheraController,

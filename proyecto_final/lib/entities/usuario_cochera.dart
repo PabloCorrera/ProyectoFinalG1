@@ -149,7 +149,7 @@ double calcularPrecioTotal(DateTime dateTimeEntrada, DateTime dateTimeSalida) {
       cargoAdicional = precioPorHora / 4 * ((minutosAdicionales - 1) ~/ 15 + 1);
     }
     double precioTotal = precioPorHora * horas + cargoAdicional;
-    return precioTotal;
+   return double.parse(precioTotal.toStringAsFixed(2));
   }
 }
 
