@@ -67,18 +67,16 @@ class DatabaseService {
           .where('email', isEqualTo: userCochera.email)
           .get();
 
-
       if (query.docs.isEmpty) {
-
         await _usuariosCocheraRef.add(userCochera);
-        return true; 
+        return true;
       } else {
         print('El correo electrónico ya existe en la base de datos');
-        return false; 
+        return false;
       }
     } catch (e) {
       print('Error al agregar el usuario: $e');
-      return false; 
+      return false;
     }
   }
 
@@ -115,7 +113,7 @@ class DatabaseService {
       } else if (queryCochera.docs.isNotEmpty) {
         return 'cochera';
       } else {
-        return null; 
+        return null;
       }
     } catch (e) {
       print('Error al obtener el tipo de usuario: $e');
@@ -133,7 +131,7 @@ class DatabaseService {
       return queryConsumidor.docs.isNotEmpty || queryDuenio.docs.isNotEmpty;
     } catch (e) {
       print('Error al validar el usuario: $e');
-      return false; 
+      return false;
     }
   }
 
